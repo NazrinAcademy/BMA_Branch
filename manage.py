@@ -6,7 +6,11 @@ import sys
 
 def main():
     """Run administrative tasks."""
+<<<<<<< HEAD
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'company_management.settings')
+=======
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'BMA.settings')
+>>>>>>> origin/Backend_Mathavan
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
