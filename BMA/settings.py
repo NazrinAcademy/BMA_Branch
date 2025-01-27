@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'jedl!3wtww8bj*-x7hhciw_z@&m@(6#*s1%p@a-*(xu(y=oq09'
+SECRET_KEY = 'bx-e&+&v+3d#_f@=(2h%c(zq$8=cx6_y-9+vf&+-gu2#$%woc1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'Myapp'
+    'Myapp',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +55,7 @@ ROOT_URLCONF = 'BMA.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['Templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -78,7 +78,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'BMA',
-        'ENFORCE_SCHEMA': False
+        'ENFORCE_SCHEMA': False, 
+        'CLIENT': {
+            'host': 'mongodb://localhost:27017',
+        }
     }
 }
 
