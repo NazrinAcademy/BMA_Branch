@@ -372,6 +372,7 @@ class Companies(models.Model):
 
     def __str__(self):
        return f"{self.gst_number or 'Company'} - {self.default_email or 'No Email'}"
+    
 
 
 

@@ -1184,7 +1184,11 @@ class PaymentView(APIView):
 
 
 
-
+# class BranchView(APIView):
+#     def post(self, request, *args, **kwargs):
+#         required_fields = ['company', 'branch_name', 'default_currency', 'timezone']
+#         missing_fields = [field for field in required_fields if field not in request.data]
+#         if missing_fields:
 
 
 
