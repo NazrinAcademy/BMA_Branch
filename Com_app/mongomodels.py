@@ -257,3 +257,9 @@ class PurchaseVoucher(Document):
 
     def calculate_total_amount(self):
         return self.amount
+    
+
+# class PurchaseVoucher(Document):
+#     purchase_id = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     supplier_invoice_no = fields.StringField(max_length=255, unique=True)  
+#     date = fields.DateField()  
