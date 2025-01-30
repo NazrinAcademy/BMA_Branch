@@ -14,8 +14,8 @@ from datetime import datetime
 from datetime import timedelta
 import random
 from Com_app.mongomodels import UserData ,EmailOTP
-from Com_app.mongomodels import Company,SalesParty,PurchaseLedger,AccountingVoucher,PurchaseParty,SalesLedger,PurchaseVoucher
-from Com_app.serializers import CompanySerializer,SalesPartySerializer,PurchaseLedgerSerializer,AccountingVoucherSerializer,PurchasePartySerializer,SalesLedgerSerializer,PurchaseVoucherSerializer
+from Com_app.mongomodels import Company,SalesParty,PurchaseLedger,AccountingVoucher,PurchaseParty,SalesLedger,PurchaseVoucher,Payment
+from Com_app.serializers import CompanySerializer,SalesPartySerializer,PurchaseLedgerSerializer,AccountingVoucherSerializer,PurchasePartySerializer,SalesLedgerSerializer,PurchaseVoucherSerializer,PaymentSerializer
 from django.conf import settings
 
 class RegisterUser(APIView):
@@ -503,7 +503,6 @@ class SalesPartyManagementView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-
 class AccountingVoucherCreateView(APIView):
     def post(self, request, *args, **kwargs):
         required_fields = [
@@ -516,75 +515,107 @@ class AccountingVoucherCreateView(APIView):
             "rate",
             "per",
             "amount",
-            "narration"
+            "narration",
+            "total_products_sold",
+            "remaining_stock",
         ]
 
-        # Check for missing or empty fields
         missing_fields = [
             field for field in required_fields
-            if field not in request.data or not request.data.get(field)
+            if field not in request.data or request.data.get(field) in [None, ""]
         ]
 
         if missing_fields:
             return Response(
-                {
-                    "error": f"The following fields are missing or empty: {', '.join(missing_fields)}"
-                },
+                {"error": f"The following fields are missing or empty: {', '.join(missing_fields)}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Use the serializer to validate and save data
-        serializer = AccountingVoucherSerializer(data=request.data)
+        try:
+            # Extract the data from the request
+            data = {
+                "date": request.data.get("date"),
+                "reference_no": request.data.get("reference_no"),
+                "party_account_name": request.data.get("party_account_name"),
+                "current_balance": request.data.get("current_balance"),
+                "sales_ledger": request.data.get("sales_ledger"),
+                "quantity": request.data.get("quantity"),
+                "rate": request.data.get("rate"),
+                "per": request.data.get("per"),
+                "amount": request.data.get("amount"),
+                "narration": request.data.get("narration", ""),
+                "total_products_sold": request.data.get("total_products_sold"),
+                "remaining_stock": request.data.get("remaining_stock"),
+            }
+            accounting_voucher = AccountingVoucher(**data)
+            accounting_voucher.save()
+            total_products_sold = request.data.get("total_products_sold", 0)
+            remaining_stock = request.data.get("remaining_stock", 0)
 
-        if serializer.is_valid():
-            try:
-                # Save the document in MongoDB
-                serializer.save()
-                return Response(
-                    {
-                        "message": "Accounting voucher successfully created.",
-                        "data": serializer.data
-                    },
-                    status=status.HTTP_201_CREATED,
-                )
-            except Exception as e:
-                return Response(
-                    {"error": f"An unexpected error occurred: {str(e)}"},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                )
-        else:
             return Response(
-                {"error": serializer.errors},
+                {
+                    "message": "Accounting Voucher successfully created.",
+                    "data": data,
+                    "total_products_sold": total_products_sold,
+                    "remaining_stock": remaining_stock,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+
+        except ValidationError as e:
+            return Response(
+                {"error": f"Validation error: {str(e)}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+        except Exception as e:
+            return Response(
+                {"error": f"An unexpected error occurred: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
+
+from django.db.models import Sum      
+from mongoengine.queryset.visitor import Q
 class AccountingVoucherManagementView(APIView):
+
     def get(self, request, pk=None, *args, **kwargs):
         try:
+            # Extract initial stock from the request payload
+            initial_stock = request.data.get("initial_stock", 1000)
+
+            # Get total quantity sold across all vouchers
+            total_products_sold = AccountingVoucher.objects.aggregate(total_sold=Sum('quantity'))['total_sold'] or 0
+
+            # Calculate remaining stock dynamically
+            remaining_stock = initial_stock - total_products_sold
+
             if pk:
+                # Fetch a single accounting voucher by pk
                 accounting_voucher = AccountingVoucher.objects.get(id=pk)
                 serializer = AccountingVoucherSerializer(accounting_voucher)
                 return Response(
-                    {"data": serializer.data},
+                    {
+                        "data": serializer.data,
+                        "total_products_sold": total_products_sold,
+                        "remaining_stock": remaining_stock,
+                    },
                     status=status.HTTP_200_OK
                 )
             else:
                 accounting_vouchers = AccountingVoucher.objects.all()
                 serializer = AccountingVoucherSerializer(accounting_vouchers, many=True)
                 return Response(
-                    {"data": serializer.data},
+                    {
+                        "data": serializer.data,
+                        "total_products_sold": total_products_sold,
+                        "remaining_stock": remaining_stock,
+                    },
                     status=status.HTTP_200_OK
                 )
         except DoesNotExist:
             return Response(
                 {"error": f"AccountingVoucher with ID {pk} does not exist."},
                 status=status.HTTP_404_NOT_FOUND
-            )
-        except ValidationError as e:
-            return Response(
-                {"error": f"Invalid ID format: {str(e)}"},
-                status=status.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
             return Response(
@@ -596,6 +627,7 @@ class AccountingVoucherManagementView(APIView):
         try:
             accounting_voucher = AccountingVoucher.objects.get(id=pk)
             serializer = AccountingVoucherSerializer(accounting_voucher, data=request.data, partial=False)
+            
             if serializer.is_valid():
                 serializer.save()
                 return Response(
@@ -611,11 +643,6 @@ class AccountingVoucherManagementView(APIView):
             return Response(
                 {"error": f"AccountingVoucher with ID {pk} does not exist."},
                 status=status.HTTP_404_NOT_FOUND
-            )
-        except ValidationError as e:
-            return Response(
-                {"error": f"Invalid ID format: {str(e)}"},
-                status=status.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
             return Response(
@@ -636,16 +663,12 @@ class AccountingVoucherManagementView(APIView):
                 {"error": f"AccountingVoucher with ID {pk} does not exist."},
                 status=status.HTTP_404_NOT_FOUND
             )
-        except ValidationError as e:
-            return Response(
-                {"error": f"Invalid ID format: {str(e)}"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
         except Exception as e:
             return Response(
                 {"error": f"An error occurred: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
 
 # class PurchasePartyViewSet(APIView):
 #     def post(self, request, *args, **kwargs):
@@ -1209,7 +1232,6 @@ class PurchaseVoucherView(APIView):
             )
 
     def delete(self, request, *args, **kwargs):
-        # Try to get the document and delete it
         try:
             purchase_voucher = PurchaseVoucher.objects.get(purchase_id=kwargs['purchase_id'])
             purchase_voucher.delete()
@@ -1220,5 +1242,199 @@ class PurchaseVoucherView(APIView):
         except PurchaseVoucher.DoesNotExist:
             return Response(
                 {"error": "Purchase Voucher not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        
+class PaymentcreateView(APIView):
+    def post(self, request, *args, **kwargs):
+      
+        required_fields = [
+            "date", "account", "cur_balance", "particulars", "amount", "payment_method"
+        ]
+        
+        missing_fields = [
+            field for field in required_fields if field not in request.data or not request.data.get(field)
+        ]
+
+        if missing_fields:
+            return Response(
+                {
+                    "error": f"The following fields are missing or empty: {', '.join(missing_fields)}"
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        payment_method = request.data.get("payment_method")  
+        payment_method_details = {}
+
+        if payment_method == "Cash":
+            payment_method_details = {
+                "method": "Cash",
+                "details": "Payment made in cash."
+            }
+        elif payment_method == "Credit Card":
+            payment_method_details = {
+                "method": "Credit Card",
+                "details": "Payment made using a credit card. Please check the card details."
+            }
+        elif payment_method == "Bank Transfer":
+            payment_method_details = {
+                "method": "Bank Transfer",
+                "details": "Payment made via bank transfer. Please verify the transaction reference."
+            }
+        else:
+            payment_method_details = {
+                "method": payment_method,
+                "details": "Custom payment method provided."
+            }
+
+        serializer = PaymentSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            try:
+                payment = serializer.save()
+
+                return Response(
+                    {
+                        "message": "Payment successfully created.",
+                        "data": serializer.data,
+                        "payment_method_details": payment_method_details
+                    },
+                    status=status.HTTP_201_CREATED,
+                )
+            except Exception as e:
+                return Response(
+                    {"error": f"An unexpected error occurred: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+        else:
+            return Response(
+                {"error": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+
+
+class PaymentView(APIView):
+
+    def get_payment_method_details(self, payment_method):
+        if payment_method == "Cash":
+            return {
+                "method": "Cash",
+                "details": "Payment made in cash."
+            }
+        elif payment_method == "Credit Card":
+            return {
+                "method": "Credit Card",
+                "details": "Payment made using a credit card."
+            }
+        elif payment_method == "Bank Transfer":
+            return {
+                "method": "Bank Transfer",
+                "details": "Payment made via bank transfer."
+            }
+        else:
+            return {
+                "method": payment_method,
+                "details": "Custom payment method provided."
+            }
+
+    def get(self, request, *args, **kwargs):
+        if 'payment_number' in kwargs:
+            try:
+                payment = Payment.objects.get(payment_number=kwargs['payment_number'])
+                serializer = PaymentSerializer(payment)
+
+                payment_method_details = self.get_payment_method_details(payment.account)
+
+                return Response(
+                    {
+                        "message": "Payment retrieved successfully",
+                        "data": {
+                            **serializer.data,
+                            "payment_method_details": payment_method_details
+                        }
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            except Payment.DoesNotExist:
+                return Response(
+                    {"error": "Payment not found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        else:
+            payments = Payment.objects.all()
+            serializer = PaymentSerializer(payments, many=True)
+
+            payments_data = []
+            for payment, serialized_payment in zip(payments, serializer.data):
+                payment_method_details = self.get_payment_method_details(payment.account)
+                payment_data = {
+                    **serialized_payment,
+                    "payment_method_details": payment_method_details
+                }
+                payments_data.append(payment_data)
+
+            return Response(
+                {
+                    "message": "Payments retrieved successfully",
+                    "data": payments_data
+                },
+                status=status.HTTP_200_OK,
+            )
+
+    def put(self, request, *args, **kwargs):
+        try:
+            payment = Payment.objects.get(payment_number=kwargs['payment_number'])
+        except Payment.DoesNotExist:
+            return Response(
+                {"error": "Payment not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = PaymentSerializer(payment, data=request.data, partial=False)
+        if serializer.is_valid():
+            try:
+                updated_payment = serializer.save()
+
+                payment_method_details = self.get_payment_method_details(updated_payment.account)
+
+                return Response(
+                    {
+                        "message": "Payment successfully updated.",
+                        "data": {
+                            **serializer.data,
+                            "payment_method_details": payment_method_details
+                        }
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            except Exception as e:
+                return Response(
+                    {"error": f"An unexpected error occurred: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+        else:
+            return Response(
+                {"error": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            payment = Payment.objects.get(payment_number=kwargs['payment_number'])
+            payment_method_details = self.get_payment_method_details(payment.account)
+            payment.delete()
+
+            return Response(
+                {
+                    "message": "Payment successfully deleted.",
+                    "payment_method_details": payment_method_details
+                },
+                status=status.HTTP_204_NO_CONTENT,
+            )
+        except Payment.DoesNotExist:
+            return Response(
+                {"error": "Payment not found."},
                 status=status.HTTP_404_NOT_FOUND,
             )

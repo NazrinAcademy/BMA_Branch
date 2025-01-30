@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from mongoengine import UUIDField,IntField,ValidationError,NotUniqueError
 import uuid
-from .mongomodels import Company,SalesParty,PurchaseParty,AccountingVoucher,SalesLedger,PurchaseVoucher
+from .mongomodels import Company,SalesParty,PurchaseParty,AccountingVoucher,SalesLedger,PurchaseVoucher,Payment
 
 
 class CompanySerializer(serializers.Serializer):
@@ -281,12 +281,40 @@ class PurchaseVoucherSerializer(serializers.Serializer):
     updated_at = serializers.DateTimeField(required=False)
 
     def create(self, validated_data):
-        # Create the PurchaseVoucher document from validated data
         return PurchaseVoucher.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         # Update the PurchaseVoucher document
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+        instance.save()
+        return instance
+    
+class PaymentSerializer(serializers.Serializer):
+    payment_id= serializers.UUIDField(default=uuid.uuid4, read_only=True)
+    date = serializers.DateField()
+    account = serializers.CharField(max_length=255)
+    cur_balance = serializers.DecimalField(max_digits=10, decimal_places=2)
+    particulars = serializers.CharField()
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    narration = serializers.CharField(allow_blank=True, required=False)
+    created_at = serializers.DateTimeField(required=False)
+    updated_at = serializers.DateTimeField(required=False) 
+
+    def create(self, validated_data):
+        # Create and save the new payment document using MongoEngine
+        payment = Payment(**validated_data)
+        payment.save()  # Save to the database
+        return payment  # Return the created payment instance
+
+    def update(self, instance, validated_data):
+        # Update an existing payment document
+        instance.payment_number = validated_data.get('payment_number', instance.payment_number)
+        instance.date = validated_data.get('date', instance.date)
+        instance.account = validated_data.get('account', instance.account)
+        instance.cur_balance = validated_data.get('cur_balance', instance.cur_balance)
+        instance.particulars = validated_data.get('particulars', instance.particulars)
+        instance.amount = validated_data.get('amount', instance.amount)
+        instance.narration = validated_data.get('narration', instance.narration)
         instance.save()
         return instance

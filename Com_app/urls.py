@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterUser, VerifyOTP,LoginView,CompanyCreateAPIView,CompanyManagementView,SalesPartyCreateView,SalesPartyManagementView,PurchaseLedgercreateView,PurchaseLedgerView,AccountingVoucherCreateView,AccountingVoucherManagementView,PurchasePartycreateViewSet,PurchasePartyViewSet,SalesLedgerCreateView,SalesLedgerView,PurchaseVoucherCreateView,PurchaseVoucherView
+from .views import RegisterUser, VerifyOTP,LoginView,CompanyCreateAPIView,CompanyManagementView,SalesPartyCreateView,SalesPartyManagementView,PurchaseLedgercreateView,PurchaseLedgerView,AccountingVoucherCreateView,AccountingVoucherManagementView,PurchasePartycreateViewSet,PurchasePartyViewSet,SalesLedgerCreateView,SalesLedgerView,PurchaseVoucherCreateView,PurchaseVoucherView,PaymentcreateView,PaymentView
 
 urlpatterns = [
     
@@ -36,4 +36,13 @@ urlpatterns = [
     path('create/purchase_voucher/', PurchaseVoucherCreateView.as_view(), name='purchase_voucher_create'),  
     path('purchase_voucher/', PurchaseVoucherView.as_view(), name='purchase_voucher_create'),  
     path('purchase_voucher/<uuid:purchase_id>/', PurchaseVoucherView.as_view(), name='purchase_voucher'),
+
+    path('create/payment/', PaymentcreateView.as_view(), name='create_payment'),
+    path('payment/', PaymentView.as_view(), name='get_all_payments'),  
+    path('payment/<int:payment_number>/', PaymentView.as_view(), name='payment_detail'),  # For GET, PUT, DELETE specific payment
+
+
+
+
+
 ]

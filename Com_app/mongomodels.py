@@ -1,4 +1,4 @@
-from mongoengine import Document, StringField, EmailField, DateTimeField,IntField,BooleanField,FloatField,DecimalField, DateField,UUIDField
+from mongoengine import Document, StringField, EmailField, DateTimeField,IntField,BooleanField,FloatField,DecimalField, DateField,UUIDField,StringField
 from django.core.exceptions import ValidationError
 from decimal import Decimal
 from datetime import date
@@ -140,7 +140,7 @@ class AccountingVoucher(Document):
     sales_id = fields.UUIDField(primary_key=True ,default=uuid.uuid4, required=True)
     date = DateField(required=True)  
     reference_no = StringField(max_length=50, required=True)  # Reference number
-    party_account_name = StringField(max_length=255, required=True)  # Party account name
+    party_account_name = StringField(max_length=255, required=True) 
     current_balance = DecimalField(precision=2, required=True)  
     sales_ledger = StringField(max_length=255, required=True)  
     quantity = IntField(required=True, min_value=0)  # Quantity
@@ -148,6 +148,8 @@ class AccountingVoucher(Document):
     per = StringField(max_length=50, required=True)  # Per unit
     amount = DecimalField(precision=2, required=True)  
     narration = StringField(required=True)  
+    created_at = DateTimeField(default=datetime.utcnow)
+    updated_at = DateTimeField(default=datetime.utcnow)
 
 
     def __str__(self):
@@ -224,8 +226,8 @@ class SalesLedger(Document):
     mailing_address = StringField(blank=True, null=True)
     provide_bank_details = BooleanField(default=False)
     pan_it_no = StringField(max_length=15, unique=True, blank=True, null=True)
-    created_at = DateTimeField(auto_now_add=True)
-    updated_at = DateTimeField(auto_now=True)
+    created_at = DateTimeField(default=datetime.utcnow)
+    updated_at = DateTimeField(default=datetime.utcnow)
 
     def __str__(self):
         return self.name
@@ -244,8 +246,8 @@ class PurchaseVoucher(Document):
     quantity = fields.DecimalField(max_digits=10, decimal_places=2)  
     rate_per = fields.DecimalField(max_digits=10, decimal_places=2)  
     amount = fields.DecimalField(max_digits=10, decimal_places=2)  
-    created_at = fields.DateTimeField(auto_now_add=True)
-    updated_at = fields.DateTimeField(auto_now=True)
+    created_at = DateTimeField(default=datetime.utcnow)
+    updated_at = DateTimeField(default=datetime.utcnow)
 
     def save(self, *args, **kwargs):
         # Calculate amount before saving
@@ -258,8 +260,17 @@ class PurchaseVoucher(Document):
     def calculate_total_amount(self):
         return self.amount
     
+class Payment(Document):
+    payment_id = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    date = DateField()  
+    account = StringField(max_length=255)  
+    cur_balance = DecimalField(max_digits=10, decimal_places=2, default=0.00)  
+    particulars = StringField()  
+    amount = DecimalField(max_digits=10, decimal_places=2)  
+    narration = StringField(blank=True, null=True)  
+    created_at = DateTimeField(default=datetime.utcnow)
+    updated_at = DateTimeField(default=datetime.utcnow)
 
-# class PurchaseVoucher(Document):
-#     purchase_id = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     supplier_invoice_no = fields.StringField(max_length=255, unique=True)  
-#     date = fields.DateField()  
+    def save(self, *args, **kwargs):
+        self.updated_at = datetime.utcnow()
+        return super().save(*args, **kwargs)
