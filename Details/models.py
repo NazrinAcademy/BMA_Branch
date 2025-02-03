@@ -127,6 +127,14 @@ class SalesParty(models.Model):
   
     set_alter_gst_details = models.BooleanField(default=False)
     gst_rate = models.FloatField(null=True, blank=True)
+
+    sales_ledger = models.CharField(max_length=255, blank=True, null=True)
+    part_name = models.CharField(max_length=255, blank=True, null=True)
+    under_sundry_debtors = models.BooleanField(default=False)  
+    journal_product_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    journal_tax = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    journal_direct_purchase_to_sales_clearance = models.TextField(blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -203,6 +211,15 @@ class PurchaseParty(models.Model):
     set_alter_gst_details = models.BooleanField(default=False) 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    purchase_ledger = models.CharField(max_length=255, blank=True, null=True)
+    part_name = models.CharField(max_length=255, blank=True, null=True)
+    under_sundry_creditors = models.BooleanField(default=False)  # Indicates if under sundry creditors
+
+    journal_product_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    journal_tax = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    journal_direct_purchase_to_sales_clearance = models.TextField(blank=True, null=True)
+
     
    
 
@@ -319,7 +336,6 @@ class Payment(models.Model):
 from django.db import models
 
 class CashInHand(models.Model):
-  
     name = models.CharField(max_length=255)  
     under = models.CharField(max_length=255, default='Cash-in-Hand (Current Assets)')  
     mailing_name = models.CharField(max_length=255)  
@@ -330,7 +346,6 @@ class CashInHand(models.Model):
     Account_number= models.CharField(max_length=50, blank=True, null=True)  
     ifsc_code = models.CharField(max_length=20, blank=True, null=True)  
     bank_name = models.CharField(max_length=255, blank=True, null=True) 
-    
     pan_it_no = models.CharField(max_length=20, blank=True, null=True) 
     created_at = models.DateTimeField(auto_now_add=True) 
     updated_at = models.DateTimeField(auto_now=True)  

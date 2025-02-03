@@ -18,6 +18,9 @@ class GST(models.Model):
     def __str__(self):
         return f"GST Details: {self.state} - {self.GSTIN_UIN}"
     
+    class Meta:
+        app_label = 'Myapp' 
+    
 
 
 
@@ -36,10 +39,12 @@ class TaxDetails(models.Model):
     cess = models.DecimalField(max_digits=5,decimal_places=2,null=True,blank=True,default=None)
 
     def __str__(self):
-        return f"Stock Group Tax Details - {self.id}"    
+        return f"Stock Group Tax Details - {self.id}"  
+
+    class Meta:
+        app_label = 'Myapp'  
 
 class GSTR1(models.Model):
-
 # B2BInvoice:
     gstin_uin_recipient = models.CharField(max_length=15,null=False)  
     receiver_name = models.CharField(max_length=255)  
@@ -111,6 +116,9 @@ class GSTR1(models.Model):
     total_number = models.IntegerField()  
     cancelled = models.BooleanField()
     net_issue = models.IntegerField() 
+
+    class Meta:
+        app_label = 'Myapp'
 
 # ----GSTR2---
 
@@ -193,6 +201,8 @@ class GSTR2(models.Model):
 
     def __str__(self):
         return f"GSTR2 {self.gstin_uin_supplier_b2b} - {self.supplier_name_b2b}"
+    class Meta:
+        app_label = 'Myapp'
 
 
 
@@ -280,6 +290,8 @@ class EWayBill(models.Model):
 
     def __str__(self):
         return self.eway_bill_no
+    class Meta:
+        app_label = 'Myapp'
 
 
 
@@ -293,6 +305,9 @@ class EInvoice(models.Model):
 
     def __str__(self):
         return self.ack_no
+    
+    class Meta:
+        app_label = 'Myapp'
 
 
 # ------------------------------NEW ----------------------
@@ -310,6 +325,8 @@ class ProductDetails(models.Model):
 
     def __str__(self):
         return self.product_name
+    class Meta:
+        app_label = 'Myapp'
 
 
 
@@ -321,6 +338,8 @@ class Category(models.Model):
 
     def __str__(self):
         return self.category_name
+    class Meta:
+        app_label = 'Myapp'
 
 
 class SubCategory(models.Model):
@@ -330,6 +349,8 @@ class SubCategory(models.Model):
 
     def __str__(self):
         return self.subcategory_name
+    class Meta:
+        app_label = 'Myapp'
 
 
 class Brand(models.Model):
@@ -337,6 +358,9 @@ class Brand(models.Model):
 
     def __str__(self):
         return self.brand_name
+    
+    class Meta:
+        app_label = 'Myapp'
 
 
 
@@ -347,6 +371,8 @@ class Unit(models.Model):
 
     def __str__(self):
         return self.unit
+    class Meta:
+        app_label = 'Myapp'
 
 
 
@@ -362,6 +388,8 @@ class PriceDetails(models.Model):
 
     def __str__(self):
         return f"{self.purchase_price}"
+    class Meta:
+        app_label = 'Myapp'
 
 
 class GSTDetails(models.Model):
@@ -375,5 +403,8 @@ class GSTDetails(models.Model):
     sgst_value = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     igst_value = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+
+    class Meta:
+        app_label = 'Myapp'
 
 

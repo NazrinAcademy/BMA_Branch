@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'myapp',
+    'Myapp',
+    'Deatils'
 ]
 
 MIDDLEWARE = [
@@ -77,9 +78,9 @@ WSGI_APPLICATION = 'productadd.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'new_bma_db',
+        'NAME': 'tally',
         'USER': 'root',
-        'PASSWORD': 'MYsql@02',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306'
             

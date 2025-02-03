@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Company, Branch, CurrencySetting,Companies,SalesParty,AccountingVoucher,PurchaseParty,PurchaseLedger,SalesLedger,PurchaseVoucher,Payment
+from .models import User, Company, Branch, CurrencySetting,Companies,SalesParty,AccountingVoucher,PurchaseParty,PurchaseLedger,SalesLedger,PurchaseVoucher,Payment,CashInHand
 
 
 
@@ -148,6 +148,12 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = ['payment_number', 'date', 'account', 'cur_balance', 'particulars', 'amount', 'narration', 'created_at', 'updated_at']
         read_only_fields = ['payment_number', 'created_at', 'updated_at']  
 
+
+
+class CashInHandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CashInHand
+        fields = '__all__'  
 
 class CompaniesSerializer(serializers.ModelSerializer):
     class Meta:

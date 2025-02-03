@@ -1,6 +1,6 @@
 from django.urls import path
 # from .views import CompanyViewSet
-from Details.views import  RegisterUser,CompanyViewSet,CompanyManagementView,BranchView,BranchManagementView,CurrencySettingPostView,CurrencySettingView,VerifyOTPView,LoginView,SalesPartyCreateView,SalesPartyManagementView,AccountingVoucherCreateView,AccountingVoucherManagementView,PurchasePartyViewSet,PurchaseLedgerView,SalesLedgerView,PurchaseVoucherCreateView,PurchaseVoucherView,PaymentView,PaymentcreateView
+from Details.views import  RegisterUser,CompanyViewSet,CompanyManagementView,BranchView,BranchManagementView,CurrencySettingPostView,CurrencySettingView,VerifyOTPView,LoginView,SalesPartyCreateView,SalesPartyManagementView,AccountingVoucherCreateView,AccountingVoucherManagementView,PurchasePartyViewSet,PurchaseLedgerView,SalesLedgerView,PurchaseVoucherCreateView,PurchaseVoucherView,PaymentView,PaymentcreateView,PurchasePartycreateViewSet,SalesLedgercreateView
 
 
 urlpatterns = [
@@ -24,7 +24,7 @@ urlpatterns = [
     path('accountingvouchers/', AccountingVoucherManagementView.as_view(), name='accounting_voucher_list'),
 
 
-    path('create/purchase-party/', PurchasePartyViewSet.as_view(), name='purchase_party'),
+    path('create/purchase-party/', PurchasePartycreateViewSet.as_view(), name='purchase_party'),
     path('purchase-party/', PurchasePartyViewSet.as_view(), name='purchase_party_list'), 
     path('purchase-party/<uuid:pk>/', PurchasePartyViewSet.as_view(), name='purchase_party_detail'),
 
@@ -33,7 +33,7 @@ urlpatterns = [
     path('purchase-ledger/', PurchaseLedgerView.as_view(), name='purchase_ledger_list'),  
     path('purchase-ledger/<uuid:purchase_ledger_id>/', PurchaseLedgerView.as_view(), name='purchase_ledger_detail'),   
 
-    path('create/salesledger/', SalesLedgerView.as_view(), name='sales_ledger'),
+    path('create/salesledger/', SalesLedgercreateView.as_view(), name='sales_ledger'),
     path('sales-ledger/', SalesLedgerView.as_view(), name='sales_ledger_list'),  
     path('sales-ledger/<uuid:SalesLedger_id>/', SalesLedgerView.as_view(), name='sales_ledger_detail'), 
 
@@ -42,8 +42,8 @@ urlpatterns = [
     path('purchase_voucher/<int:purchase_no>/', PurchaseVoucherView.as_view(), name='purchase_voucher_detail'),  
 
     path('create/payment/', PaymentcreateView.as_view(), name='create_payment'),
-    path('payment/', PaymentView.as_view(), name='get_all_payments'),  # For GET all payments
-    path('payment/<int:payment_number>/', PaymentView.as_view(), name='payment_detail'),  # For GET, PUT, DELETE specific payment
+    path('payment/', PaymentView.as_view(), name='get_all_payments'),  
+    path('payment/<int:payment_number>/', PaymentView.as_view(), name='payment_detail'),  
 
 
 

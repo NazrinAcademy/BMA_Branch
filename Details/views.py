@@ -13,7 +13,7 @@ from django.utils.timezone import now
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from .models import UserData,EmailOTP, Company, SalesParty, PurchaseParty, Branch,CurrencySetting,AccountingVoucher,PurchaseLedger,SalesLedger,PurchaseVoucher,Payment
-from .serializers import CompanySerializer,BranchSerializer,CurrencySettingSerializer,CompaniesSerializer,SalesPartySerializer,AccountingVoucherSerializer,PurchasePartySerializer,PurchaseLedgerSerializer,SalesLedgerSerializer,PurchaseVoucherSerializer,PaymentSerializer
+from .serializers import CompanySerializer,BranchSerializer,CurrencySettingSerializer,CompaniesSerializer,SalesPartySerializer,AccountingVoucherSerializer,PurchasePartySerializer,PurchaseLedgerSerializer,SalesLedgerSerializer,PurchaseVoucherSerializer,PaymentSerializer,CashInHandSerializer
 
 
 
@@ -461,8 +461,9 @@ class SalesPartyManagementView(APIView):
                 {"error": f"An error occurred: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
 
-
+from django.db.models import Sum
 class AccountingVoucherCreateView(APIView):
     def post(self, request, *args, **kwargs):
         required_fields = [
@@ -475,37 +476,43 @@ class AccountingVoucherCreateView(APIView):
             "rate",
             "per",
             "amount",
-            "narration"
+            "narration",
+            "total_products_sold", 
+            "remaining_stock"  
         ]
         
-      
+        # Check for missing or empty fields
         missing_fields = [
             field for field in required_fields
-            if field not in request.data or not request.data.get(field)
+            if field not in request.data or request.data.get(field) in [None, ""]
         ]
         
         if missing_fields:
             return Response(
-                {
-                    "error": f"The following fields are missing or empty: {', '.join(missing_fields)}"
-                },
+                {"error": f"The following fields are missing or empty: {', '.join(missing_fields)}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         serializer = AccountingVoucherSerializer(data=request.data)
-        
+
         if serializer.is_valid():
             try:
-                serializer.save()
+                accounting_voucher = serializer.save()
+
+                # Get `total_products_sold` and `remaining_stock` from request payload
+                total_products_sold = request.data.get("total_products_sold", 0)
+                remaining_stock = request.data.get("remaining_stock", 0)
+
                 return Response(
                     {
-                        "message": "Accounting voucher successfully created.",
-                        "data": serializer.data
+                        "message": "Accounting Voucher successfully created.",
+                        "data": serializer.data,
+                        "total_products_sold": total_products_sold,
+                        "remaining_stock": remaining_stock,
                     },
                     status=status.HTTP_201_CREATED,
                 )
             except Exception as e:
-                
                 return Response(
                     {"error": f"An unexpected error occurred: {str(e)}"},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -516,22 +523,38 @@ class AccountingVoucherCreateView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-
 class AccountingVoucherManagementView(APIView):
     def get(self, request, pk=None, *args, **kwargs):
         try:
+            # Extract initial stock from the request payload
+            initial_stock = request.data.get("initial_stock", 1000)  
+
+            # Get total quantity sold across all vouchers
+            total_products_sold = AccountingVoucher.objects.aggregate(total_sold=Sum('quantity'))['total_sold'] or 0
+            
+            # Calculate remaining stock dynamically
+            remaining_stock = initial_stock - total_products_sold
+
             if pk:
                 accounting_voucher = AccountingVoucher.objects.get(pk=pk)
                 serializer = AccountingVoucherSerializer(accounting_voucher)
                 return Response(
-                    {"data": serializer.data},
+                    {
+                        "data": serializer.data,
+                        "total_products_sold": total_products_sold,
+                        "remaining_stock": remaining_stock,
+                    },
                     status=status.HTTP_200_OK
                 )
             else:
                 accounting_vouchers = AccountingVoucher.objects.all()
                 serializer = AccountingVoucherSerializer(accounting_vouchers, many=True)
                 return Response(
-                    {"data": serializer.data},
+                    {
+                        "data": serializer.data,
+                        "total_products_sold": total_products_sold,
+                        "remaining_stock": remaining_stock,
+                    },
                     status=status.HTTP_200_OK
                 )
         except AccountingVoucher.DoesNotExist:
@@ -590,8 +613,12 @@ class AccountingVoucherManagementView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
+from .serializers import PurchasePartySerializer
 
-class PurchasePartyViewSet(APIView):
+class PurchasePartycreateViewSet(APIView):
     def post(self, request, *args, **kwargs):
         required_fields = [
             "name",
@@ -602,20 +629,18 @@ class PurchasePartyViewSet(APIView):
             "mailing_pincode",
         ]
 
-
         missing_fields = [
             field for field in required_fields
-            if field not in request.data or not request.data.get(field)
+            if field not in request.data or request.data.get(field) in [None, ""]
         ]
 
         if missing_fields:
             return Response(
-                {
-                    "error": f"The following fields are missing or empty: {', '.join(missing_fields)}"
-                },
+                {"error": f"The following fields are missing or empty: {', '.join(missing_fields)}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        # Validate `maintain_balances` specific fields
         if request.data.get("maintain_balances", False):
             if not request.data.get("default_credit_period"):
                 return Response(
@@ -629,13 +654,19 @@ class PurchasePartyViewSet(APIView):
                 )
 
         serializer = PurchasePartySerializer(data=request.data)
+        
         if serializer.is_valid():
             try:
-                serializer.save()
+                purchase_party = serializer.save()
+
+                # Extract product details from the request payload
+                product_data = request.data.get("product_details", [])
+
                 return Response(
                     {
                         "message": "Purchase Party successfully created.",
-                        "data": serializer.data
+                        "data": serializer.data,
+                        "product_details": product_data  
                     },
                     status=status.HTTP_201_CREATED,
                 )
@@ -645,11 +676,11 @@ class PurchasePartyViewSet(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
         else:
-
             return Response(
                 {"error": serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
 
 class PurchasePartyViewSet(APIView):
     def get(self, request, *args, **kwargs):
@@ -842,7 +873,7 @@ class PurchaseLedgerView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-class SalesLedgerView(APIView):
+class SalesLedgercreateView(APIView):
     def post(self, request, *args, **kwargs):
  
         required_fields = [
@@ -899,7 +930,6 @@ class SalesLedgerView(APIView):
 
 
 class SalesLedgerView(APIView):
-
     def get(self, request, *args, **kwargs):
         if 'SalesLedger_id' in kwargs:
             try:
@@ -1079,9 +1109,8 @@ class PurchaseVoucherView(APIView):
 
 class PaymentcreateView(APIView):
     def post(self, request, *args, **kwargs):
- 
         required_fields = [
-            "date", "account", "cur_balance", "particulars", "amount"
+            "date", "account", "cur_balance", "particulars", "amount", "payment_method"
         ]
         
         missing_fields = [
@@ -1096,13 +1125,43 @@ class PaymentcreateView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        payment_method = request.data.get("payment_method")  # Getting the payment method from the request body
+        payment_method_details = {}
+
+      
+        if payment_method == "Cash":
+            payment_method_details = {
+                "method": "Cash",
+                "details": "Payment made in cash."
+            }
+        elif payment_method == "Credit Card":
+            payment_method_details = {
+                "method": "Credit Card",
+                "details": "Payment made using a credit card. Please check the card details."
+            }
+        elif payment_method == "Bank Transfer":
+            payment_method_details = {
+                "method": "Bank Transfer",
+                "details": "Payment made via bank transfer. Please verify the transaction reference."
+            }
+        else:
+            payment_method_details = {
+                "method": payment_method,
+                "details": "Custom payment method provided."
+            }
+
+ 
         serializer = PaymentSerializer(data=request.data)
         if serializer.is_valid():
             try:
-           
-                serializer.save()
+                payment = serializer.save()
+
                 return Response(
-                    {"message": "Payment successfully created.", "data": serializer.data},
+                    {
+                        "message": "Payment successfully created.",
+                        "data": serializer.data,
+                        "payment_method_details": payment_method_details 
+                    },
                     status=status.HTTP_201_CREATED,
                 )
             except Exception as e:
@@ -1116,15 +1175,48 @@ class PaymentcreateView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+
 class PaymentView(APIView):
+
+    def get_payment_method_details(self, payment_method):
+        if payment_method == "Cash":
+            return {
+                "method": "Cash",
+                "details": "Payment made in cash."
+            }
+        elif payment_method == "Credit Card":
+            return {
+                "method": "Credit Card",
+                "details": "Payment made using a credit card."
+            }
+        elif payment_method == "Bank Transfer":
+            return {
+                "method": "Bank Transfer",
+                "details": "Payment made via bank transfer."
+            }
+        else:
+            return {
+                "method": payment_method,
+                "details": "Custom payment method provided."
+            }
 
     def get(self, request, *args, **kwargs):
         if 'payment_number' in kwargs:
             try:
                 payment = Payment.objects.get(payment_number=kwargs['payment_number'])
                 serializer = PaymentSerializer(payment)
+                
+                # Fetch payment method details for a single payment
+                payment_method_details = self.get_payment_method_details(payment.account)
+
                 return Response(
-                    {"message": "Payment retrieved successfully", "data": serializer.data},
+                    {
+                        "message": "Payment retrieved successfully",
+                        "data": {
+                            **serializer.data,
+                            "payment_method_details": payment_method_details
+                        }
+                    },
                     status=status.HTTP_200_OK,
                 )
             except Payment.DoesNotExist:
@@ -1135,8 +1227,22 @@ class PaymentView(APIView):
         else:
             payments = Payment.objects.all()
             serializer = PaymentSerializer(payments, many=True)
+
+            # Add payment method details inside each payment item
+            payments_data = []
+            for payment, serialized_payment in zip(payments, serializer.data):
+                payment_method_details = self.get_payment_method_details(payment.account)
+                payment_data = {
+                    **serialized_payment,
+                    "payment_method_details": payment_method_details
+                }
+                payments_data.append(payment_data)
+
             return Response(
-                {"message": "Payments retrieved successfully", "data": serializer.data},
+                {
+                    "message": "Payments retrieved successfully",
+                    "data": payments_data
+                },
                 status=status.HTTP_200_OK,
             )
 
@@ -1152,9 +1258,19 @@ class PaymentView(APIView):
         serializer = PaymentSerializer(payment, data=request.data, partial=False)
         if serializer.is_valid():
             try:
-                serializer.save()
+                updated_payment = serializer.save()
+
+                # Fetch payment method details for the updated payment
+                payment_method_details = self.get_payment_method_details(updated_payment.account)
+
                 return Response(
-                    {"message": "Payment successfully updated.", "data": serializer.data},
+                    {
+                        "message": "Payment successfully updated.",
+                        "data": {
+                            **serializer.data,
+                            "payment_method_details": payment_method_details
+                        }
+                    },
                     status=status.HTTP_200_OK,
                 )
             except Exception as e:
@@ -1171,9 +1287,14 @@ class PaymentView(APIView):
     def delete(self, request, *args, **kwargs):
         try:
             payment = Payment.objects.get(payment_number=kwargs['payment_number'])
+            payment_method_details = self.get_payment_method_details(payment.account)
             payment.delete()
+            
             return Response(
-                {"message": "Payment successfully deleted."},
+                {
+                    "message": "Payment successfully deleted.",
+                    "payment_method_details": payment_method_details
+                },
                 status=status.HTTP_204_NO_CONTENT,
             )
         except Payment.DoesNotExist:
@@ -1182,7 +1303,64 @@ class PaymentView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+class CashInHandCreateView(APIView):
+    def post(self, request, *args, **kwargs):
+        # Deserialize the incoming request data
+        serializer = CashInHandSerializer(data=request.data)
 
+        # Extract the payment method from the request body
+        payment_method = request.data.get("payment_method", None)
+
+        # Check if the payment method exists and is valid
+        if payment_method:
+            # Based on the payment method, return the details
+            if payment_method == "Cash":
+                payment_method_details = {
+                    "method": "Cash",
+                    "details": "Payment made in cash."
+                }
+            elif payment_method == "Bank Transfer":
+                payment_method_details = {
+                    "method": "Bank Transfer",
+                    "details": "Payment made via bank transfer."
+                }
+            elif payment_method == "Cheque":
+                payment_method_details = {
+                    "method": "Cheque",
+                    "details": "Payment made by cheque."
+                }
+            else:
+                payment_method_details = {
+                    "method": "Unknown",
+                    "details": "Payment method details are unavailable."
+                }
+
+            # Add payment method details to the response
+            payment_method_response = payment_method_details
+        else:
+            # If no payment method provided, return an error
+            payment_method_response = {
+                "error": "Payment method is required."
+            }
+            return Response(payment_method_response, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the serializer data is valid
+        if serializer.is_valid():
+            # Save the new object to the database
+            new_cash_in_hand = serializer.save()
+
+            # Return the response with the newly created object data, including payment method details
+            return Response({
+                "message": "CashInHand created successfully.",
+                "data": serializer.data,
+                "payment_method_details": payment_method_response
+            }, status=status.HTTP_201_CREATED)
+        
+        # If the serializer is invalid, return errors
+        return Response({
+            "message": "Failed to create CashInHand.",
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 # class BranchView(APIView):
 #     def post(self, request, *args, **kwargs):
