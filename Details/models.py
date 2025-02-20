@@ -173,21 +173,53 @@ class SalesParty(models.Model):
         super().clean()
 
 
-class AccountingVoucher(models.Model):
-    sales_no = models.AutoField(primary_key=True) 
-    date = models.DateField()  
-    reference_no = models.CharField(max_length=50)  
-    party_account_name = models.CharField(max_length=255)  
-    current_balance = models.DecimalField(max_digits=15, decimal_places=2) 
-    sales_ledger = models.CharField(max_length=255) 
-    quantity = models.PositiveIntegerField()  
-    rate = models.DecimalField(max_digits=10, decimal_places=2)      
-    per = models.CharField(max_length=50)  
-    amount = models.DecimalField(max_digits=15, decimal_places=2) 
-    narration = models.TextField()  
+# class AccountingVoucher(models.Model):
+#     sales_no = models.AutoField(primary_key=True) 
+#     date = models.DateField()  
+#     reference_no = models.CharField(max_length=50)  
+#     party_account_name = models.CharField(max_length=255)  
+#     current_balance = models.DecimalField(max_digits=15, decimal_places=2) 
+#     sales_ledger = models.CharField(max_length=255) 
+#     quantity = models.PositiveIntegerField()  
+#     rate = models.DecimalField(max_digits=10, decimal_places=2)      
+#     per = models.CharField(max_length=50)  
+#     amount = models.DecimalField(max_digits=15, decimal_places=2) 
+#     narration = models.TextField()  
 
+#     def __str__(self):
+#         return f"Voucher {self.sales_no} - {self.party_account_name}"
+
+class AccountingVoucher(models.Model):
+    sales_no = models.AutoField(primary_key=True)
+    date = models.DateField()
+    reference_no = models.CharField(max_length=50)
+    party_account_name = models.CharField(max_length=255)
+    customer_name = models.CharField(max_length=255)
+    mobile_no = models.CharField(max_length=15, blank=True, null=True)
+    gst_no = models.CharField(max_length=50, blank=True, null=True)
+    hsn_sac_code = models.CharField(max_length=50, blank=True, null=True)
+    quantity = models.PositiveIntegerField()
+    rate = models.DecimalField(max_digits=10, decimal_places=2)
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    cgst_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    sgst_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    total_amount = models.DecimalField(max_digits=15, decimal_places=2,blank=True, null=True)
+    payment_type = models.CharField(max_length=50, choices=[('Cash', 'Cash'), ('Card', 'Card'), ('UPI', 'UPI'), ('Bank Transfer', 'Bank Transfer'),], blank=True, null=True)
+    payment_status = models.CharField(max_length=50, choices=[('Paid', 'Paid'), ('Pending', 'Pending'), ('Partial', 'Partial')], blank=True, null=True)
+    received = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    total_amount_before_tax = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    grand_total = models.DecimalField(max_digits=15, decimal_places=2)
+    billing_address = models.TextField(blank=True, null=True)
+    shipping_address = models.TextField(blank=True, null=True)
+    sales_notes = models.TextField(blank=True, null=True)
+    e_invoice_required = models.BooleanField(default=False)
+    billing_shipping_same = models.BooleanField(default=False)
+    narration = models.TextField()
+    
     def __str__(self):
         return f"Voucher {self.sales_no} - {self.party_account_name}"
+
 
 
 class PurchaseParty(models.Model):
@@ -209,16 +241,14 @@ class PurchaseParty(models.Model):
     registration_type = models.CharField(max_length=50, default="Regular")
     gstin_uin = models.CharField(max_length=15, blank=True, null=True)
     set_alter_gst_details = models.BooleanField(default=False) 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
     purchase_ledger = models.CharField(max_length=255, blank=True, null=True)
     part_name = models.CharField(max_length=255, blank=True, null=True)
     under_sundry_creditors = models.BooleanField(default=False)  # Indicates if under sundry creditors
-
     journal_product_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     journal_tax = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     journal_direct_purchase_to_sales_clearance = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     
    

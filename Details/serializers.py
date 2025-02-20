@@ -21,31 +21,30 @@ class SalesPartySerializer(serializers.ModelSerializer):
         model = SalesParty
         fields = "__all__"
 
-    def validate(self, attrs):
-        maintain_balances = attrs.get("maintain_balances_bill_by_bill", False)
-        default_credit_period = attrs.get("default_credit_period", "")
-        if default_credit_period == "":
-            attrs["default_credit_period"] = None
-        elif not isinstance(attrs.get("default_credit_period"), int) and attrs.get("default_credit_period") is not None:
-            raise serializers.ValidationError({
-                "default_credit_period": "A valid integer is required."
-            })
+    # def validate(self, attrs):
+    #     maintain_balances = attrs.get("maintain_balances_bill_by_bill", False)
+    #     default_credit_period = attrs.get("default_credit_period", "")
+    #     if default_credit_period == "":
+    #         attrs["default_credit_period"] = None
+    #     elif not isinstance(attrs.get("default_credit_period"), int) and attrs.get("default_credit_period") is not None:
+    #         raise serializers.ValidationError({
+    #             "default_credit_period": "A valid integer is required."
+    #         })
 
-        check_credit_days = attrs.get("check_credit_days_during_voucher_entry", "")
-        if check_credit_days == "":
-            attrs["check_credit_days_during_voucher_entry"] = None
-        elif not isinstance(attrs.get("check_credit_days_during_voucher_entry"), bool) and attrs.get("check_credit_days_during_voucher_entry") is not None:
-            raise serializers.ValidationError({
-                "check_credit_days_during_voucher_entry": "Must be a valid boolean."
-            })
+    #     check_credit_days = attrs.get("check_credit_days_during_voucher_entry", "")
+    #     if check_credit_days == "":
+    #         attrs["check_credit_days_during_voucher_entry"] = None
+    #     elif not isinstance(attrs.get("check_credit_days_during_voucher_entry"), bool) and attrs.get("check_credit_days_during_voucher_entry") is not None:
+    #         raise serializers.ValidationError({
+    #             "check_credit_days_during_voucher_entry": "Must be a valid boolean."
+    #         })
 
    
-        if not maintain_balances:
-            attrs["default_credit_period"] = None
-            attrs["check_credit_days_during_voucher_entry"] = None
+    #     if not maintain_balances:
+    #         attrs["default_credit_period"] = None
+    #         attrs["check_credit_days_during_voucher_entry"] = None
 
-        return attrs
-
+    #     return attrs
 
 class AccountingVoucherSerializer(serializers.ModelSerializer):
     class Meta:
@@ -53,8 +52,11 @@ class AccountingVoucherSerializer(serializers.ModelSerializer):
         fields = '__all__'  
 
     def validate(self, data):
-        if data['amount'] != data['quantity'] * data['rate']:
-            raise serializers.ValidationError("Amount must be equal to quantity * rate.")
+        calculated_amount = data['quantity'] * data['rate']
+        if data.get('total_amount') != calculated_amount:
+            raise serializers.ValidationError({
+                'total_amount': f"Total amount must be equal to quantity * rate ({calculated_amount})."
+            })
         return data
 
 
@@ -102,12 +104,12 @@ class PurchaseLedgerSerializer(serializers.ModelSerializer):
                     "rounding_limit": "This field is required when type_of_ledger is 'Invoice Rounding'."
                 })
 
-        else:
-            if data.get("rounding_method") or data.get("rounding_limit") is not None:
-                raise serializers.ValidationError({
-                    "rounding_method": "This field must be null unless type_of_ledger is 'Invoice Rounding'.",
-                    "rounding_limit": "This field must be null unless type_of_ledger is 'Invoice Rounding'."
-                })
+        # else:
+        #     if data.get("rounding_method") or data.get("rounding_limit") is not None:
+        #         raise serializers.ValidationError({
+        #         #     "rounding_method": "This field must be null unless type_of_ledger is 'Invoice Rounding'.",
+        #         #     "rounding_limit": "This field must be null unless type_of_ledger is 'Invoice Rounding'."
+        #         # })
 
         return data
     
@@ -124,6 +126,7 @@ class SalesLedgerSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"rounding_limit": "This field is required when type_of_salesLeger is 'Invoice Rounding'."})
             if data.get('rounding_method') is None:
                 raise serializers.ValidationError({"rounding_method": "This field is required when type_of_salesLeger is 'Invoice Rounding'."})
+            
         else:
             
             data['rounding_limit'] = None

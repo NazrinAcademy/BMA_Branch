@@ -1,6 +1,6 @@
 from django.urls import path
 # from .views import CompanyViewSet
-from Details.views import  RegisterUser,CompanyViewSet,CompanyManagementView,BranchView,BranchManagementView,CurrencySettingPostView,CurrencySettingView,VerifyOTPView,LoginView,SalesPartyCreateView,SalesPartyManagementView,AccountingVoucherCreateView,AccountingVoucherManagementView,PurchasePartyViewSet,PurchaseLedgerView,SalesLedgerView,PurchaseVoucherCreateView,PurchaseVoucherView,PaymentView,PaymentcreateView,PurchasePartycreateViewSet,SalesLedgercreateView
+from Details.views import  RegisterUser,CompanyViewSet,CompanyManagementView,BranchView,BranchManagementView,CurrencySettingPostView,CurrencySettingView,VerifyOTPView,LoginView,SalesPartyCreateView,SalesPartyManagementView,AccountingVoucherCreateView,AccountingVoucherManagementView,PurchasePartyViewSet,PurchaseLedgerView,SalesLedgerView,PurchaseVoucherCreateView,PurchaseVoucherView,PaymentView,PaymentcreateView,PurchasePartycreateViewSet,SalesLedgercreateView,CashInHandCreateView,CashInHandView,UserManagement,PurchaseLedgercreateView
 
 
 urlpatterns = [
@@ -9,6 +9,11 @@ urlpatterns = [
     path('register/', RegisterUser.as_view(), name='register'),
     path('verify-otp/', VerifyOTPView.as_view(), name='verify_otp'),
     path('login/', LoginView.as_view(), name='login'),
+
+    path('user/', UserManagement.as_view(), name='get_all_users'),  
+    path('user/<int:user_id>/', UserManagement.as_view(), name='manage_user'), 
+
+
 
     path('create/company/', CompanyViewSet.as_view(), name='create_company'), 
     path('companies/', CompanyManagementView.as_view(), name='get_all_companies'),
@@ -29,7 +34,7 @@ urlpatterns = [
     path('purchase-party/<uuid:pk>/', PurchasePartyViewSet.as_view(), name='purchase_party_detail'),
 
 
-    path('create/purchase-ledger/', PurchaseLedgerView.as_view(), name='purchase_ledger_create'), 
+    path('create/purchase-ledger/', PurchaseLedgercreateView.as_view(), name='purchase_ledger_create'), 
     path('purchase-ledger/', PurchaseLedgerView.as_view(), name='purchase_ledger_list'),  
     path('purchase-ledger/<uuid:purchase_ledger_id>/', PurchaseLedgerView.as_view(), name='purchase_ledger_detail'),   
 
@@ -43,7 +48,13 @@ urlpatterns = [
 
     path('create/payment/', PaymentcreateView.as_view(), name='create_payment'),
     path('payment/', PaymentView.as_view(), name='get_all_payments'),  
-    path('payment/<int:payment_number>/', PaymentView.as_view(), name='payment_detail'),  
+    path('payment/<int:payment_number>/', PaymentView.as_view(), name='payment_detail'), 
+
+
+    path('create/cash-in-hand/', CashInHandCreateView.as_view(), name='cash_in_hand_create'), 
+    path('cash-in-hand/', CashInHandView.as_view(), name='cash_in_hand_list'),  
+    path('cash-in-hand/<int:pk>/', CashInHandView.as_view(), name='cash_in_hand_detail'),  
+
 
 
 

@@ -11,15 +11,15 @@ from django.contrib.auth.hashers import check_password
 from django.core.mail import send_mail
 from django.utils.timezone import now
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
-from .models import UserData,EmailOTP, Company, SalesParty, PurchaseParty, Branch,CurrencySetting,AccountingVoucher,PurchaseLedger,SalesLedger,PurchaseVoucher,Payment
+from .models import UserData,EmailOTP, Company, SalesParty, PurchaseParty, Branch,CurrencySetting,AccountingVoucher,PurchaseLedger,SalesLedger,PurchaseVoucher,Payment,CashInHand
 from .serializers import CompanySerializer,BranchSerializer,CurrencySettingSerializer,CompaniesSerializer,SalesPartySerializer,AccountingVoucherSerializer,PurchasePartySerializer,PurchaseLedgerSerializer,SalesLedgerSerializer,PurchaseVoucherSerializer,PaymentSerializer,CashInHandSerializer
 
 
 
 class RegisterUser(APIView):
     permission_classes = [AllowAny]
-
     def post(self, request, *args, **kwargs):
         try:
             data = request.data
@@ -81,7 +81,17 @@ class RegisterUser(APIView):
             )
 
             return Response(
-                {'message': 'User registered successfully. OTP sent to your email for verification.'},
+                {
+                    'message': 'User registered successfully. OTP sent to your email for verification.',
+                    'user': {
+                        
+                        'user_id': User.id,
+                        'username': username,
+                        'email': email,
+                        'phone': phone,
+                        'license_key': license_key
+                    }
+                },
                 status=status.HTTP_201_CREATED
             )
 
@@ -91,6 +101,97 @@ class RegisterUser(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
+class UserManagement(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        user_id = kwargs.get('user_id', None)  # Correctly retrieve user_id from kwargs
+
+        if user_id:
+            # Fetch a specific user by their ID
+            try:
+                user = UserData.objects.get(id=user_id)  # Ensure correct reference to model field
+
+                user_data = {
+                    "id": user.id,  # Ensure id is correctly included
+                    "username": user.username,
+                    "email": user.email,
+                    "phone": user.phone,
+                    "license_key": user.license_key,
+                    "status": user.status
+                }
+
+                return Response(user_data, status=status.HTTP_200_OK)
+
+            except ObjectDoesNotExist:
+                return Response(
+                    {"message": "User not found."},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        else:
+            # Fetch all users (this is for the case when no user_id is provided)
+            users = UserData.objects.all()
+            users_data = []
+
+            for user in users:
+                users_data.append({
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "phone": user.phone,
+                    "license_key": user.license_key,
+                    "status": user.status
+                })
+
+            return Response(users_data, status=status.HTTP_200_OK)
+
+    # PUT Method to update user details
+    def put(self, request, *args, **kwargs):
+        try:
+            user_id = kwargs.get('user_id')
+            user = UserData.objects.get(id=user_id)
+
+            # Update fields if provided
+            username = request.data.get('username', user.username)
+            email = request.data.get('email', user.email)
+            phone = request.data.get('phone', user.phone)
+            license_key = request.data.get('license_key', user.license_key)
+
+            user.username = username
+            user.email = email
+            user.phone = phone
+            user.license_key = license_key
+            user.save()
+
+            return Response(
+                {"message": "User details updated successfully."},
+                status=status.HTTP_200_OK
+            )
+
+        except ObjectDoesNotExist:
+            return Response(
+                {"message": "User not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    # DELETE Method to delete a user
+    def delete(self, request, *args, **kwargs):
+        try:
+            user_id = kwargs.get('user_id')
+            user = UserData.objects.get(id=user_id)
+            user.delete()
+
+            return Response(
+                {"message": "User deleted successfully."},
+                status=status.HTTP_204_NO_CONTENT
+            )
+
+        except ObjectDoesNotExist:
+            return Response(
+                {"message": "User not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
 class VerifyOTPView(APIView):
     def post(self, request, *args, **kwargs):
         try:
@@ -364,8 +465,8 @@ class SalesPartyCreateView(APIView):
                 response_data = serializer.data.copy()
                 if 'default_credit_period' not in response_data or response_data['default_credit_period'] == '':
                     response_data['default_credit_period'] = None
-                if 'check_credit_days_during_voucher_entry' not in response_data or response_data['check_credit_days_during_voucher_entry'] == '':
-                    response_data['check_credit_days_during_voucher_entry'] = None
+                # if 'check_credit_days_during_voucher_entry' not in response_data or response_data['check_credit_days_during_voucher_entry'] == '':
+                #     response_data['check_credit_days_during_voucher_entry'] = None
                 return Response(
                     {
                         "message": "SalesParty successfully created.",
@@ -466,30 +567,23 @@ class SalesPartyManagementView(APIView):
 from django.db.models import Sum
 class AccountingVoucherCreateView(APIView):
     def post(self, request, *args, **kwargs):
+        print("Received Request Data:", request.data)  # Debugging
+        print("Keys in Request Data:", request.data.keys())  # Debugging
+
         required_fields = [
             "date",
             "reference_no",
             "party_account_name",
-            "current_balance",
-            "sales_ledger",
             "quantity",
             "rate",
-            "per",
-            "amount",
-            "narration",
-            "total_products_sold", 
-            "remaining_stock"  
+            "narration"
         ]
-        
-        # Check for missing or empty fields
-        missing_fields = [
-            field for field in required_fields
-            if field not in request.data or request.data.get(field) in [None, ""]
-        ]
-        
+
+        # Check for missing fields and empty values
+        missing_fields = [field for field in required_fields if not request.data.get(field)]
         if missing_fields:
             return Response(
-                {"error": f"The following fields are missing or empty: {', '.join(missing_fields)}"},
+                {"error": f"Missing or empty fields: {', '.join(missing_fields)}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -498,8 +592,7 @@ class AccountingVoucherCreateView(APIView):
         if serializer.is_valid():
             try:
                 accounting_voucher = serializer.save()
-
-                # Get `total_products_sold` and `remaining_stock` from request payload
+                
                 total_products_sold = request.data.get("total_products_sold", 0)
                 remaining_stock = request.data.get("remaining_stock", 0)
 
@@ -522,7 +615,7 @@ class AccountingVoucherCreateView(APIView):
                 {"error": serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
+        
 class AccountingVoucherManagementView(APIView):
     def get(self, request, pk=None, *args, **kwargs):
         try:
@@ -758,7 +851,7 @@ class PurchasePartyViewSet(APIView):
 
 
 
-class PurchaseLedgerView(APIView):
+class PurchaseLedgercreateView(APIView):
     def post(self, request, *args, **kwargs):
         required_fields = [
             "name",
@@ -1305,15 +1398,10 @@ class PaymentView(APIView):
 
 class CashInHandCreateView(APIView):
     def post(self, request, *args, **kwargs):
-        # Deserialize the incoming request data
+      
         serializer = CashInHandSerializer(data=request.data)
-
-        # Extract the payment method from the request body
         payment_method = request.data.get("payment_method", None)
-
-        # Check if the payment method exists and is valid
         if payment_method:
-            # Based on the payment method, return the details
             if payment_method == "Cash":
                 payment_method_details = {
                     "method": "Cash",
@@ -1335,10 +1423,9 @@ class CashInHandCreateView(APIView):
                     "details": "Payment method details are unavailable."
                 }
 
-            # Add payment method details to the response
+    
             payment_method_response = payment_method_details
         else:
-            # If no payment method provided, return an error
             payment_method_response = {
                 "error": "Payment method is required."
             }
@@ -1361,6 +1448,88 @@ class CashInHandCreateView(APIView):
             "message": "Failed to create CashInHand.",
             "errors": serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class CashInHandView(APIView):
+    def get(self, request, *args, **kwargs):
+        if 'pk' in kwargs:
+            try:
+                cash_in_hand = CashInHand.objects.get(pk=kwargs['pk'])
+                serializer = CashInHandSerializer(cash_in_hand)
+                
+                return Response(
+                    {
+                        "message": "CashInHand record retrieved successfully.",
+                        "data": serializer.data
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            except CashInHand.DoesNotExist:
+                return Response(
+                    {"error": "CashInHand record not found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        else:
+            cash_in_hand_records = CashInHand.objects.all()
+            serializer = CashInHandSerializer(cash_in_hand_records, many=True)
+
+            return Response(
+                {
+                    "message": "CashInHand records retrieved successfully.",
+                    "data": serializer.data
+                },
+                status=status.HTTP_200_OK,
+            )
+
+    def put(self, request, *args, **kwargs):
+        try:
+            cash_in_hand = CashInHand.objects.get(pk=kwargs['pk'])
+        except CashInHand.DoesNotExist:
+            return Response(
+                {"error": "CashInHand record not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = CashInHandSerializer(cash_in_hand, data=request.data, partial=False)
+        if serializer.is_valid():
+            try:
+                updated_cash_in_hand = serializer.save()
+
+                return Response(
+                    {
+                        "message": "CashInHand record successfully updated.",
+                        "data": serializer.data
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            except Exception as e:
+                return Response(
+                    {"error": f"An unexpected error occurred: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+        else:
+            return Response(
+                {"error": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            cash_in_hand = CashInHand.objects.get(pk=kwargs['pk'])
+            cash_in_hand.delete()
+            
+            return Response(
+                {
+                    "message": "CashInHand record successfully deleted."
+                },
+                status=status.HTTP_204_NO_CONTENT,
+            )
+        except CashInHand.DoesNotExist:
+            return Response(
+                {"error": "CashInHand record not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
 # class BranchView(APIView):
 #     def post(self, request, *args, **kwargs):
