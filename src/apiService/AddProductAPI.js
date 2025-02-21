@@ -1,13 +1,12 @@
-// addproduct api
 import axios from 'axios';
 
 // Base URL for the json-server
-const PRODUCT_API_URL = 'http://localhost:5000/products';
+const API_URL = 'https://0150-59-92-125-2.ngrok-free.app';
 
 // Function to fetch all products
 export const fetchProducts = async () => {
   try {
-    const response = await axios.get(PRODUCT_API_URL);
+    const response = await axios.get(`${API_URL}/products`);
     return response.data;
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -20,10 +19,10 @@ export const addProduct = async (product) => {
   try {
     const newProduct = { 
       ...product,
-      image: product.image, // Directly use the base64 image string
+      image: product.image, 
     };
 
-    const response = await axios.post(PRODUCT_API_URL, newProduct);
+    const response = await axios.post(`${API_URL}/products`, newProduct);
     return response.data;
   } catch (error) {
     console.error('Error adding product:', error);
@@ -35,7 +34,7 @@ export const addProduct = async (product) => {
 // Function to update a product
 export const updateProduct = async (id, updatedProduct) => {
   try {
-    const response = await axios.put(`${PRODUCT_API_URL}/${id}`, updatedProduct);
+    const response = await axios.put(`${API_URL}/products/${id}`, updatedProduct);
     return response.data;
   } catch (error) {
     console.error('Error updating product:', error);
@@ -46,7 +45,7 @@ export const updateProduct = async (id, updatedProduct) => {
 // Function to delete a product
 export const deleteProduct = async (id) => {
   try {
-    await axios.delete(`${PRODUCT_API_URL}/${id}`);
+    await axios.delete(`${API_URL}/products/${id}`);
   } catch (error) {
     console.error('Error deleting product:', error);
     throw error;
@@ -55,18 +54,12 @@ export const deleteProduct = async (id) => {
 
 
 
-// ---------------------------------------------------------------------------------
+// ------------------------------Sub  Categories---------------------------------------------------
 
-
-const API_URL = "http://localhost:5000/categories"; // Replace with your backend URL
-
-
-
-// ---------------------------------------
 
 export const addSubCategory = async (categoryName, subCategoryName, hsnCode) => {
   try {
-    const categories = await getCategories();  // Fetch existing categories
+    const categories = await getCategories();  
 
     // Find the category by name
     const categoryToUpdate = categories.find(
@@ -77,17 +70,15 @@ export const addSubCategory = async (categoryName, subCategoryName, hsnCode) => 
       throw new Error("Category not found");
     }
 
-    // Add the new subcategory and its HSN code
     const updatedCategory = {
       ...categoryToUpdate,
       subCategories: [
         ...(categoryToUpdate.subCategories || []),
-        { name: subCategoryName, hsnCode: hsnCode }  // Include the HSN code
+        { name: subCategoryName, hsnCode: hsnCode } 
       ],
     };
 
-    // Update the category in the backend using Axios
-    const response = await axios.put(`${API_URL}/${categoryToUpdate.id}`, updatedCategory, {
+    const response = await axios.put(`${API_URL}/categories/${categoryToUpdate.id}`, updatedCategory, {
       headers: {
         "Content-Type": "application/json",
       }
@@ -97,33 +88,19 @@ export const addSubCategory = async (categoryName, subCategoryName, hsnCode) => 
       throw new Error("Failed to update category");
     }
 
-    return response.data;  // Return the updated category data
+    return response.data;
 
   } catch (error) {
     console.error("Error adding subcategory:", error);
-    throw error;  // Rethrow the error to be handled elsewhere
+    throw error;  
   }
 };
 
-// ---------------------------------------
-// // Fetch all categories
-// export const fetchCategories = async () => {
-//   try {
-//     const response = await fetch(API_URL);
-//     if (!response.ok) {
-//       throw new Error("Failed to fetch categories");
-//     }
-//     return await response.json();
-//   } catch (error) {
-//     console.error(error);
-//     throw error;
-//   }
-// };
 
 // Add a new category
 export const addCategory = async (category) => {
   try {
-    const response = await fetch(API_URL, {
+    const response = await fetch(`${API_URL}/categories`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -145,7 +122,7 @@ export const addCategory = async (category) => {
 // Get the updated list of categories (optional if fetchCategories is reused)
 export const getCategories = async () => {
   try {
-    const response = await fetch(API_URL);
+    const response = await fetch(`${API_URL}/categories`);
     if (!response.ok) {
       throw new Error("Failed to fetch categories");
     }
@@ -161,7 +138,7 @@ export const getCategories = async () => {
 // Update a category
 export const updateCategory = async (id, updatedCategory) => {
   try {
-    const response = await axios.put(`${API_URL}/${id}`, updatedCategory, {
+    const response = await axios.put(`${API_URL}/categories/${id}`, updatedCategory, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -177,7 +154,7 @@ export const updateCategory = async (id, updatedCategory) => {
 // Delete a category
 export const deleteCategory = async (id) => {
   try {
-    const response = await axios.delete(`${API_URL}/${id}`);
+    const response = await axios.delete(`${API_URL}/categories/${id}`);
 
     if (!response.status === 200) {
       throw new Error("Failed to delete category");
@@ -190,46 +167,10 @@ export const deleteCategory = async (id) => {
   }
 };
 
-// // Add a subcategory to a specific category
-// export const addSubCategory = async (categoryName, subCategoryName) => {
-//   try {
-//     const categories = await getCategories();
-
-//     // Find the category by name
-//     const categoryToUpdate = categories.find(
-//       (category) => category.categoryName === categoryName
-//     );
-
-//     if (!categoryToUpdate) {
-//       throw new Error("Category not found");
-//     }
-
-//     // Add the new subcategory
-//     const updatedCategory = {
-//       ...categoryToUpdate,
-//       subCategories: [...(categoryToUpdate.subCategories || []), subCategoryName],
-//     };
-
-//     // Update the category in the backend
-//     const response = await fetch(`${API_URL}/${categoryToUpdate.id}`, {
-//       method: "PUT",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify(updatedCategory),
-//     });
-
-//     if (!response.ok) throw new Error("Failed to update category");
-//     return await response.json();
-//   } catch (error) {
-//     console.error("Error adding subcategory:", error);
-//     throw error;
-//   }
-// };
 
 export const getSubCategories = async () => {
   try {
-    const response = await fetch(`${API_URL}`);
+    const response = await fetch(`${API_URL}/categories`);
     if (!response.ok) throw new Error("Failed to fetch categories");
     return await response.json();
   } catch (error) {
@@ -240,46 +181,10 @@ export const getSubCategories = async () => {
 
 // ---------------------------brands ---------------------------
 
-const BRAND_API_URL = "http://localhost:5000/brands"; // Replace with your actual backend URL
-
-// // Add a new brand
-// export const addBrand = async (brandName) => {
-//   try {
-//     const response = await fetch(BRAND_API_URL, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({ name: brandName }),
-//     });
-
-//     if (!response.ok) throw new Error("Failed to add brand");
-//     return await response.json();
-//   } catch (error) {
-//     console.error("Error adding brand:", error);
-//     throw error;
-//   }
-// };
-
-// // Get all brands
-// export const getBrands = async () => {
-//   try {
-//     const response = await fetch(BRAND_API_URL);
-
-//     if (!response.ok) throw new Error("Failed to fetch brands");
-//     return await response.json();
-//   } catch (error) {
-//     console.error("Error fetching brands:", error);
-//     throw error;
-//   }
-// };
-
-
-
 // Add a new brand
 export const addBrand = async (brandName) => {
   try {
-    const response = await axios.post(BRAND_API_URL, { name: brandName });
+    const response = await axios.post(`${API_URL}/api/create_brand/`, { name: brandName });
     return response.data;
   } catch (error) {
     console.error("Error adding brand:", error);
@@ -290,7 +195,7 @@ export const addBrand = async (brandName) => {
 // Get all brands
 export const getBrands = async () => {
   try {
-    const response = await axios.get(BRAND_API_URL);
+    const response = await axios.get(`${API_URL}/api/get_brand/`);
     return response.data;
   } catch (error) {
     console.error("Error fetching brands:", error);
@@ -301,7 +206,7 @@ export const getBrands = async () => {
 // Update brand
 export const updateBrand = async (brandId, updatedBrand) => {
   try {
-    const response = await axios.put(`${BRAND_API_URL}/${brandId}`, updatedBrand);
+    const response = await axios.put(`${API_URL}/api/update_brand/${brandId}`, updatedBrand);
     return response.data;
   } catch (error) {
     console.error("Error updating brand:", error);
@@ -312,7 +217,7 @@ export const updateBrand = async (brandId, updatedBrand) => {
 // Delete brand
 export const deleteBrand = async (brandId) => {
   try {
-    await axios.delete(`${BRAND_API_URL}/${brandId}`);
+    await axios.delete(`${API_URL}/api/delete_brand//${brandId}`);
     return { success: true };
   } catch (error) {
     console.error("Error deleting brand:", error);
@@ -321,14 +226,13 @@ export const deleteBrand = async (brandId) => {
 };
 
 
-// unitAPI.js
+// --------------------------- unit api --------------------------------------
 
-const UNIT_API_URL = "http://localhost:5000/units"; // Replace with your actual API endpoint
 
 // Fetch all units
 export const fetchUnits = async () => {
   try {
-    const response = await fetch(UNIT_API_URL);
+    const response = await fetch(`${API_URL}/units`);
     if (!response.ok) throw new Error("Failed to fetch units");
     return await response.json();
   } catch (error) {
@@ -340,7 +244,7 @@ export const fetchUnits = async () => {
 // Add a new unit
 export const addNewUnit = async (unitData) => {
   try {
-    const response = await fetch(UNIT_API_URL, {
+    const response = await fetch(`${API_URL}/units`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -361,7 +265,7 @@ export const addNewUnit = async (unitData) => {
 // Delete a unit
 export const deleteUnit = async (unitId) => {
   try {
-    const response = await axios.delete(`${UNIT_API_URL}/${unitId}`);
+    const response = await axios.delete(`${API_URL}/units/${unitId}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting unit:", error);
@@ -372,7 +276,7 @@ export const deleteUnit = async (unitId) => {
 // Update a unit
 export const updateUnit = async (unitId, updatedData) => {
   try {
-    const response = await axios.put(`${UNIT_API_URL}/${unitId}`, updatedData, {
+    const response = await axios.put(`${API_URL}/units/${unitId}`, updatedData, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -384,14 +288,11 @@ export const updateUnit = async (unitId, updatedData) => {
   }
 };
 
-// ------------------------------------------------------------
-
-const API_BASE_URL = "http://localhost:5000";
-
+// ------------------------------   categories ------------------------------
 // Fetch all categories
 export const fetchCategories = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/categories`);
+    const response = await axios.get(`${API_URL}/categories`);
     return response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -402,7 +303,7 @@ export const fetchCategories = async () => {
 // Fetch GST details for a specific category
 export const fetchGstByCategory = async (categoryId) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/categories/${categoryId}`);
+    const response = await axios.get(`${API_URL}/categories/${categoryId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching GST details:", error);
@@ -413,7 +314,7 @@ export const fetchGstByCategory = async (categoryId) => {
 // Save GST form details
 export const saveGstDetails = async (gstFormData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/gstDetails`, gstFormData);
+    const response = await axios.post(`${API_URL}/gstDetails`, gstFormData);
     return response.data;
   } catch (error) {
     console.error("Error saving GST details:", error);
@@ -423,14 +324,11 @@ export const saveGstDetails = async (gstFormData) => {
 
 
 // ---------------------  price details ----------------------
-// priceAPI.js
-
-const BASE_URL = "http://localhost:5000"; // JSON server or backend API
 
 // 🟢 Save Price Details
 export const savePriceDetails = async (priceData) => {
   try {
-    const response = await axios.post(`${BASE_URL}/priceDetails`, priceData);
+    const response = await axios.post(`${API_URL}/priceDetails`, priceData);
     return response.data;
   } catch (error) {
     console.error("Error saving price details:", error);
@@ -440,7 +338,7 @@ export const savePriceDetails = async (priceData) => {
 // 🟢 Get Price Details
 export const getPriceDetails = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/priceDetails`);
+    const response = await axios.get(`${API_URL}/priceDetails`);
     return response.data;
   } catch (error) {
     console.error("Error fetching price details:", error);
@@ -450,7 +348,7 @@ export const getPriceDetails = async () => {
 // 🟢 Update Price Details
 export const updatePriceDetails = async (id, updatedData) => {
   try {
-    const response = await axios.put(`${BASE_URL}/priceDetails/${id}`, updatedData);
+    const response = await axios.put(`${API_URL}/priceDetails/${id}`, updatedData);
     return response.data;
   } catch (error) {
     console.error("Error updating price details:", error);
@@ -460,33 +358,20 @@ export const updatePriceDetails = async (id, updatedData) => {
 
 // ---------------------------------------  stock api -----------------------------------------------------------
 
-const STOCK_API_URL = "http://localhost:5000/stock"; // Update with your JSON Server URL
 
 export const fetchStockData = async () => {
-  const response = await axios.get(STOCK_API_URL);
+  const response = await axios.get(`${API_URL}/stock`);
   return response.data;
 };
 
 export const addStockData = async (data) => {
-  const response = await axios.post(STOCK_API_URL, data);
+  const response = await axios.post(`${API_URL}/stock`, data);
   return response.data;
 };
 
 export const updateStockData = async (id, data) => {
-  const response = await axios.put(`${STOCK_API_URL}/${id}`, data);
+  const response = await axios.put(`${API_URL}/stock/${id}`, data);
   return response.data;
 };
 
-
-const PRICE_API_URL = "http://localhost:5000/priceDetails"; // JSON Server URL
-
-export const fetchProductData = async () => {
-  try {
-    const response = await axios.get(PRICE_API_URL);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching product data:", error);
-    return [];
-  }
-};
 

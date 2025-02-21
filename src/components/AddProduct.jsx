@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Barcode from 'react-barcode';
-import {  addCategory, addSubCategory, getCategories, getBrands, addBrand, getSubCategories, addNewUnit, addProduct, savePriceDetails, updateStockData, addStockData, fetchStockData, fetchProductData } from "../apiService/AddProductAPI";
+import {  addCategory, addSubCategory, getCategories, getBrands, addBrand, getSubCategories, addNewUnit, addProduct, savePriceDetails, updateStockData, addStockData, fetchStockData, getPriceDetails } from "../apiService/AddProductAPI";
 import { fetchUnits as fetchUnitsAPI } from "../apiService/AddProductAPI";
 import { ImagePlus, X, CirclePlus, ChevronDown, ScanBarcode, Edit, Printer } from "lucide-react";
 import successImage from '../assets/success.png'
@@ -826,7 +826,7 @@ const AddProduct = () => {
  
   useEffect(() => {
     const getData = async () => {
-      const data = await fetchProductData();
+      const data = await getPriceDetails();
       if (data.length > 0) {
         setPriceData({ salePrice: data[0]?.salePrice || "" }); // Ensure salePrice is available
       }

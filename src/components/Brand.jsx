@@ -20,8 +20,8 @@ const Brand = () => {
         // Fetch brands when component mounts
         const fetchBrands = async () => {
             try {
-                const fetchedBrands = await getBrands();
-                setBrands(fetchedBrands);
+              const fetchedBrands = await getBrands();
+              setBrands(fetchedBrands.data || []); // Access correct array key              
             } catch (error) {
                 console.error("Error fetching brands:", error);
             }
