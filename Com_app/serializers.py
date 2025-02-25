@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from mongoengine import UUIDField,IntField,ValidationError,NotUniqueError
+from datetime import datetime
 import uuid
 from .mongomodels import Company,SalesParty,PurchaseParty,AccountingVoucher,SalesLedger,PurchaseVoucher,Payment
 
@@ -149,7 +150,6 @@ class PurchaseLedgerSerializer(serializers.Serializer):
         instance.save()
         return instance
     
-
 class AccountingVoucherSerializer(serializers.Serializer):
     sales_id = serializers.UUIDField(default=uuid.uuid4, read_only=True) 
     date = serializers.DateField()
@@ -163,12 +163,21 @@ class AccountingVoucherSerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=15, decimal_places=2)
     narration = serializers.CharField()
 
+    def validate_date(self, value):
+        """ Ensure date is in YYYY-MM-DD format and convert to datetime. """
+        if isinstance(value, str):
+            try:
+                return datetime.strptime(value, "%Y-%m-%d").date()
+            except ValueError:
+                raise serializers.ValidationError("Invalid date format. Use YYYY-MM-DD.")
+        return value
+
     def create(self, validated_data):
-        # Save the validated data into the MongoDB database
+        """ Save the validated data into the MongoDB database. """
         return AccountingVoucher(**validated_data).save()
 
     def update(self, instance, validated_data):
-        # Update the existing MongoEngine document
+        """ Update the existing MongoEngine document. """
         for field, value in validated_data.items():
             setattr(instance, field, value)
         instance.save()

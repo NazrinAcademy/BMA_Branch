@@ -503,76 +503,67 @@ class SalesPartyManagementView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
+
 class AccountingVoucherCreateView(APIView):
     def post(self, request, *args, **kwargs):
+        print("Received Request Data:", request.data) 
+        print("Keys in Request Data:", request.data.keys()) 
+
         required_fields = [
             "date",
             "reference_no",
             "party_account_name",
-            "current_balance",
-            "sales_ledger",
             "quantity",
             "rate",
-            "per",
-            "amount",
-            "narration",
-            "total_products_sold",
-            "remaining_stock",
+            "narration"
         ]
 
-        missing_fields = [
-            field for field in required_fields
-            if field not in request.data or request.data.get(field) in [None, ""]
-        ]
-
+        # Check for missing fields and empty values
+        missing_fields = [field for field in required_fields if not request.data.get(field)]
         if missing_fields:
             return Response(
-                {"error": f"The following fields are missing or empty: {', '.join(missing_fields)}"},
+                {"error": f"Missing or empty fields: {', '.join(missing_fields)}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        try:
-            # Extract the data from the request
-            data = {
-                "date": request.data.get("date"),
-                "reference_no": request.data.get("reference_no"),
-                "party_account_name": request.data.get("party_account_name"),
-                "current_balance": request.data.get("current_balance"),
-                "sales_ledger": request.data.get("sales_ledger"),
-                "quantity": request.data.get("quantity"),
-                "rate": request.data.get("rate"),
-                "per": request.data.get("per"),
-                "amount": request.data.get("amount"),
-                "narration": request.data.get("narration", ""),
-                "total_products_sold": request.data.get("total_products_sold"),
-                "remaining_stock": request.data.get("remaining_stock"),
-            }
-            accounting_voucher = AccountingVoucher(**data)
-            accounting_voucher.save()
-            total_products_sold = request.data.get("total_products_sold", 0)
-            remaining_stock = request.data.get("remaining_stock", 0)
+        # Convert date from string to datetime (MongoDB expects a datetime format)
+        if "date" in request.data:
+            try:
+                request.data["date"] = datetime.strptime(request.data["date"], "%Y-%m-%d")
+            except ValueError:
+                return Response(
+                    {"error": "Invalid date format. Use YYYY-MM-DD."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-            return Response(
-                {
-                    "message": "Accounting Voucher successfully created.",
-                    "data": data,
-                    "total_products_sold": total_products_sold,
-                    "remaining_stock": remaining_stock,
-                },
-                status=status.HTTP_201_CREATED,
-            )
+        serializer = AccountingVoucherSerializer(data=request.data)
 
-        except ValidationError as e:
+        if serializer.is_valid():
+            try:
+                accounting_voucher = serializer.save()  # MongoEngine save method
+                
+                total_products_sold = request.data.get("total_products_sold", 0)
+                remaining_stock = request.data.get("remaining_stock", 0)
+
+                return Response(
+                    {
+                        "message": "Accounting Voucher successfully created.",
+                        "data": serializer.data,
+                        "total_products_sold": total_products_sold,
+                        "remaining_stock": remaining_stock,
+                    },
+                    status=status.HTTP_201_CREATED,
+                )
+            except Exception as e:
+                return Response(
+                    {"error": f"An unexpected error occurred: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+        else:
             return Response(
-                {"error": f"Validation error: {str(e)}"},
+                {"error": serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        except Exception as e:
-            return Response(
-                {"error": f"An unexpected error occurred: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-
 
 from django.db.models import Sum      
 from mongoengine.queryset.visitor import Q

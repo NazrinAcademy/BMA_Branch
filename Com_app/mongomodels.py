@@ -1,5 +1,6 @@
 from mongoengine import Document, StringField, EmailField, DateTimeField,IntField,BooleanField,FloatField,DecimalField, DateField,UUIDField,StringField
 from django.core.exceptions import ValidationError
+import mongoengine as me
 from decimal import Decimal
 from datetime import date
 import uuid
@@ -135,27 +136,43 @@ class SalesParty(Document):
 
     def __str__(self):
         return self.name
-    
-class AccountingVoucher(Document):
-    sales_id = fields.UUIDField(primary_key=True ,default=uuid.uuid4, required=True)
-    date = DateField(required=True)  
-    reference_no = StringField(max_length=50, required=True)  # Reference number
-    party_account_name = StringField(max_length=255, required=True) 
-    current_balance = DecimalField(precision=2, required=True)  
-    sales_ledger = StringField(max_length=255, required=True)  
-    quantity = IntField(required=True, min_value=0)  # Quantity
-    rate = DecimalField(precision=2, required=True)  # Rate
-    per = StringField(max_length=50, required=True)  # Per unit
-    amount = DecimalField(precision=2, required=True)  
-    narration = StringField(required=True)  
-    created_at = DateTimeField(default=datetime.utcnow)
-    updated_at = DateTimeField(default=datetime.utcnow)
+class AccountingVoucher(me.Document):
+    sales_no = me.SequenceField(primary_key=True)  
+    date = me.DateTimeField(required=True)
+    reference_no = me.StringField(max_length=50, required=True)
+    party_account_name = me.StringField(max_length=255, required=True)
+    customer_name = me.StringField(max_length=255, required=True)
+    mobile_no = me.StringField(max_length=15, null=True)
+    gst_no = me.StringField(max_length=50, null=True)
+    hsn_sac_code = me.StringField(max_length=50, null=True)
+    quantity = me.IntField(min_value=0, required=True)
+    rate = me.DecimalField(precision=2, required=True)
+    discount_percentage = me.DecimalField(precision=2, default=0.00)
+    cgst_percentage = me.DecimalField(precision=2, default=0.00)
+    sgst_percentage = me.DecimalField(precision=2, default=0.00)
+    total_amount = me.DecimalField(precision=2, null=True)
+    payment_type = me.StringField(
+        choices=['Cash', 'Card', 'UPI', 'Bank Transfer'], null=True
+    )
+    payment_status = me.StringField(
+        choices=['Paid', 'Pending', 'Partial'], null=True
+    )
+    received = me.DecimalField(precision=2, default=0.00)
+    balance = me.DecimalField(precision=2, default=0.00)
+    total_amount_before_tax = me.DecimalField(precision=2, default=0.00)
+    grand_total = me.DecimalField(precision=2, required=True)
+    billing_address = me.StringField(null=True)
+    shipping_address = me.StringField(null=True)
+    sales_notes = me.StringField(null=True)
+    e_invoice_required = me.BooleanField(default=False)
+    billing_shipping_same = me.BooleanField(default=False)
+    narration = me.StringField()
 
+    meta = {'collection': 'accounting_voucher'}  
 
     def __str__(self):
         return f"Voucher {self.sales_no} - {self.party_account_name}"
     
-
 class PurchaseParty(Document):
     purchase_party_id = UUIDField(primary_key=True, default=uuid.uuid4)
     name = StringField(max_length=255, required=True)
