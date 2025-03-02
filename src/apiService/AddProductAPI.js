@@ -3,6 +3,8 @@ import axios from 'axios';
 // Base URL for the json-server
 const API_URL = 'http://localhost:5000';
 
+const BASE_URL="http://127.0.0.1:8000"
+
 // Function to fetch all products
 export const fetchProducts = async () => {
   try {
@@ -184,7 +186,7 @@ export const getSubCategories = async () => {
 // Add a new brand
 export const addBrand = async (brandName) => {
   try {
-    const response = await axios.post(`${API_URL}/brands`, { name: brandName });
+    const response = await axios.post(`${BASE_URL}/unit/add`, { brand_name: brandName });
     return response.data;
   } catch (error) {
     console.error("Error adding brand:", error);
