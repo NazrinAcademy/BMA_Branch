@@ -184,9 +184,9 @@ export const getSubCategories = async () => {
 // ---------------------------brands ---------------------------
 
 // Add a new brand
-export const addBrand = async (brandName) => {
+export const addBrand = async (brandName, config) => {
   try {
-    const response = await axios.post(`${BASE_URL}/unit/add`, { brand_name: brandName });
+    const response = await axios.post(`${BASE_URL}/brand/add`, { brand_name: brandName }, config);
     return response.data;
   } catch (error) {
     console.error("Error adding brand:", error);
@@ -197,7 +197,7 @@ export const addBrand = async (brandName) => {
 // Get all brands
 export const getBrands = async () => {
   try {
-    const response = await axios.get(`${API_URL}/brands`);
+    const response = await axios.get(`${API_URL}/brand/get`);
     console.log("API Response:", response.data); // Debugging
     return response.data;
   } catch (error) {
@@ -209,7 +209,7 @@ export const getBrands = async () => {
 // Update brand
 export const updateBrand = async (brandId, updatedBrand) => {
   try {
-    const response = await axios.put(`${API_URL}/brands/${brandId}`, updatedBrand);
+    const response = await axios.put(`${API_URL}/unit/update/${brandId}`, updatedBrand);
     return response.data;
   } catch (error) {
     console.error("Error updating brand:", error);
@@ -220,7 +220,7 @@ export const updateBrand = async (brandId, updatedBrand) => {
 // Delete brand
 export const deleteBrand = async (brandId) => {
   try {
-    await axios.delete(`${API_URL}/brands/${brandId}`);
+    await axios.delete(`${API_URL}/unit/delete/${brandId}`);
     return { success: true };
   } catch (error) {
     console.error("Error deleting brand:", error);
@@ -245,13 +245,11 @@ export const fetchUnits = async () => {
 };
 
 // Add a new unit
-export const addNewUnit = async (unitData) => {
+export const addNewUnit = async (unitData,config) => {
   try {
-    const response = await fetch(`${API_URL}/units`, {
+    const response = await fetch(`${BASE_URL}/unit/add`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      config,
       body: JSON.stringify(unitData),
     });
 

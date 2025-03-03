@@ -4,6 +4,8 @@ import { addBrand, deleteBrand, getBrands, updateBrand } from "../../../apiServi
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import successImage from '../../../assets/success.png'
+import { useSelector } from "react-redux";
+import { toast, ToastContainer } from "react-toastify";
 
 
 const Brand = () => {
@@ -13,6 +15,8 @@ const Brand = () => {
     const [showOverlay, setShowOverlay] = useState(false);
     const [newBrandName, setNewBrandName] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
+
+    const {userDetails}=useSelector((state)=>(state.auth))
 
     const startIndex = (currentPage - 1) * perPage;
 
@@ -37,18 +41,34 @@ const Brand = () => {
 
     // Handle Save Brand
     const handleSaveBrand = async () => {
+        const userData = JSON.parse(localStorage.getItem("user"));
+    
+        const token = userData?.access_token;
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userDetails?.token}`
+            }
+        };
+    
+        const payload = {
+            brand_name: newBrandName,
+        };
+    
         if (newBrandName.trim() !== "") {
             try {
-                const newBrand = await addBrand(newBrandName);
-                setBrands([...brands, newBrand]);
+                const newBrand = await addBrand(payload, config);
+                if (newBrand?.data) {
+                    setBrands([...brands, newBrand.data]);
+                }
                 setNewBrandName("");
                 handleCloseOverlay();
             } catch (error) {
-                console.error("Error saving brand:", error);
+                toast.error(`Error saving brand: ${error.message}`);
             }
         }
     };
-
+    
     // Handle Export to Excel
     const handleExportExcel = () => {
         const ws = XLSX.utils.json_to_sheet(brands);
@@ -420,6 +440,7 @@ const Brand = () => {
                   </div>
                 </div>
               )}
+              <ToastContainer autoClose={3000} />
         </div>
     );
 };

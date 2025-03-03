@@ -4,6 +4,7 @@ import { fetchUnits, addNewUnit, deleteUnit, updateUnit } from "../../../apiServ
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import successImage from '../../../assets/success.png'
+import { useSelector } from "react-redux";
 
 
 const Units = () => {
@@ -17,6 +18,8 @@ const Units = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const startIndex = (currentPage - 1) * perPage;
+  const {userDetails}=useSelector((state)=>(state.auth))
+
 
   // Input Refs for Focus
   const newUnitRef = useRef(null);
@@ -47,12 +50,18 @@ const Units = () => {
     if (unitName.trim() !== "" && unitFullName.trim() !== "") {
       const newUnit = {
         unit: unitName,
-        fullName: unitFullName,
-        allowDecimal: allowDecimal === "yes",
+        fullname: unitFullName,
+        allow_decimal: allowDecimal === "yes",
       };
+      const config = {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userDetails?.token}`
+        }
+    };
 
       try {
-        const addedUnit = await addNewUnit(newUnit); // Call the API to add a new unit
+        const addedUnit = await addNewUnit(newUnit,config); // Call the API to add a new unit
         setUnits([...units, addedUnit]); // Add the new unit to the list
         setUnitName("");
         setUnitFullName("");
