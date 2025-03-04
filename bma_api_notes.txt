@@ -1,0 +1,426 @@
+GST API:
+POST = http://127.0.0.1:8000/haniya/create_gst/
+
+GET =http://127.0.0.1:8000/haniya/get_gst/
+    json => get datas using gst "id"    
+UPDATE =http://127.0.0.1:8000/haniya/update_gst/
+   json => update datas with gst "id"    
+DELETE=http://127.0.0.1:8000/haniya/delete_gst/
+  json => delete datas with gst  "id"    
+Payload ={
+    "state": "Maharashtra",
+    "registration_type": "Regular",
+    "assessee_of_other_territory": "No",
+    "GSTIN_UIN": "27ABCDE1234F1Z5",
+    "periodicity_of_GSTR1": "Monthly",
+    "gst_user_name": "ExampleUser",
+    "mode_filing": "Online",
+    "e_invoicing_applicable": "Yes",
+    "applicable_from_e_invoicing": "2023-01-01",
+    "invoice_bill_from_place": "Pune",
+    "e_way_bill_applicable": "Yes",
+    "applicable_from_e_way_bill": "2023-01-01",
+    "applicable_for_intrastate": "Yes"
+}
+----------------------------------------------
+E-WAY-BILL:
+
+POST = http://127.0.0.1:8000/haniya/create_ewaybill/
+
+GET http://127.0.0.1:8000/haniya/get_ewaybill/
+    json => get datas using e-way-bill "id"    
+UPDATE http://127.0.0.1:8000/haniya/update_ewaybill/
+   json => update datas with e-way-bill "id"    
+http://127.0.0.1:8000/haniya/delete_ewaybill/
+  json => delete datas with e-way-bill "id"    
+Payload={
+    "eway_bill_no": "12345",
+    "date": "2025-01-24",
+    "dispatch_from": "City A",
+    "ship_to": "City B",
+    "transporter_name": "new",
+    "new_transport_for_shipment": "abcdeff",
+    "transport_id": "T123",
+    "mode": "Road",
+    "doc_lading_rr_airway_no": "AWB001",
+    "vehicle_number": "KA-01-1234",
+    "vehicle_type": "Heavy",
+    "date_of_transport": "2025-01-24"
+}
+--------------------------------------------
+E-INVOICE :
+POST = http://127.0.0.1:8000/haniya/create_einvoice/
+
+GET http://127.0.0.1:8000/haniya/get_einvoice/
+    json => get datas using e-invoice "id"    
+UPDATE http://127.0.0.1:8000/haniya/update_einvoice/
+   json => update datas with e-invoice "id"    
+DELETE =http://127.0.0.1:8000/haniya/delete_einvoice/
+  json => delete datas with e-invoice "id"    
+
+Payload={
+    "ack_no": "A12345",
+    "ack_date": "2025-01-24",
+    "irn": "IRN123456",
+    "bill_to_place": "City A",
+    "ship_to_place": "City B"
+}
+------------------------------------------------
+CATEGORY API:
+POST = http://127.0.0.1:8000/haniya/create_category/
+
+GET =http://127.0.0.1:8000/haniya/get_category/
+    json => get datas with category"id"    and  get category and subcategory datas with category "id"
+UPDATE =http://127.0.0.1:8000/haniya/update_category/
+   json => update datas with category"id"    
+DELETE  = http://127.0.0.1:8000/haniya/delete_category/
+  json => delete datas with category"id"    and  delete category and subcategory datas with category "id"
+
+Payload={
+    "category_name":"Fashion",
+    "cgst": 9.00,
+    "sgst": 9.00,
+    "igst":18.00
+
+}
+----------------------------------------------
+SUBCATEGORY API:
+
+POST = http://127.0.0.1:8000/haniya/create_subcategory/
+
+GET = http://127.0.0.1:8000/haniya/create_subcategory/
+    json => get datas using subcategory "id"    
+UPDATE= http://127.0.0.1:8000/haniya/create_subcategory/
+   json => update datas with subcategory"id"    
+DELETE =http://127.0.0.1:8000/haniya/create_subcategory/
+  json => delete datas with subcategory "id"    
+
+Payload={
+  "category_name": "Fashion",
+  "subcategory_name": "Mens Collection",
+  "hsn_sac_code":4567890
+}
+--------------------------------------------
+BRAND API:
+
+POST = http://127.0.0.1:8000/haniya/create_brand/
+
+GET = http://127.0.0.1:8000/haniya/get_brand/
+    json => get datas using brand"id"   
+UPDATE= http://127.0.0.1:8000/haniya/update_brand/
+   json => update datas with brand"id"    
+DELETE http://127.0.0.1:8000/haniya/delete_brand/
+  json => delete datas with brand "id"    
+
+Payload = {
+    "brand_name": "Avasa"
+}
+---------------------------------------------------------------
+UNIT API:
+
+POST = http://127.0.0.1:8000/haniya/create_brand/
+
+GET = http://127.0.0.1:8000/haniya/get_brand/
+    json => get datas using unit "id"    
+UPDATE= http://127.0.0.1:8000/haniya/update_brand/
+   json => update datas with unit "id"    
+DELETE http://127.0.0.1:8000/haniya/delete_brand/
+  json => delete datas with unit "id"    
+
+Payload={
+    "unit": "kg",
+    "full_name": "kilogram",
+    "allow_decimal": true
+}
+-----------------------------------------------
+PRODUCT API:
+
+POST = http://127.0.0.1:8000/haniya/create_product/
+
+GET = http://127.0.0.1:8000/haniya/create_product/
+    json => get datas using product "id"    
+UPDATE= http://127.0.0.1:8000/haniya/create_product/
+   json => update datas with product "id"    
+DELETE http://127.0.0.1:8000/haniya/create_product/
+  json => delete datas with product "id"    
+
+Payload={
+
+  "product_name": "Kurthi",
+  "category": "Fashion",
+  "sub_category": "Mens Collection",
+  "brand": "Avasa",
+  "unit": "pcs",
+  "product_code": "PRO0001",
+  "bar_qr_code": "127890",
+  "description": "This is a sample product."
+}
+------------------------------------------------------------
+PRICE DETAILS API:
+
+POST = http://127.0.0.1:8000/haniya/create_price_details/
+
+GET = http://127.0.0.1:8000/haniya/create_price_details/
+    json => get datas using pricedeatils "price_id"    
+UPDATE= http://127.0.0.1:8000/haniya/create_price_details/
+   json => update datas with pricedetails "price_id"    
+DELETE http://127.0.0.1:8000/haniya/create_price_details/
+  json => delete datas with pricedetails "price_id"    
+
+Payload={
+    
+    "purchase_price": 100.00,
+    "sale_price": 120.00,
+    "min_sale_price": 90.00,
+    "mrp": 150.00,
+    "discount": 10.00,
+    "hsn_sac_code": "12345678"
+}
+------------------------------------------------------
+PRICEGST DEATILS API:
+
+GET = (Calculate gst ) http://127.0.0.1:8000/api/calculate_tax_and_total/
+
+POST = http://127.0.0.1:8000/haniya/create_price_gst_details/
+
+GET = http://127.0.0.1:8000/haniya/create_price_gst_details/
+    json => get datas using gstdeatils "gst_details_id"
+UPDATE= http://127.0.0.1:8000/haniya/create_price_gst_details/
+   json => update datas with gstdeatils"gst_details_id"   
+DELETE http://127.0.0.1:8000/haniya/create_price_gst_details/
+  json => delete datas with gstdeatils "gst_details_id"    
+
+Payload={
+   
+    "cgst_percentage": 9.0,
+    "sgst_percentage": 9.0,
+    "igst_percentage": 18.0,
+    "cgst_value": 90.0,
+    "sgst_value": 90.0,
+    "igst_value": 180.0,
+    "total_amount": 1180.0
+}
+----------------------------------------------------
+STOCK DEATILS API:
+
+POST = http://127.0.0.1:8000/haniya/create_price_gst_details/
+
+GET = http://127.0.0.1:8000/haniya/create_price_gst_details/
+    json => get datas using stockdetails "stock_id"
+UPDATE= http://127.0.0.1:8000/haniya/create_price_gst_details/
+   json => update datas with stockdeatils "stock_id"   
+DELETE http://127.0.0.1:8000/haniya/create_price_gst_details/
+  json => delete datas with stockdeatils "stock_id"    
+
+Payload={
+  "opening_stock": 100,
+  "opening_stock_value": 1500.50,
+  "low_stock_qty": 10,
+  "date": "2025-01-27",
+  "location": "Warehouse A"
+}
+----------------------------------------------------
+REPORT:
+
+GET => http://127.0.0.1:8000/haniya/customer_product_report/
+-----------------------------------------------------
+ADMIN :
+
+
+POST = http://127.0.0.1:8000/haniya/create_admin/
+
+GET = http://127.0.0.1:8000/haniya/get_admin_details/
+    json => get datas using  "admin_id"
+
+UPDATE= http://127.0.0.1:8000/haniya/update_admin_details/
+   json => update datas with "admin_id"   
+
+DELETE http://127.0.0.1:8000/haniya/delete_admin_details/
+  json => delete datas using "admin_id"    
+
+Payload={
+    "email": "haniya21998@gmail.com",
+    "password": "haniya02@123",
+    "full_name": "Haniya",
+    "hardware_signature": "00:1F:2E:3U:4D:5E",
+    "last_login": "2025-05-01T11:00:00Z",
+    "is_active": true
+}
+
+---------------------------------------------------------------------------
+
+SUBSCRIPTION PLAN:
+
+
+POST = http://127.0.0.1:8000/haniya/create_subscription_plan/
+
+GET = http://127.0.0.1:8000/haniya/get_subscription_plan/
+    json => get datas using  "plan_id"
+
+UPDATE= http://127.0.0.1:8000/haniya/update_subscription_plan/
+   json => update datas with "plan_id"   
+
+DELETE http://127.0.0.1:8000/haniya/delete_subscription_plan/
+  json => delete datas using "plan_id"    
+
+Payload={
+  "admin_id": 4,
+  "plan_name": "Premium Plan",
+  "duration_days": 5,
+  "price": "199.99",
+  "description": "This is a premium subscription plan.",
+  "created_at": "2025-02-14T11:00:00",
+  "is_active": true
+}
+
+-----------------------------------------------------------------------
+LICENSE KEY :
+
+POST = http://127.0.0.1:8000/haniya/store_license_details/
+
+GET = http://127.0.0.1:8000/haniya/get_license_details/
+    json => get datas using  "license_id"
+
+UPDATE= http://127.0.0.1:8000/haniya/update_license_details/
+   json => update datas with "license_id"
+
+DELETE = http://127.0.0.1:8000/haniya/delete_license_details
+  json => delete datas using "license_id"
+
+Payload={
+    "admin_id": 4,
+    "plan_id": 3, 
+    "license_key": "ABC123XYZ789",
+    "validity_days": 60,
+    "is_active": true,
+    "hardware_signature":"00:1A:2B:3C:4D:5E" ,
+    "last_validated": "2025-02-01 12:00:00"
+}
+
+-------------------------------------------------------------------------
+PAYMENT :
+
+--------------------------------------------------------------------------
+SUPPLIER:
+
+POST = http://127.0.0.1:8000/haniya/create_supplier/
+
+GET = http://127.0.0.1:8000/haniya/get_supplier/
+    json => get datas using  "supplier_id"
+
+UPDATE= http://127.0.0.1:8000/haniya/update_supplier/
+   json => update datas with "supplier_id"
+
+DELETE = http://127.0.0.1:8000/haniya/delete_supplier/
+  json => delete datas using "supplier_id"
+
+Payload={
+  "supplier_name":"haniya",
+  "mobile_number":"9076408253",
+  "email":"hani3@gmail.com",
+  "address": "15 2nd street",
+  "area":"chennai",
+  "pin_code":"627811",
+  "state":"tamilnadu",
+  "opening_balance":12000,
+  "gst_number":"3358GTK7890023"
+  
+}
+------------------------------------------------------------------
+
+CUSTOMERLIST:
+
+POST = http://127.0.0.1:8000/haniya/create_customer/
+
+GET = http://127.0.0.1:8000/haniya/get_customer/
+    json => get datas using  "customer_id"
+
+UPDATE= http://127.0.0.1:8000/haniya/update_customer/
+   json => update datas with "customer_id"
+
+DELETE = http://127.0.0.1:8000/haniya/delete_customer/
+  json => delete datas using "customer_id"
+
+Payload={
+  "customer_name":"Haniya",
+  "mobile_number":"6383771273",
+  "email":"sufahaniya3@gmail.com",
+  "address": "12 2nd street",
+  "area":"tenkasi",
+  "pin_code":"627811",
+  "state":"tamilnadu",
+  "opening_balance":16000,
+  "gst_number":"3356GYK7890023"
+  
+}
+--------------------------------------------------------------------
+EMPLOYEE(model name CUSTOMER):
+
+POST = http://127.0.0.1:8000/haniya/add_employee/
+
+GET = http://127.0.0.1:8000/haniya/get_employee/
+    json => get datas using  "employee_id"
+
+UPDATE= http://127.0.0.1:8000/haniya/update_employee/
+   json => update datas with  "employee_id"
+
+DELETE = http://127.0.0.1:8000/haniya/delete_employee/
+  json => delete datas using  "employee_id"
+
+Payload={
+    "name": "Divya",
+    "gender": "Female",
+    "date_of_birth": "1990-05-15",
+    "email": "divya@example.com",
+    "phone_number": "9876578910",
+    "role": "Manager",
+    "date_joined": "2024-01-30",
+    "salary": "50000.00",
+    "address": "123 Main Street, City"
+}
+
+------------------------------------------------------------------
+POST= https://81fa-59-92-125-2.ngrok-free.app/haniya/login/
+
+GET = http://127.0.0.1:8000/haniya/get_all_users/ 
+
+DELETE = http://127.0.0.1:8000/haniya/delete_all_users/
+
+ONE MORE API(for tranfer) = https://81fa-59-92-125-2.ngrok-free.app/haniya/notify/
+
+Payload={
+  "user_name":"Sufahaniya",
+  "email":"sufahaniya@gmail.com",
+  "access_key":"aaec8ba9-a18f-4e51-a2f4-1a422ad2a518"
+  
+}
+---------------------------------------ANOTHER APP------------------------------------------------
+VERIFIED APP:
+
+USER REGISTERATION:
+
+POST = http://127.0.0.1:8000/haniya/create_product/
+
+GET = http://127.0.0.1:8000/haniya/get_all_details/ => for get all datas
+
+UPDATE= http://127.0.0.1:8000/haniya/update_user_details/
+   json => update datas with  "user_id"
+
+DELETE = http://127.0.0.1:8000/haniya/delete_user_details/
+  json => delete datas using  "user_id"
+
+Payload={
+  "name":"Sufahaniya",
+  "email":"sufahaniya@gmail.com",
+  "password":"sufa@02"
+  
+}
+----------------------------------------------------------------------
+USER HARDWARE DETAILS:
+
+ONE MORE API (for transfer) = https://81fa-59-92-125-2.ngrok-free.app/api/store_hardware/
+
+GET = http://127.0.0.1:8000/haniya/get_all_hardware_details/ 
+
+DELETE = http://127.0.0.1:8000/haniya/delete_all_details/
+

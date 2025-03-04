@@ -1,0 +1,56 @@
+1. **Django**
+   - Installation: `pip install django==4.2.16`
+   - Reason: Core framework for building your web application.
+   - Related Packages: `asgiref==3.8.1`, `async-timeout==5.
+
+2.**Celery**
+      -Installation:` pip install celery==5.4.0`
+      -Reason: Perform background tasks like sending emails or processing large data.
+     -Related Packages: billiard==4.2.1, kombu==5.4.2, vine==5.1.0, amqp==5.3.1, pytz==2024.2
+
+3. **django-celery-beat**
+    -Installation: `pip install django-celery-beat==2.7.0`
+    -Reason: Schedule periodic tasks through the Django admin panel.
+    -Related Packages: cron-descriptor==1.4.5, python-crontab==3.2.0, pytz==2024.2, psutil==7.0.0
+
+4. **requests**
+   - Installation: `pip install requests==2.32.3`
+   - Reason: Call external APIs for payment gateways or third-party services.
+   - Related Packages: `certifi==2025.1.31`, `charset-normalizer==3.4.1`, `idna==3.10`, `urllib3==2.3.0`
+
+5. **razorpay**
+   - Installation: `pip install razorpay==1.4.2`
+   - Reason: Integrate Razorpay payment gateway.
+   - Related Packages: `PyJWT==2.10.1`
+
+6. **django-cors-headers**
+   - Installation: `pip install django-cors-headers==4.7.0`
+   - Reason: Allow your Django app to accept requests from different domains.
+
+7. **PyJWT**
+   - Installation: `pip install PyJWT==2.10.1`
+   - Reason: Authenticate users with JWT tokens.
+
+8. **redis**
+   - Installation: `pip install redis==5.2.1`
+   - Reason: Cache data and use as a message broker for Celery.
+
+9. **mysqlclient**
+   - Installation: `pip install mysqlclient==2.2.7`
+   - Reason: Connect Django to the MySQL database.
+
+10. **cloudinary**
+    - Installation: `pip install cloudinary==1.42.2`
+    - Reason: Upload and manage images to Cloudinary.
+    - Related Packages: `django-cloudinary-storage==0.3.0`
+
+
+11. **WMI**
+    - Installation: `pip install WMI==1.5.1`
+    - Reason: Fetch system information on Windows.
+
+12. **python-dateutil**
+    - Installation: `pip install python-dateutil==2.9.0.post0`
+    - Reason: Handle date and time operations more effectively.
+    - Related Packages: `six==1.17.0`
+
