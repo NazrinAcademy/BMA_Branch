@@ -17,7 +17,7 @@ export function CustomerAdd(data,config, callback, errorcallback) {
 }
 
 export function Customerget(config, callback, errorcallback) {
-  axios.get(`${BASE_URL}/customer/get`, config)
+  axios.get(`${BASE_URL}/customer/get/all`, config)
     .then((response) => {
       if (callback) {
         callback(response);
