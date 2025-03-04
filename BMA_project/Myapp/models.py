@@ -279,7 +279,6 @@ class Supplier(models.Model):
         return self.supplier_name
 
 class accesskey(models.Model):
-    # id = models.ObjectIdField(default=ObjectId, primary_key=True)  # Store as ObjectId in MongoDB
     access_id =  models.CharField(primary_key= True, max_length=24, default=generate_add_gst_id)
     access_key = models.CharField(max_length=24, unique=True, default=generate_add_gst_id)  
     name = models.CharField(max_length=100, null=True)

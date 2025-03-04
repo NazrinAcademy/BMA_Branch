@@ -232,6 +232,32 @@ async def async_StockCategory_Get(request):
     except Exception as e:
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
 
+def category_get_all(request):
+    return async_to_sync(async_category_get_all)(request)
+async def async_category_get_all(request):
+    try:
+        if request.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method , only GET allowed'},status = 400)
+        try: 
+            all_get = await sync_to_async(list)(StockCategory.objects.all())
+        except StockCategory.DoesNotExist:
+            return JsonResponse({'error':f'category is empty'},status= 404)
+        stock_category_data = [
+            {
+                'id': str(stock_category.StockCategory_id),
+                'sno': stock_category.sno,
+                'name': stock_category.name,
+                'igst': stock_category.igst,
+                'cgst': stock_category.cgst,
+                'sgst': stock_category.sgst,
+            }
+            for stock_category in  all_get                      
+        ]
+        return JsonResponse({"all_stock":stock_category_data}, status=200)
+        
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepted error :{str(e)}'},status = 500)
+    
 @csrf_exempt
 def update_StockCategory(request):
     return async_to_sync(async_update_StockCategory)(request)
@@ -332,6 +358,7 @@ async def async_add_unit_creation(request):
 
     except Exception as e:
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
+
 @csrf_exempt
 def get_unit(request):
     return async_to_sync(async_get_unit_by_id)(request)
@@ -364,6 +391,29 @@ async def async_get_unit_by_id(request):
         return JsonResponse({'error': 'Invalid data format'}, status=400)
     except Exception as e:
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
+
+def all_unit(request):
+    return async_to_sync(async_unit_all)(request)
+async def async_unit_all(request):
+    try:
+        if request.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowed'},status = 400)
+        try:
+            all_get =  await sync_to_async(list)(UnitCreation.objects.all())
+        except UnitCreation.DoesNotExist:
+            return JsonResponse({'error':f'unit is empty'},status = 404)
+        unit_all = [
+            {
+            'id': str(unit.Unit_Id),
+            'unit': unit.unit,
+            'fullname': unit.fullname,
+            'allow_decimal': unit.allow_decimal,
+        }
+        for unit in all_get
+        ]
+        return JsonResponse({'unit_all':unit_all},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error: {str(e)}'},status = 500)
 
 @csrf_exempt
 def update_unit(request):
@@ -493,6 +543,31 @@ async def async_get_category_by_ids(request):
         return JsonResponse(category_data, status=200)
     except Exception as e:
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
+
+def subCategory_all(request):
+    return async_to_sync(async_subcategory_all)(request)
+async def async_subcategory_all(request):
+    try:
+        if request.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowed'},status = 400)
+        try: 
+            all_get = await sync_to_async(list)(StocksubCategory)
+        except StocksubCategory:
+            return JsonResponse({'error:'f'subcategory is empty'},status = 404)
+        subcategory_all = [
+            {
+            'subCategory_Id': str(category.subCategory_Id),
+            'S.No':category.sno,
+            'StockCategory_id': category.StockCategory_id,
+            'subCategoryname': category.subCategoryname,
+            'Categoryname': category.Categoryname,
+            'hsn_sac_code': category.hsn_sac_code,
+            }
+            for category in all_get
+        ]
+        return JsonResponse({'subCategory':subcategory_all},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error: {str(e)}'},status = 500)
 
 @csrf_exempt
 def update_StocksubCategory(request):
@@ -632,6 +707,30 @@ async def async_getStockDetailsById(request):
     except Exception as e:
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
 
+def stock_details_all(request):
+    return async_to_sync(async_stock_details_all)(request)
+async def async_stock_details_all(request):
+    try:
+        if request.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowed'},status = 400)
+        try:
+            all_data =  await sync_to_async(list)(StockDetails.objects.all())
+        except StockDetails.DoesNotExist:
+            return JsonResponse({'error':f'stock is empty'},status = 404)
+        stock_details_all = [{
+            'product_Id': str(stock_details.product_Id),
+            'opening_stock': stock_details.opening_stock,
+            'opening_stock_values': stock_details.opening_stock_values,
+            'low_stock_qty': stock_details.low_stock_qty,
+            'date': stock_details.date, 
+            'location': stock_details.location, 
+            'id': stock_details.StockDetails_id
+        }
+        for stock_details in all_data                 
+        ]
+        return JsonResponse({'all_stock_details':stock_details_all},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error : {str(e)}'},status = 500)
 @csrf_exempt
 def update_stockDetails(request):
     return async_to_sync(async_updateStockDetailsById)(request)
@@ -844,6 +943,7 @@ async def async_get_product_by_id(request):
         return JsonResponse(product_data, status=200)
     except Exception as e:
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
+
 @csrf_exempt   
 def get_product_all(request):
     return async_to_sync(async_get_all_products)(request)
@@ -963,10 +1063,21 @@ async def async_Customer_product_cul(request):
         try:
             amount = await sync_to_async(PriceDetails.objects.get)(product_Id = object_id)
             gstamount = await sync_to_async(PriceGstDetails.objects.get)(product_Id = object_id)
+            stock_balance =  await sync_to_async(StockDetails.objects.filter(product_Id = object_id).exists)()
+            if not stock_balance:
+                return JsonResponse({'error': 'Stock details not found for the product'}, status=404)
+            stock_qyt = await sync_to_async(StockDetails.objects.get)(product_Id = object_id)
             rate = amount.SalePrice
             discount = amount.discount
         except  (PriceDetails.DoesNotExist, PriceGstDetails.DoesNotExist):
             return JsonResponse({'error':f'Data not found'},status=404)
+        
+        
+        balance_qyt = stock_qyt.low_stock_qty
+        
+        if qyt > balance_qyt:
+            return JsonResponse({'error': f'Insufficient stock! Available quantity: {balance_qyt}, Requested quantity: {qyt}'
+                }, status=400)
         
         multible_amount = qyt * rate
         cgst = qyt * gstamount.cgstprice
@@ -1139,6 +1250,32 @@ async def async_get_price_by_id(request):
         logger.error(f"An unexpected error occurred: {str(e)}")
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
 
+def get_priceDetails_all(reqeust):
+    return async_to_sync(async_get_priceDetails_all)(reqeust)
+async def async_get_priceDetails_all(reqeust):
+    try:
+        if reqeust.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowes'},status = 400)
+        try:
+            all_data =  await sync_to_async(list)(PriceDetails.objects.all())
+        except PriceDetails.DoesNotExist:
+            return JsonResponse({'error':f'Price details is empty'},status = 404)
+        price_data = [
+            {
+            'product_Id': str(price.product_Id),
+            'PurchasePrice': price.PurchasePrice,
+            'SalePrice': price.SalePrice,
+            'Min_Sale_Price': price.Min_Sale_Price,
+            'MRP': price.MRP,
+            'hsn_sac_code': price.hsn_sac_code,
+            'discount': price.discount,
+        }
+        for price in all_data
+        ]
+        return JsonResponse({'priceGstData':price_data},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error : {str(e)}'},status = 500)
+
 @csrf_exempt
 def update_priceDetails(request):
     return async_to_sync(async_update_price)(request)
@@ -1277,6 +1414,36 @@ async def async_get_price_Gstdetails_by_id(request):
     except Exception as e:
         logger.error(f"An unexpected error occurred: {str(e)}")
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
+
+def priceGstDtails_all(reqeust):
+    return async_to_sync(async_priceGstDtails_all)(reqeust)
+async def async_priceGstDtails_all(reqeust):
+    try:
+        if reqeust.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowes'},status = 400)
+        try:
+            all_data =  await sync_to_async(list)(PriceGstDetails.objects.all())
+        except PriceGstDetails.DoesNotExist:
+            return JsonResponse({'error':f'Price Gst details is empty'},status = 404)
+        price_data = [
+            {
+            'product_Id': str(price.product_Id),
+            'gstdetail_id': str(price.Gstdetails_Id),
+            'igst': price.igst,
+            'igstprice': price.igstprice,
+            'cgst': price.cgst,
+            'cgstprice': price.cgstprice,
+            'sgst': price.sgst,
+            'sgstprice': price.sgstprice,
+            'cess': price.cess,
+            'cessprice': price.cessprice,
+            'totalamount': price.totalamount,
+        }
+        for price in all_data
+        ]
+        return JsonResponse({'priceGstData':price_data},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error : {str(e)}'},status = 500)
 
 @csrf_exempt
 def update_priceGstDetails(request):
@@ -1679,6 +1846,27 @@ async def async_get_brand(request):
     except Exception as e:
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
 
+def get_brand_all(reqeust):
+    return async_to_sync(async_get_brand_all)(reqeust)
+async def async_get_brand_all(reqeust):
+    try:
+        if reqeust.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowes'},status = 400)
+        try:
+            all_data =  await sync_to_async(list)(brand.objects.all())
+        except PriceDetails.DoesNotExist:
+            return JsonResponse({'error':f'brand details is empty'},status = 404)
+        price_data = [
+        {
+            'brand_id': product.brand_id,
+            'brand_name': product.brand_name,
+        }
+        for product in all_data
+        ]
+        return JsonResponse({'brand':price_data},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error : {str(e)}'},status = 500)
+
 @csrf_exempt
 def update_brand(request):
     return async_to_sync(async_update_brand)(request)
@@ -1807,6 +1995,32 @@ async def async_get_e_invoice_by_id(request):
 
     except Exception as e:
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
+
+def get_e_invoice_all(reqeust):
+    return async_to_sync(async_get_e_invoice_all)(reqeust)
+async def async_get_e_invoice_all(reqeust):
+    try:
+        if reqeust.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowes'},status = 400)
+        try:
+            all_data =  await sync_to_async(list)(EInvoiceDetails.objects.all())
+        except EInvoiceDetails.DoesNotExist:
+            return JsonResponse({'error':f'EInvoiceDetails details is empty'},status = 404)
+        price_data = [
+        {
+            'sale_id': str(e_invoice.sale_id),
+            'ack_no': e_invoice.ack_no,
+            'ack_date': str(e_invoice.ack_date) if e_invoice.ack_date else None,
+            'irn': e_invoice.irn,
+            'bill_to_place': e_invoice.bill_to_place,
+            'ship_to_place': e_invoice.ship_to_place,
+        }
+        for e_invoice in all_data
+        ]
+        return JsonResponse({'EInvoiceDetails':price_data},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error : {str(e)}'},status = 500)
+
 @csrf_exempt
 def update_e_invoice(request):
     return async_to_sync(async_update_e_invoice_details)(request)
@@ -1914,6 +2128,7 @@ async def async_add_eway_bill(request):
         return JsonResponse({'message':'Successufully','sale_id':e_way_bill.sale_id},status=200)
     except Exception as e:
         return JsonResponse({'error':f'an unexpected error:{str(e)}'},status=500)
+
 @csrf_exempt
 def get_e_way_bill(request):
     return async_to_sync(async_get_ewaybill)(request)
@@ -1947,6 +2162,38 @@ async def async_get_ewaybill(request):
         return JsonResponse(get_record_details,status=200)
     except Exception as e:
         return JsonResponse({'error':f'An unexpected error (str{e})'},status=500)
+
+def get_e_way_bill_all(reqeust):
+    return async_to_sync(async_get_e_way_bill_all)(reqeust)
+async def async_get_e_way_bill_all(reqeust):
+    try:
+        if reqeust.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowes'},status = 400)
+        try:
+            all_data =  await sync_to_async(list)(EWayBill.objects.all())
+        except EWayBill.DoesNotExist:
+            return JsonResponse({'error':f'EWayBill details is empty'},status = 404)
+        price_data = [
+       {
+            'sale_id':str(get_records.sale_id),
+            'eway_bill_no': get_records.eway_bill_no,
+            'date':get_records.date,
+            'dispatch_from':get_records.dispatch_from,
+            'ship_to':get_records.ship_to,
+            'transporter_name':get_records.transporter_name,
+            'transport_id':get_records.transport_id,
+            'mode':get_records.mode,
+            'doc_or_airway_no':get_records.doc_or_airway_no,
+            'vehicle_number':get_records.vehicle_number,
+            'vehicle_date':get_records.vehicle_date,
+            'vehicle_type':get_records.vehicle_type,
+        }
+        for get_records in all_data
+        ]
+        return JsonResponse({'EWayBill':price_data},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error : {str(e)}'},status = 500)
+    
 @csrf_exempt
 def update_e_way_bill(request):
     return async_to_sync(async_update_ewaybill)(request)
@@ -2265,22 +2512,18 @@ def get_admin(request):
     return async_to_sync(async_get_admin_by_id)(request)
 async def async_get_admin_by_id(request):
     try:
-        # Check if the request method is GET
         if request.method != 'GET':
             return JsonResponse({'error': 'Invalid request method. Only GET is allowed.'}, status=405)
 
-        # Get the admin_id from query parameters
         admin_id = request.GET.get('object_id')
         if not admin_id:
             return JsonResponse({'error': 'admin_id query parameter is required.'}, status=400)
 
-        # Fetch the admin record by admin_id
         try:
             admin = await sync_to_async(Admin.objects.get)(admin_id=admin_id)
         except Admin.DoesNotExist:
             return JsonResponse({'error': 'Admin not found.'}, status=404)
 
-        # Prepare the admin data for response
         admin_data = {
             'admin_id': admin.admin_id,
             'email': admin.email,
@@ -2291,13 +2534,38 @@ async def async_get_admin_by_id(request):
             'hardware_signature': admin.hardware_signature,
         }
 
-        # Return the admin data
         return JsonResponse(admin_data, status=200)
 
     except Exception as e:
         logger.error(f"An unexpected error occurred: {str(e)}")
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
 
+def get_admin_all(reqeust):
+    return async_to_sync(async_get_admin_all)(reqeust)
+async def async_get_admin_all(reqeust):
+    try:
+        if reqeust.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowes'},status = 400)
+        try:
+            all_data =  await sync_to_async(list)(Admin.objects.all())
+        except Admin.DoesNotExist:
+            return JsonResponse({'error':f'Admin details is empty'},status = 404)
+        price_data = [
+            {
+            'admin_id': admin.admin_id,
+            'email': admin.email,
+            'full_name': admin.full_name,
+            'created_at': admin.created_at.isoformat(),
+            'last_login': admin.last_login.isoformat() if admin.last_login else None,
+            'is_active': admin.is_active,
+            'hardware_signature': admin.hardware_signature,
+        }
+        for admin in all_data
+        ]
+        return JsonResponse({'Admin':price_data},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error : {str(e)}'},status = 500)
+    
 @csrf_exempt
 def update_admin(request):
     return async_to_sync(async_update_admin)(request)
@@ -2456,7 +2724,40 @@ async def async_get_subscription_plan_by_id(request):
     except Exception as e:
         logger.error(f"An unexpected error occurred: {str(e)}")
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
-    
+
+def get_subscription_plan_all(reqeust):
+    return async_to_sync(async_get_subscription_plan_all)(reqeust)
+async def async_get_subscription_plan_all(reqeust):
+    try:
+        if reqeust.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowes'},status = 400)
+        try:
+            subscription_plans = await sync_to_async(list)(SubscriptionPlan.objects.all())
+        except SubscriptionPlan.DoesNotExist:
+            return JsonResponse({'error': 'Subscription Plan not found.'}, status=404)
+        
+        price_data = [
+            {
+            'plan_id': subscription_plan.plan_id,
+            'admin_id': subscription_plan.admin_id,
+            'plan_name': subscription_plan.plan_name,
+            'duration_days': subscription_plan.duration_days,
+            'starting_days':subscription_plan.starting_days,
+            'ending_days':subscription_plan.ending_days,
+            'price': (
+                float(subscription_plan.price.to_decimal()) 
+                if isinstance(subscription_plan.price, Decimal128) 
+                else float(subscription_plan.price)
+                ),
+            'description': subscription_plan.description,
+            'is_active': subscription_plan.is_active,
+            }
+        for subscription_plan in subscription_plans
+        ]
+        return JsonResponse({'SubscriptionPlan':price_data},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error : {str(e)}'},status = 500)
+
 @csrf_exempt
 def update_subscription_plan(request):
     return async_to_sync(async_update_subscription_plan)(request)
@@ -2635,6 +2936,7 @@ async def async_add_license(request):
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         return JsonResponse({'error': f'Unexpected error: {str(e)}'}, status=500)
+
 @csrf_exempt
 def get_license(request):
     return async_to_sync(async_get_license_by_admin_id)(request)
@@ -2690,6 +2992,40 @@ async def async_get_license_by_admin_id(request):
     except Exception as e:
         logger.error(f"An unexpected error occurred: {str(e)}")
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
+
+def get_license_all(reqeust):
+    return async_to_sync(async_get_license_all)(reqeust)
+async def async_get_license_all(reqeust):
+    try:
+        if reqeust.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowes'},status = 400)
+        try:
+            License = await sync_to_async(list)(License.objects.all())
+        except License.DoesNotExist:
+            return JsonResponse({'error': 'License  not found.'}, status=404)
+        
+        price_data = [
+            {
+            'plan_id': subscription_plan.plan_id,
+            'admin_id': subscription_plan.admin_id,
+            'plan_name': subscription_plan.plan_name,
+            'duration_days': subscription_plan.duration_days,
+            'starting_days':subscription_plan.starting_days,
+            'ending_days':subscription_plan.ending_days,
+            'price': (
+                float(subscription_plan.price.to_decimal()) 
+                if isinstance(subscription_plan.price, Decimal128) 
+                else float(subscription_plan.price)
+                ),
+            'description': subscription_plan.description,
+            'is_active': subscription_plan.is_active,
+            }
+        for subscription_plan in License
+        ]
+        return JsonResponse({'SubscriptionPlan':price_data},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error : {str(e)}'},status = 500)
+
 @csrf_exempt
 def update_license(request):
     return async_to_sync(async_update_license)(request)
@@ -3002,6 +3338,33 @@ async def async_get_notification(request):
     except Exception as e:
         logger.error(f"An unexpected error occurred: {str(e)}")
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
+
+def get_notification_all(reqeust):
+    return async_to_sync(async_get_notification_all)(reqeust)
+async def async_get_notification_all(reqeust):
+    try:
+        if reqeust.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowes'},status = 400)
+        try:
+            get_all = await sync_to_async(list)(Notification.objects.all())
+        except SubscriptionPlan.DoesNotExist:
+            return JsonResponse({'error': 'Subscription Plan not found.'}, status=404)
+        
+        price_data = [
+            {
+            'notification_id': notification.notification_id,
+            'admin_id': notification.admin_id,
+            'type': notification.type,
+            'message': notification.message,
+            'is_read': notification.is_read,
+            'created_at': notification.created_at.isoformat(),  
+        }
+        for notification in get_all
+        ]
+        return JsonResponse({'notification':price_data},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error : {str(e)}'},status = 500)
+    
 @csrf_exempt
 def update_notification(request):
     return async_to_sync(async_update_notification)(request)
@@ -3123,7 +3486,7 @@ async def async_get_customer(request):
             datas = await sync_to_async(Customer.objects.get)(customer_name=customer_name)
         except Customer.DoesNotExist:
             return JsonResponse({'error':f'User not found'},status=404)
-        Customer_date={
+        Customer_date = {
             'Customer_id' :datas.Customer_id,
             'User_id' : datas.User_id,
             'customer_name' : datas.customer_name,
@@ -3140,6 +3503,39 @@ async def async_get_customer(request):
         return JsonResponse(Customer_date,status=200)
     except Exception as e:
         return JsonResponse({'error':f'An unexpected erorr {e}'},status=500)
+
+def Customer_get_all(reqeust):
+    return async_to_sync(async_Customer_get_all)(reqeust)
+async def async_Customer_get_all(reqeust):
+    try:
+        if reqeust.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowes'},status = 400)
+        try:
+            get_all = await sync_to_async(list)(Customer.objects.all())
+        except Customer.DoesNotExist:
+            return JsonResponse({'error': 'Customer not found.'}, status=404)
+        
+        price_data = [
+           {
+            'Customer_id' :datas.Customer_id,
+            'User_id' : datas.User_id,
+            'customer_name' : datas.customer_name,
+            'Mobile_no' : datas.mobile_no,
+            'email' : datas.email,
+            'address' : datas.address,
+            'area' : datas.area,
+            'pincode' : datas.pincode,
+            'state' : datas.state,
+            'opening_balance' : convert_decimal(datas.opening_balance),
+            'balance_amount' : convert_decimal(datas.balance_amount),
+            'GST_No' : datas.gst_number, 
+        }
+        for datas in get_all
+        ]
+        return JsonResponse({'Customer':price_data},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error : {str(e)}'},status = 500)
+    
 @csrf_exempt
 def customer_update(request):
     return async_to_sync(async_customer_update)(request)
@@ -3247,7 +3643,7 @@ async def async_supplier_get(request):
             get_data = await sync_to_async(Supplier.objects.get)(User_id=user_id)
         except Supplier.DoesNotExist:
             return JsonResponse({'error':f'data is not found'},status=404)
-        supplier_data ={
+        supplier_data = {
             'supplier_id': get_data.supplier_id,
             'User_id': get_data.User_id,
             'supplier_name': get_data.supplier_name,
@@ -3264,6 +3660,39 @@ async def async_supplier_get(request):
         return JsonResponse(supplier_data,status=200)
     except Exception as e:
         return JsonResponse({'error':f'An unexpected error:{str(e)}'},status=500)
+
+def Supplier_get_all(reqeust):
+    return async_to_sync(async_Supplier_get_all)(reqeust)
+async def async_Supplier_get_all(reqeust):
+    try:
+        if reqeust.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowes'},status = 400)
+        try:
+            get_all = await sync_to_async(list)(Supplier.objects.all())
+        except Supplier.DoesNotExist:
+            return JsonResponse({'error': 'Supplier not found.'}, status=404)
+        
+        price_data = [
+           {
+            'supplier_id': get_data.supplier_id,
+            'User_id': get_data.User_id,
+            'supplier_name': get_data.supplier_name,
+            'mobile_no': get_data.mobile_no,
+            'email': get_data.email,
+            'address': get_data.address,
+            'area': get_data.area,
+            'pincode': get_data.pincode,
+            'state': get_data.state,
+            'opening_balance': convert_decimal(get_data.opening_balance),
+            'balance_amount': convert_decimal(get_data.balance_amount),
+            'gst_number': get_data.gst_number,
+        }
+        for get_data in get_all
+        ]
+        return JsonResponse({'Supplier':price_data},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error : {str(e)}'},status = 500)
+    
 @csrf_exempt
 def supplier_update(request):
     return async_to_sync(async_suppiler_update)(request)
@@ -3455,6 +3884,31 @@ async def async_get_accesskey (request):
     except Exception as e:
         return JsonResponse({'error':f'An unexcepted error: {str(e)}'},status=500)
 
+def accesskey_get_all(reqeust):
+    return async_to_sync(async_accesskey_get_all)(reqeust)
+async def async_accesskey_get_all(reqeust):
+    try:
+        if reqeust.method != 'GET':
+            return JsonResponse({'error':f'Invalid request method, only GET allowes'},status = 400)
+        try:
+            get_all = await sync_to_async(list)(accesskey.objects.all())
+        except accesskey.DoesNotExist:
+            return JsonResponse({'error': 'accesskey not found.'}, status=404)
+        
+        price_data = [
+           {
+            'id':datas.access_id,
+            'access_key':datas.access_key,
+            'name':datas.name,
+            'email_id':datas.email_id,
+            'permissin':datas.permissin,
+        }
+        for datas in get_all
+        ]
+        return JsonResponse({'accesskey':price_data},status = 200)
+    except Exception as e:
+        return JsonResponse({'error':f'An unexcepeted error : {str(e)}'},status = 500)
+
 @csrf_exempt
 def accesskey_update(request):
     return async_to_sync(async_update_accesskey)(request)
@@ -3488,6 +3942,7 @@ async def async_update_accesskey(request):
         return JsonResponse({'success':f'data update successfully'},status=200)
     except Exception as e:
         return JsonResponse({'error':f'An unexcepted error: {str(e)}'},status=500)
+
 @csrf_exempt
 def accesskey_delete(request):
     return async_to_sync(async_delete_accesskey)(request)
@@ -3507,39 +3962,58 @@ async def async_delete_accesskey(request):
         return JsonResponse({'error':f'data delete successfully'},status=200)
     except Exception as e:
         return JsonResponse({'error':f'An unexcpted error:{str(e)}'},status=500)
-@csrf_exempt
-def customer_sale_add(request):
-    return async_to_sync(async_add_sale)(request)
 
+@csrf_exempt
+def customer_sale_ledger_add(request):
+    return async_to_sync(async_add_sale)(request)
 async def async_add_sale(request):
     try:
         if request.method != 'POST':
             return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-        # Parse JSON request body
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON payload'}, status=400)
-
-        # Required fields validation
+        
         required_fields = [
             'customer_id', 'customer_name', 'mobile_no', 'invoice_no', 'invoice_date',
             'due_date', 'sale_type', 'products', 'total_amount', 'received_amount', 
             'balance_amount', 'total_before_tax', 'cgst', 'sgst', 'discount', 
-            'grand_total', 'payment_type', 'payment_status', 'billing_address', 'shipping_address'
-        ]
+            'grand_total', 'payment_type', 'payment_status', 'billing_address', 'shipping_address']
 
         for field in required_fields:
             if field not in data or not data[field]:
                 return JsonResponse({'error': f'Missing required field: {field}'}, status=400)
+        
+        products = data.get('products', [])
 
-        # Create Sale entry asynchronously
+        if not isinstance(products, list) or not products:
+            return JsonResponse({'error': 'Products should be a list and cannot be empty'}, status=400)
+
+        for product in products:
+            product_id = product.get('product_Id')
+            sale_quantity = product.get('quantity', 0)
+
+            if not product_id or sale_quantity <= 0:
+                return JsonResponse({'error': 'Invalid product details or quantity'}, status=400)
+
+            stock_obj = await sync_to_async(StockDetails.objects.filter(product_Id=product_id).first)()
+
+            if not stock_obj:
+                return JsonResponse({'error': f'Stock details not found for product ID: {product_id}'}, status=404)
+
+            if stock_obj.low_stock_qty < sale_quantity:
+                return JsonResponse({'error': f'Insufficient stock for product ID: {product_id}, Available: {stock_obj.low_stock_qty}, Requested: {sale_quantity}'}, status=400)
+
+            # Reduce the stock quantity
+            stock_obj.low_stock_qty -= sale_quantity
+            await sync_to_async(stock_obj.save)()  
+        
         sale = await sync_to_async(Sale.objects.create)(
             customer_id=data['customer_id'],
             customer_name=data['customer_name'],
             mobile_no=data['mobile_no'],
-            gst_no=data.get('gst_no', None),  # Optional field
+            gst_no=data.get('gst_no', None),  
             invoice_no=data['invoice_no'],
             invoice_date=data['invoice_date'],
             due_date=data['due_date'],
@@ -3557,10 +4031,9 @@ async def async_add_sale(request):
             payment_status=data['payment_status'],
             billing_address=data['billing_address'],
             shipping_address=data['shipping_address'],
-            sale_notes=data.get('sale_notes', ''),  # Optional field
-            require_invoice=data.get('require_invoice', False)  # Default False
+            sale_notes=data.get('sale_notes', ''),  
+            require_invoice=data.get('require_invoice', False) 
         )
-
         return JsonResponse({
             'message': 'Sale record added successfully',
             'sale_id': str(sale.sale_id),
@@ -3570,4 +4043,3 @@ async def async_add_sale(request):
 
     except Exception as e:
         return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
-
