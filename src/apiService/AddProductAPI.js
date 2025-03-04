@@ -3,6 +3,8 @@ import axios from 'axios';
 // Base URL for the json-server
 const API_URL = 'http://localhost:5000';
 
+const BASE_URL="http://127.0.0.1:8000"
+
 // Function to fetch all products
 export const fetchProducts = async () => {
   try {
@@ -57,72 +59,52 @@ export const deleteProduct = async (id) => {
 // ------------------------------Sub  Categories---------------------------------------------------
 
 
-export const addSubCategory = async (categoryName, subCategoryName, hsnCode) => {
-  try {
-    const categories = await getCategories();  
+// export const addSubCategory = async (categoryName, subCategoryName, hsnCode) => {
+//   try {
+//     const categories = await getCategories();  
 
-    // Find the category by name
-    const categoryToUpdate = categories.find(
-      (category) => category.categoryName === categoryName
-    );
+//     // Find the category by name
+//     const categoryToUpdate = categories.find(
+//       (category) => category.categoryName === categoryName
+//     );
 
-    if (!categoryToUpdate) {
-      throw new Error("Category not found");
-    }
+//     if (!categoryToUpdate) {
+//       throw new Error("Category not found");
+//     }
 
-    const updatedCategory = {
-      ...categoryToUpdate,
-      subCategories: [
-        ...(categoryToUpdate.subCategories || []),
-        { name: subCategoryName, hsnCode: hsnCode } 
-      ],
-    };
+//     const updatedCategory = {
+//       ...categoryToUpdate,
+//       subCategories: [
+//         ...(categoryToUpdate.subCategories || []),
+//         { name: subCategoryName, hsnCode: hsnCode } 
+//       ],
+//     };
 
-    const response = await axios.put(`${API_URL}/categories/${categoryToUpdate.id}`, updatedCategory, {
-      headers: {
-        "Content-Type": "application/json",
-      }
-    });
+//     const response = await axios.put(`${API_URL}/categories/${categoryToUpdate.id}`, updatedCategory, {
+//       headers: {
+//         "Content-Type": "application/json",
+//       }
+//     });
 
-    if (response.status !== 200) {
-      throw new Error("Failed to update category");
-    }
+//     if (response.status !== 200) {
+//       throw new Error("Failed to update category");
+//     }
 
-    return response.data;
+//     return response.data;
 
-  } catch (error) {
-    console.error("Error adding subcategory:", error);
-    throw error;  
-  }
-};
+//   } catch (error) {
+//     console.error("Error adding subcategory:", error);
+//     throw error;  
+//   }
+// };
 
 
-// Add a new category
-export const addCategory = async (category) => {
-  try {
-    const response = await fetch(`${API_URL}/categories`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(category),
-    });
 
-    if (!response.ok) {
-      throw new Error("Failed to add category");
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
 
 // Get the updated list of categories (optional if fetchCategories is reused)
-export const getCategories = async () => {
+export const getCategories = async (config) => {
   try {
-    const response = await fetch(`${API_URL}/categories`);
+    const response = await fetch(`${BASE_URL}/category/get`, config);
     if (!response.ok) {
       throw new Error("Failed to fetch categories");
     }
@@ -134,38 +116,6 @@ export const getCategories = async () => {
 };
 
 
-
-// Update a category
-export const updateCategory = async (id, updatedCategory) => {
-  try {
-    const response = await axios.put(`${API_URL}/categories/${id}`, updatedCategory, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    return response.data;
-  } catch (error) {
-    console.error("Error updating category:", error);
-    throw error;
-  }
-};
-
-// Delete a category
-export const deleteCategory = async (id) => {
-  try {
-    const response = await axios.delete(`${API_URL}/categories/${id}`);
-
-    if (!response.status === 200) {
-      throw new Error("Failed to delete category");
-    }
-
-    return { success: true, id };
-  } catch (error) {
-    console.error("Error deleting category:", error);
-    throw error;
-  }
-};
 
 
 export const getSubCategories = async () => {
@@ -182,9 +132,9 @@ export const getSubCategories = async () => {
 // ---------------------------brands ---------------------------
 
 // Add a new brand
-export const addBrand = async (brandName) => {
+export const addBrand = async (brandName, config) => {
   try {
-    const response = await axios.post(`${API_URL}/brands`, { name: brandName });
+    const response = await axios.post(`${BASE_URL}/brand/add`, { brand_name: brandName }, config);
     return response.data;
   } catch (error) {
     console.error("Error adding brand:", error);
@@ -193,9 +143,9 @@ export const addBrand = async (brandName) => {
 };
 
 // Get all brands
-export const getBrands = async () => {
+export const getBrands = async (config) => {
   try {
-    const response = await axios.get(`${API_URL}/brands`);
+    const response = await axios.get(`${BASE_URL}/brand/get`, config);
     console.log("API Response:", response.data); // Debugging
     return response.data;
   } catch (error) {
@@ -207,7 +157,7 @@ export const getBrands = async () => {
 // Update brand
 export const updateBrand = async (brandId, updatedBrand) => {
   try {
-    const response = await axios.put(`${API_URL}/brands/${brandId}`, updatedBrand);
+    const response = await axios.put(`${BASE_URL}/brand/update/${brandId}`, updatedBrand);
     return response.data;
   } catch (error) {
     console.error("Error updating brand:", error);
@@ -218,7 +168,7 @@ export const updateBrand = async (brandId, updatedBrand) => {
 // Delete brand
 export const deleteBrand = async (brandId) => {
   try {
-    await axios.delete(`${API_URL}/brands/${brandId}`);
+    await axios.delete(`${BASE_URL}/brand/delete/${brandId}`);
     return { success: true };
   } catch (error) {
     console.error("Error deleting brand:", error);
@@ -231,9 +181,9 @@ export const deleteBrand = async (brandId) => {
 
 
 // Fetch all units
-export const fetchUnits = async () => {
+export const fetchUnits = async (config) => {
   try {
-    const response = await fetch(`${API_URL}/units`);
+    const response = await fetch(`${BASE_URL}/unit/get`, config);
     if (!response.ok) throw new Error("Failed to fetch units");
     return await response.json();
   } catch (error) {
@@ -243,13 +193,11 @@ export const fetchUnits = async () => {
 };
 
 // Add a new unit
-export const addNewUnit = async (unitData) => {
+export const addNewUnit = async (unitData,config) => {
   try {
-    const response = await fetch(`${API_URL}/units`, {
+    const response = await fetch(`${BASE_URL}/unit/add`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      config,
       body: JSON.stringify(unitData),
     });
 
@@ -264,9 +212,9 @@ export const addNewUnit = async (unitData) => {
 
 
 // Delete a unit
-export const deleteUnit = async (unitId) => {
+export const deleteUnit = async (unitId, config) => {
   try {
-    const response = await axios.delete(`${API_URL}/units/${unitId}`);
+    const response = await axios.delete(`${BASE_URL}/unit/delete/${unitId}`, config);
     return response.data;
   } catch (error) {
     console.error("Error deleting unit:", error);
@@ -275,9 +223,9 @@ export const deleteUnit = async (unitId) => {
 };
 
 // Update a unit
-export const updateUnit = async (unitId, updatedData) => {
+export const updateUnit = async (unitId, updatedData, config) => {
   try {
-    const response = await axios.put(`${API_URL}/units/${unitId}`, updatedData, {
+    const response = await axios.put(`${BASE_URL}/unit/update/${unitId}`, updatedData, config, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -291,15 +239,75 @@ export const updateUnit = async (unitId, updatedData) => {
 
 // ------------------------------   categories ------------------------------
 // Fetch all categories
-export const fetchCategories = async () => {
+export const fetchCategories = async (config) => {
   try {
-    const response = await axios.get(`${API_URL}/categories`);
+    const response = await axios.get(`${BASE_URL}/category/get`, config);
     return response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
     throw error;
   }
 };
+
+// Add a new category
+export const addCategory = async (category, config) => {
+  try {
+    const response = await fetch(`${BASE_URL}/category/add`, {
+      method: "POST", // Specify the HTTP method
+      headers: config.headers, // Pass headers correctly
+      body: JSON.stringify(category), // Convert category to JSON string
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to add category");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error adding category:", error);
+    throw error;
+  }
+};
+
+// Update a category
+export const updateCategory = async (id, updatedCategory, config) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/category/update/${id}`, updatedCategory,config,  {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error updating category:", error);
+    throw error;
+  }
+};
+
+// Delete a category
+export const deleteCategory = async (id, config) => {
+  try {
+    const response = await axios.delete(`${BASE_URL}/category/delete/${id}`, config);
+
+    if (!response.status === 200) {
+      throw new Error("Failed to delete category");
+    }
+
+    return { success: true, id };
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    throw error;
+  }
+};
+
+
+
+
+
+
+
+
 
 // Fetch GST details for a specific category
 export const fetchGstByCategory = async (categoryId) => {
@@ -376,3 +384,47 @@ export const updateStockData = async (id, data) => {
 };
 
 
+// ----------------------- new sub category function --------------
+
+// Fetch all subcategories
+export const fetchSubCategories = async () => {
+  try {
+    const response = await axios.get(BASE_URL);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching subcategories:', error);
+    throw error;
+  }
+};
+
+// Add a new subcategory
+export const addSubCategory = async (newSubCategory) => {
+  try {
+    const response = await axios.post(BASE_URL, newSubCategory);
+    return response.data;
+  } catch (error) {
+    console.error('Error adding subcategory:', error);
+    throw error;
+  }
+};
+
+// Update a subcategory
+export const updateSubCategory = async (id, updatedData) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/${id}`, updatedData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating subcategory:', error);
+    throw error;
+  }
+};
+
+// Delete a subcategory
+export const deleteSubCategory = async (id) => {
+  try {
+    await axios.delete(`${BASE_URL}/${id}`);
+  } catch (error) {
+    console.error('Error deleting subcategory:', error);
+    throw error;
+  }
+};

@@ -5,11 +5,15 @@ import { formLogin } from "../../apiService/PGapi";
 import { toast, ToastContainer } from "react-toastify";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+
+import { setUserDetails } from "../../redux/Slice/authSlice";
 
 const Login = () => {
   const navigate = useNavigate();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const dispatch=useDispatch()
 
   const eyeClick = () => {
     setShowPassword(!showPassword);
@@ -26,7 +30,6 @@ const Login = () => {
       toast.error("Invalid email format");
       return false;
     }
-
     if (!loginData.password) {
       toast.error("Password is required");
       return false;
@@ -39,14 +42,16 @@ const Login = () => {
   };
   const handelSubmit = async (e) => {
     e.preventDefault();
+  const config={  headers: {
+      "Content-Type": "application/json",
+    }}
   
     if (!validate()) return; // Stop if validation fails
-  
-    const result = await formLogin(loginData);
+    const result = await formLogin(loginData,config);
     if (result) {
+      dispatch(setUserDetails(result))
       localStorage.setItem("user", JSON.stringify(result)); // Store user data
       toast.success("Login successful!");
-  
       setTimeout(() => {
         window.location.href = "/dashboard"; // Force page reload to update authentication state
       }, 1000);
@@ -54,7 +59,6 @@ const Login = () => {
       toast.error("Invalid email or password. Please try again.");
     }
   };
-  
   
   return (
     <>

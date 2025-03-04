@@ -1,56 +1,53 @@
-import axios from 'axios';
+import axios from "axios";
 
 const API_URL = 'http://localhost:5000';
+
+const BASE_URL="http://127.0.0.1:8000"
 
 // ----------------- Register api ----------------------------
 
 export const savePersonalDetails = async (data) => {
-    try {
-        const response = await axios.post(`${API_URL}/personalDetails`, data);
-        return response.data;
-    } catch (error) {
-        console.error('Error saving personal details:', error);
-        throw error;
-    }
+	try {
+		const response = await axios.post(`${API_URL}/personalDetails`, data);
+		return response.data;
+	} catch (error) {
+		console.error("Error saving personal details:", error);
+		throw error;
+	}
 };
 
 // Fetch Personal Details
 export const getPersonalDetails = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/personalDetails`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching personal details:", error);
-      throw error;
-    }
-  };
-
-export const saveOrganizedDetails = async (data) => {
-    try {
-        const response = await axios.post(`${API_URL}/organizedDetails`, data);
-        return response.data;
-    } catch (error) {
-        console.error('Error saving general details:', error);
-        throw error;
-    }
+	try {
+		const response = await axios.get(`${API_URL}/personalDetails`);
+		return response.data;
+	} catch (error) {
+		console.error("Error fetching personal details:", error);
+		throw error;
+	}
 };
 
+export const saveOrganizedDetails = async (data,config) => {
+	try {
+		// console.log("create company",data)
+		const response = await axios.post(`${BASE_URL}/create/company/`,data);
+		return response.data;
+	} catch (error) {
+		console.error("Error saving general details:", error);
+		throw error;
+	}
+};
 
 // ----------------------- login api ----------------------------------
 
-export const formLogin = async (userData) => {
-    try {
-      const response = await axios.get(`${API_URL}/users?email=${userData.email}`);
-      const user = response.data[0]; 
-  
-      if (user && user.password === userData.password) {
-        return user; 
-      } else {
-        return null; 
-      }
-    } catch (error) {
-      console.error("Login API error:", error);
-      return null;
-    }
-  };
-  
+export const formLogin = async (userData,config) => {
+	try {
+
+		const response = await axios.post(`${BASE_URL}/login/`, userData,config);
+    return response?.data
+	
+	} catch (error) {
+		console.error("Login API error:", error.response?.data || error.message);
+		
+	}
+};

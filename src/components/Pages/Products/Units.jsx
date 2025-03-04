@@ -4,6 +4,7 @@ import { fetchUnits, addNewUnit, deleteUnit, updateUnit } from "../../../apiServ
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import successImage from '../../../assets/success.png'
+import { useSelector } from "react-redux";
 
 
 const Units = () => {
@@ -17,6 +18,8 @@ const Units = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const startIndex = (currentPage - 1) * perPage;
+  const {userDetails}=useSelector((state)=>(state.auth))
+
 
   // Input Refs for Focus
   const newUnitRef = useRef(null);
@@ -26,8 +29,14 @@ const Units = () => {
   // Fetch units from API when the component mounts
   useEffect(() => {
     const loadUnits = async () => {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userDetails.token}`,
+        },
+      };
         try {
-            const fetchedUnits = await fetchUnits();
+            const fetchedUnits = await fetchUnits(config);
             console.log("Fetched Units:", fetchedUnits); // Debugging
             setUnits(fetchedUnits);
         } catch (error) {
@@ -47,12 +56,18 @@ const Units = () => {
     if (unitName.trim() !== "" && unitFullName.trim() !== "") {
       const newUnit = {
         unit: unitName,
-        fullName: unitFullName,
-        allowDecimal: allowDecimal === "yes",
+        fullname: unitFullName,
+        allow_decimal: allowDecimal === "yes",
       };
+      const config = {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userDetails?.token}`
+        }
+    };
 
       try {
-        const addedUnit = await addNewUnit(newUnit); // Call the API to add a new unit
+        const addedUnit = await addNewUnit(newUnit,config); // Call the API to add a new unit
         setUnits([...units, addedUnit]); // Add the new unit to the list
         setUnitName("");
         setUnitFullName("");
@@ -129,8 +144,14 @@ const Units = () => {
       
       const confirmDelete = async () => {
         if (!selectedUnit?.id) return;
+        const config = {
+          headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userDetails.token}`,
+          }
+        };
         try {
-            await deleteUnit(selectedUnit.id);
+            await deleteUnit(selectedUnit.id, config);
             setUnits((units) => units.filter((unit) => unit.id !== selectedUnit.id));
             setShowDeleteConfirm(false);
         } catch (error) {
