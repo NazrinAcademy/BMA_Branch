@@ -21,10 +21,15 @@ const Brand = () => {
     const startIndex = (currentPage - 1) * perPage;
 
     useEffect(() => {
-      console.log("Fetching brands...");
       const fetchBrands = async () => {
+        const config = {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userDetails.token}`,
+            },
+          };
           try {
-              const fetchedBrands = await getBrands();
+              const fetchedBrands = await getBrands(config);
               console.log("Fetched Brands:", fetchedBrands);
               setBrands(fetchedBrands.data || []);
           } catch (error) {
@@ -133,8 +138,14 @@ const Brand = () => {
     
    const confirmDelete = async () => {
       if (!selectedBrand) return;
+      const config = {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userDetails.token}`,
+        },
+    };
       try {
-        await deleteBrand(selectedBrand.id); // API call
+        await deleteBrand(selectedBrand.id, config); // API call
         setBrands(brands.filter((brand) => brand.id !== selectedBrand.id));
                 setShowDeleteConfirm(false);
         // alert("Category deleted successfully!");

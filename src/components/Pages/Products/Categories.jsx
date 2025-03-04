@@ -4,6 +4,7 @@ import { fetchCategories, addCategory, deleteCategory, updateCategory } from "..
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import successImage from '../../../assets/success.png'
+import { useSelector } from "react-redux";
 
 
 const Categories = () => {
@@ -17,6 +18,8 @@ const Categories = () => {
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const {userDetails}=useSelector((state)=>(state.auth))
 
 
 
@@ -38,21 +41,37 @@ const Categories = () => {
 
   // Fetch categories when the component loads
   useEffect(() => {
+    if (!userDetails?.token) return; // Prevents fetching if token is not available
+  
     const getCategoriesData = async () => {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userDetails.token}`,
+        },
+      };
+  
       try {
-        const fetchedCategories = await fetchCategories();
-        setCategories(fetchedCategories); 
+        const fetchedCategories = await fetchCategories(config);
+        setCategories(fetchedCategories);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
-
-    getCategoriesData(); 
-  }, []); 
+  
+    getCategoriesData();
+  }, [userDetails?.token]); // Added dependency for token updates
+  
 
 
   // Handle Save Category
   const handleSaveCategory = async () => {
+    const config = {
+      headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userDetails?.token}`
+      }
+  };
     try {
       const category = {
         categoryName: newCategory.categoryName,
@@ -60,7 +79,7 @@ const Categories = () => {
         cgst: newCategory.cgst,
         sgst: newCategory.sgst,
       };
-      const savedCategory = await addCategory(category); 
+      const savedCategory = await addCategory(category, config); 
 
       setCategories((prevCategories) => [...prevCategories, savedCategory]);
 
@@ -144,8 +163,14 @@ XLSX.writeFile(wb, "categories.xlsx");
 
   const confirmDelete = async () => {
     if (!selectedCategory) return;
+    const config = {
+      headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userDetails.token}`,
+      },
+    };
     try {
-      await deleteCategory(selectedCategory.id); // Using API function
+      await deleteCategory(selectedCategory.id, config); // Using API function
       setCategories(categories.filter((cat) => cat.id !== selectedCategory.id));
       setShowDeleteConfirm(false);
       // alert("Category deleted successfully!");

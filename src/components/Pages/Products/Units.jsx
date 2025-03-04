@@ -29,8 +29,14 @@ const Units = () => {
   // Fetch units from API when the component mounts
   useEffect(() => {
     const loadUnits = async () => {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userDetails.token}`,
+        },
+      };
         try {
-            const fetchedUnits = await fetchUnits();
+            const fetchedUnits = await fetchUnits(config);
             console.log("Fetched Units:", fetchedUnits); // Debugging
             setUnits(fetchedUnits);
         } catch (error) {
@@ -138,8 +144,14 @@ const Units = () => {
       
       const confirmDelete = async () => {
         if (!selectedUnit?.id) return;
+        const config = {
+          headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userDetails.token}`,
+          }
+        };
         try {
-            await deleteUnit(selectedUnit.id);
+            await deleteUnit(selectedUnit.id, config);
             setUnits((units) => units.filter((unit) => unit.id !== selectedUnit.id));
             setShowDeleteConfirm(false);
         } catch (error) {
