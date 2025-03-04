@@ -32,7 +32,7 @@ const Units = () => {
       const config = {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userDetails.token}`,
+          Authorization: `Bearer ${userDetails.access_token}`,
         },
       };
         try {
@@ -62,7 +62,7 @@ const Units = () => {
       const config = {
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${userDetails?.token}`
+            Authorization: `Bearer ${userDetails?.access_token}`
         }
     };
 
@@ -147,7 +147,7 @@ const Units = () => {
         const config = {
           headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${userDetails.token}`,
+              Authorization: `Bearer ${userDetails.access_token}`,
           }
         };
         try {
