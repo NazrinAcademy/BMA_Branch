@@ -437,12 +437,12 @@ const Supplier = () => {
       }
       const payload = {
         User_id: userDetails?.access_token,
-        customer_name: form?.supplierName,
+        supplier_name: form?.supplierName,
         mobile_no: form?.phoneNo,
         email: form?.email,
         address: form?.address,
         area: form?.Area,
-        pincode: form?.pincode,
+        pincode: form?.pinCode,
         state: selectedState,
         openging_balance: form?.openingBalance,
         gst_number: form?.gstNumber,
@@ -496,9 +496,9 @@ const Supplier = () => {
 
   }, [userDetails?.access_token])
 
-  useEffect(() => {
-    getDetails();
-  }, [getDetails]);
+  // useEffect(() => {
+  //   getDetails();
+  // }, [getDetails]);
 
 
 

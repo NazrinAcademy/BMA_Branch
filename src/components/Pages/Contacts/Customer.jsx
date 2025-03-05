@@ -14,189 +14,151 @@ import successImage from "../../../assets/success.png";
 import { CustomerAdd, CustomerDelete, Customerget, CustomerUpdate } from "../../../apiService/customerAPI";
 import { useSelector } from "react-redux";
 import SuccessMessage from "../../SuccessMessage";
+import CustomerTable from "./CustomerDetails/customerTable";
 
 const Customer = () => {
-	const allCustomers = [
-		{
-			id: 1,
-			customerName: "Niyas",
-			phoneNo: 7695822683,
-			email: "niyas@gmail.com",
-			address: "South Main Road,",
-			area: "Tenkasi",
-			state: "Tamilnadu-",
-			pinCode: 627811,
-			openingBalance: 20000,
-			gstNumber: 5000,
-		},
-		{
-			id: 2,
-			customerName: "Mohamed",
-			phoneNo: 9695822683,
-			email: "mohamed@gmail.com",
-			address: "New Main Road,",
-			area: "Madurai",
-			state: "Tamilnadu-",
-			pinCode: 52312,
-			openingBalance: 30000,
-			gstNumber: 1000,
-		},
-		{
-			id: 3,
-			customerName: "Ismail",
-			phoneNo: 7995822683,
-			email: "ismai@gmaill.com",
-			address: "North Road,",
-			area: "Theni",
-			state: "Tamilnadu-",
-			pinCode: 58112,
-			openingBalance: 40000,
-			gstNumber: 2000,
-		},
-		{
-			id: 4,
-			customerName: "Raja",
-			phoneNo: 8895822683,
-			email: "raja@gmail.com",
-			address: "New Temple Road,",
-			area: "vallem",
-			state: "Tamilnadu-",
-			pinCode: 627814,
-			openingBalance: 9000,
-			gstNumber: 3000,
-		},
-		{
-			id: 5,
-			customerName: "joe",
-			phoneNo: 7195822681,
-			email: "joe@gmail.com",
-			address: "Bazar Road,",
-			area: "Kanyakumari",
-			state: "Tamilnadu-",
-			pinCode: 50812,
-			openingBalance: 80000,
-			gstNumber: 4000,
-		},
-		{
-			id: 6,
-			customerName: "Maddy",
-			phoneNo: 8695822688,
-			email: "maddy@gmail.com",
-			address: "Colony Road,",
-			area: "kadayanallur",
-			state: "Tamilnadu-",
-			pinCode: 627815,
-			openingBalance: 70000,
-			gstNumber: 5000,
-		},
-		{
-			id: 7,
-			customerName: "Ram",
-			phoneNo: 7611822684,
-			email: "ram@gmail.com",
-			address: "Bustant  Road,",
-			area: "madurai",
-			state: "Tamilnadu-",
-			pinCode: 57622,
-			openingBalance: 60000,
-			gstNumber: 6000,
-		},
-		{
-			id: 8,
-			customerName: "Vincy",
-			phoneNo: 7695822685,
-			email: "vinc@gmail.com",
-			address: "New Road,",
-			area: "nellai",
-			state: "Tamilnadu-",
-			pinCode: 626821,
-			openingBalance: 90000,
-			gstNumber: 7000,
-		},
-		{
-			id: 9,
-			customerName: "Kalai",
-			phoneNo: 6595822685,
-			email: "kalai@gmail.com",
-			address: "South Main Road,",
-			area: "Tenkasi",
-			state: "Tamilnadu-",
-			pinCode: 627811,
-			openingBalance: 110000,
-			gstNumber: 9000,
-		},
-		{
-			id: 10,
-			customerName: "niyas",
-			phoneNo: 7695822683,
-			email: "niyas@g.com",
-			address: "South Main Road,",
-			area: "Tenkasi",
-			state: "Tamilnadu-",
-			pinCode: 627811,
-			openingBalance: 20000,
-			gstNumber: 5000,
-		},
-		{
-			id: 11,
-			customerName: "niyas",
-			phoneNo: 7695822683,
-			email: "niyas@g.com",
-			address: "South Main Road,",
-			area: "Tenkasi",
-			state: "Tamilnadu-",
-			pinCode: 627811,
-			openingBalance: 20000,
-			gstNumber: 5000,
-		},
-		{
-			id: 12,
-			customerName: "niyas",
-			phoneNo: 7695822683,
-			email: "niyas@g.com",
-			address: "South Main Road,",
-			area: "Tenkasi",
-			state: "Tamilnadu-",
-			pinCode: 627811,
-			openingBalance: 20000,
-			gstNumber: 5000,
-		},
-		{
-			id: 13,
-			customerName: "niyas",
-			phoneNo: 7695822683,
-			email: "niyas@g.com",
-			address: "South Main Road,",
-			area: "Tenkasi",
-			state: "Tamilnadu-",
-			pinCode: 627811,
-			openingBalance: 20000,
-			gstNumber: 5000,
-		},
-		{
-			id: 14,
-			customerName: "niyas",
-			phoneNo: 7695822683,
-			email: "niyas@g.com",
-			address: "South Main Road,",
-			area: "Tenkasi",
-			state: "Tamilnadu-",
-			pinCode: 627811,
-			openingBalance: 20000,
-			gstNumber: 5000,
-		},
-		{
-			id: 15,
-			customerName: "niyas",
-			phoneNo: 7695822683,
-			email: "niyas@g.com",
-			address: "South Main Road,",
-			area: "Tenkasi",
-			state: "Tamilnadu-",
-			pinCode: 627811,
-			openingBalance: 20000,
-			gstNumber: 5000,
-		},
+	const allCustomers =[
+	
+					{
+							"Customer_id": "67c719e9e2717a50276bb006",
+							"User_id": "123",
+							"customer_name": "John Doe",
+							"Mobile_no": "9876543210",
+							"email": "johndoe@example.com",
+							"address": "123 Street",
+							"area": "Downtown",
+							"pincode": "560001",
+							"state": "Karnataka",
+							"opening_balance": 5000.0,
+							"balance_amount": null,
+							"GST_No": "GST12345"
+					},
+					{
+							"Customer_id": "67c7228ae2717a50276bb008",
+							"User_id": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxMDk5NTgzLCJpYXQiOjE3NDEwOTkyODMsImp0aSI6ImUwNDQ0MGU3ZTRmZDRlMTE5ZjI4MGM4NDA5MDBhNzM3IiwidXNlcl9pZCI6IjY3YzMxZTdkZWE0MTQxMjZlNzRiOTE1NSJ9.bWWvhvRqPlkT4K4-HJWiHIbjf16P32l3YKxX3TsciPY",
+							"customer_name": "prema",
+							"Mobile_no": "09384191526",
+							"email": "salvatore@gmail.com",
+							"address": "yyyyy",
+							"area": "kadayanllur",
+							"pincode": "627751",
+							"state": "Tamil Nadu",
+							"opening_balance": 345555.0,
+							"balance_amount": null,
+							"GST_No": "12345678"
+					},
+					{
+							"Customer_id": "67c72454e2717a50276bb00a",
+							"User_id": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxMDk5NTgzLCJpYXQiOjE3NDEwOTkyODMsImp0aSI6ImUwNDQ0MGU3ZTRmZDRlMTE5ZjI4MGM4NDA5MDBhNzM3IiwidXNlcl9pZCI6IjY3YzMxZTdkZWE0MTQxMjZlNzRiOTE1NSJ9.bWWvhvRqPlkT4K4-HJWiHIbjf16P32l3YKxX3TsciPY",
+							"customer_name": "prema",
+							"Mobile_no": "9567678712",
+							"email": "prema@gmail.com",
+							"address": "yyyyy",
+							"area": "kadayanllur",
+							"pincode": "627751",
+							"state": "Tamil Nadu",
+							"opening_balance": 345555.0,
+							"balance_amount": null,
+							"GST_No": "123456677"
+					},
+					{
+							"Customer_id": "67c724d3e2717a50276bb00c",
+							"User_id": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxMDk5NTgzLCJpYXQiOjE3NDEwOTkyODMsImp0aSI6ImUwNDQ0MGU3ZTRmZDRlMTE5ZjI4MGM4NDA5MDBhNzM3IiwidXNlcl9pZCI6IjY3YzMxZTdkZWE0MTQxMjZlNzRiOTE1NSJ9.bWWvhvRqPlkT4K4-HJWiHIbjf16P32l3YKxX3TsciPY",
+							"customer_name": "prema",
+							"Mobile_no": "9567678712",
+							"email": "nivetha@gmail.com",
+							"address": "yyyyy",
+							"area": "kadayanllur",
+							"pincode": "627751",
+							"state": "Tamil Nadu",
+							"opening_balance": 345555.0,
+							"balance_amount": null,
+							"GST_No": "12345678"
+					},
+					{
+							"Customer_id": "67c72912e2717a50276bb00e",
+							"User_id": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxMDk5NTgzLCJpYXQiOjE3NDEwOTkyODMsImp0aSI6ImUwNDQ0MGU3ZTRmZDRlMTE5ZjI4MGM4NDA5MDBhNzM3IiwidXNlcl9pZCI6IjY3YzMxZTdkZWE0MTQxMjZlNzRiOTE1NSJ9.bWWvhvRqPlkT4K4-HJWiHIbjf16P32l3YKxX3TsciPY",
+							"customer_name": "prema",
+							"Mobile_no": "9567678712",
+							"email": "nive@gmail.com",
+							"address": "yyyyy",
+							"area": "kadayanllur",
+							"pincode": "627751",
+							"state": "Tamil Nadu",
+							"opening_balance": 345555.0,
+							"balance_amount": null,
+							"GST_No": "12345678"
+					},
+					{
+							"Customer_id": "67c72b51e2717a50276bb019",
+							"User_id": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxMDk5NTgzLCJpYXQiOjE3NDEwOTkyODMsImp0aSI6ImUwNDQ0MGU3ZTRmZDRlMTE5ZjI4MGM4NDA5MDBhNzM3IiwidXNlcl9pZCI6IjY3YzMxZTdkZWE0MTQxMjZlNzRiOTE1NSJ9.bWWvhvRqPlkT4K4-HJWiHIbjf16P32l3YKxX3TsciPY",
+							"customer_name": "dheena",
+							"Mobile_no": "9334567812",
+							"email": "nila@gmail.com",
+							"address": "yyyyyy",
+							"area": "tenkasi",
+							"pincode": "627751",
+							"state": "Tamil Nadu",
+							"opening_balance": 789045.0,
+							"balance_amount": null,
+							"GST_No": "12345678"
+					},
+					{
+							"Customer_id": "67c72c37e2717a50276bb01b",
+							"User_id": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxMDk5NTgzLCJpYXQiOjE3NDEwOTkyODMsImp0aSI6ImUwNDQ0MGU3ZTRmZDRlMTE5ZjI4MGM4NDA5MDBhNzM3IiwidXNlcl9pZCI6IjY3YzMxZTdkZWE0MTQxMjZlNzRiOTE1NSJ9.bWWvhvRqPlkT4K4-HJWiHIbjf16P32l3YKxX3TsciPY",
+							"customer_name": "dheena",
+							"Mobile_no": "9334567812",
+							"email": "jeeva@gmail.com",
+							"address": "yyyyyy",
+							"area": "tenkasi",
+							"pincode": "627751",
+							"state": "Tamil Nadu",
+							"opening_balance": 789045.0,
+							"balance_amount": null,
+							"GST_No": "12345678"
+					},
+					{
+							"Customer_id": "67c72e13e2717a50276bb01d",
+							"User_id": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxMDk5NTgzLCJpYXQiOjE3NDEwOTkyODMsImp0aSI6ImUwNDQ0MGU3ZTRmZDRlMTE5ZjI4MGM4NDA5MDBhNzM3IiwidXNlcl9pZCI6IjY3YzMxZTdkZWE0MTQxMjZlNzRiOTE1NSJ9.bWWvhvRqPlkT4K4-HJWiHIbjf16P32l3YKxX3TsciPY",
+							"customer_name": "customer testing",
+							"Mobile_no": "9797981234",
+							"email": "dheena@gmail.com",
+							"address": "yyyyyy",
+							"area": "tenkasi",
+							"pincode": "627751",
+							"state": "Tamil Nadu",
+							"opening_balance": 789045.0,
+							"balance_amount": null,
+							"GST_No": "12345678"
+					},
+					{
+							"Customer_id": "67c86688588394c0aff54389",
+							"User_id": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxMTg2OTIwLCJpYXQiOjE3NDExODY2MjAsImp0aSI6ImVkZjU2OWI1MjkzZjQzNWJhZDA4ZGNjZjFiOGZkMzYyIiwidXNlcl9pZCI6IjY3YzMxZTdkZWE0MTQxMjZlNzRiOTE1NSJ9.Lc6e65QvcNB6lyh9Au9Gu2nQ38-ZbDDznvLAPmb6mXI",
+							"customer_name": "customer 1",
+							"Mobile_no": "9892345612",
+							"email": "customer1@gmail.com",
+							"address": "yyyyyy",
+							"area": "tenkasi",
+							"pincode": "627751",
+							"state": "Tamil Nadu",
+							"opening_balance": 789045.0,
+							"balance_amount": null,
+							"GST_No": "12345678"
+					},
+					{
+							"Customer_id": "67c87805588394c0aff5438b",
+							"User_id": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQxMTg2OTIwLCJpYXQiOjE3NDExODY2MjAsImp0aSI6ImVkZjU2OWI1MjkzZjQzNWJhZDA4ZGNjZjFiOGZkMzYyIiwidXNlcl9pZCI6IjY3YzMxZTdkZWE0MTQxMjZlNzRiOTE1NSJ9.Lc6e65QvcNB6lyh9Au9Gu2nQ38-ZbDDznvLAPmb6mXI",
+							"customer_name": "prema",
+							"Mobile_no": "9567678712",
+							"email": "customer@gmail.com",
+							"address": "yyyyy",
+							"area": "kadayanllur",
+							"pincode": "627751",
+							"state": "Tamil Nadu",
+							"opening_balance": 345555.0,
+							"balance_amount": null,
+							"GST_No": "12345678"
+					}
 	];
 	const { userDetails } = useSelector((state) => state.auth);
 	const [Customers, setCustomers] = useState(allCustomers);
@@ -213,7 +175,7 @@ const Customer = () => {
 	const [successMsg, setSuccessMsg] = useState({ create: "", update: "" })
 	const [deleteMessage, setDeleteMessage] = useState(false);
 	const [selectedRowId, setSelectedRowId] = useState(null);
-	const [filteredCustomers, setFilteredCustomers] = useState(Customers);
+	const [filteredCustomers, setFilteredCustomers] = useState([]);
 	const inputRef = useRef(null);
 
 	useEffect(() => {
@@ -330,18 +292,18 @@ const Customer = () => {
 		);
 	};
 
-	useEffect(() => {
-		const filteredData = Customers.filter(
-			(customer) =>
-				customer.customerName
-					.toLowerCase()
-					.includes(searchQurey.toLowerCase()) ||
-				customer.phoneNo.toString().includes(searchQurey) ||
-				customer.email.toLowerCase().includes(searchQurey.toLowerCase()) ||
-				customer.address.toLowerCase().includes(searchQurey.toLowerCase())
-		);
-		setFilteredCustomers(filteredData);
-	}, [searchQurey, Customers]);
+	// useEffect(() => {
+	// 	const filteredData = Customers.filter(
+	// 		(customer) =>
+	// 			customer.customerName
+	// 				.toLowerCase()
+	// 				.includes(searchQurey.toLowerCase()) ||
+	// 			customer.phoneNo.toString().includes(searchQurey) ||
+	// 			customer.email.toLowerCase().includes(searchQurey.toLowerCase()) ||
+	// 			customer.address.toLowerCase().includes(searchQurey.toLowerCase())
+	// 	);
+	// 	setFilteredCustomers(filteredData);
+	// }, [searchQurey, Customers]);
 
 	const totalPage = Math.ceil(filteredCustomers.length / perPage);
 	const starterIndex = (currentPage - 1) * perPage;
@@ -432,6 +394,7 @@ const Customer = () => {
 					// alert("Created SuccessFully");
 					setSuccessMsg((prevState) => ({ ...prevState, create: true }))
 					setform({})
+					getDetails()
 					setShowModal(false);
 				},
 				(err) => {
@@ -457,7 +420,9 @@ const Customer = () => {
 		Customerget(
 			config,
 			(res) => {
-				setCustomers(res?.data)
+				console.log("customer response",res?.data?.Customer)
+				setCustomers(res?.data?.Customer)
+				
 			},
 			(err) => {
 				console.log(err)
@@ -465,6 +430,10 @@ const Customer = () => {
 		);
 
 	}, [userDetails?.access_token])
+
+	// useEffect(()=>{
+	// 	getDetails()
+	// },[userDetails?.access_token])
 
 	const handelPrint = () => {
 		window.print();
@@ -571,7 +540,7 @@ const Customer = () => {
 						</button>
 					</div>
 				</div>
-				<div className="mt-5 rounded border border-[#c9c9cd]">
+				{/* <div className="mt-5 rounded border border-[#c9c9cd]">
 					<div className="max-h-[350px] overflow-y-auto">
 						<table className="w-full">
 							<thead className="sticky top-0 bg-[#f8f8f8]">
@@ -738,7 +707,8 @@ const Customer = () => {
 							</div>
 						</div>
 					)}
-				</div>
+				{/* </div> */} 
+				<CustomerTable Customers={Customers}/>
 
 				{showModal && (
 					<div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
