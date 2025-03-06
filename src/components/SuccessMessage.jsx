@@ -2,7 +2,7 @@ import React from "react";
 import successImage from "../assets/success.png";
 import { X } from "lucide-react"; // TriangleAlert was unused, so removed
 
-const SuccessMessage = ({ showMsg, onClose }) => {
+const SuccessMessage = ({ showMsg, onClose,content }) => {
   if (!showMsg) return null; // Prevent rendering if showMsg is false
 
   return (
@@ -29,7 +29,7 @@ const SuccessMessage = ({ showMsg, onClose }) => {
         {/* Success Message */}
         <div className="flex flex-col items-center text-center px-6">
           <p className="text-gray-500 text-base font-medium leading-6">
-            Supplier details have been created successfully!
+          {content}
           </p>
         </div>
       </div>

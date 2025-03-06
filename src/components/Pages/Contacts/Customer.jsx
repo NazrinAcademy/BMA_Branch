@@ -162,10 +162,10 @@ const Customer = () => {
 	];
 	const { userDetails } = useSelector((state) => state.auth);
 	const [Customers, setCustomers] = useState(allCustomers);
-
+const [triggerApi,setTriggerApi]=useState({getApi:false})
 
 	//------------ edit and context menu states:
-	const [editRowId, setEditRowId] = useState(null);
+	const [editRowId, setEditRowId] = useState({});
 	const [editData, setEditData] = useState({});
 	const [editDropdown, setEditDropdown] = useState(null);
 	const inputRef = useRef(null);
@@ -203,9 +203,9 @@ const Customer = () => {
 	useEffect(() => {
 		setTimeout(() => {
 			setShowSuccessMessage(false);
-			setSuccessMsg((prevState) => ({ ...prevState, create: false }))
+			setSuccessMsg((prevState) => ({ ...prevState, create: false,update:false }))
 		}, 2000);
-	}, [showSuccessMessage, successMsg?.create]);
+	}, [showSuccessMessage, successMsg?.create,successMsg?.update]);
 
 
 
@@ -434,6 +434,15 @@ const Customer = () => {
 			(res) => {
 				console.log("customer response",res?.data?.Customer)
 				setCustomers(res?.data?.Customer)
+				setFilteredCustomers(res?.data?.Customer)
+				
+				setEditRowId(
+					res?.data?.Customer.reduce((acc, el) => {
+							acc[el?.Customer_id] = false;
+							return acc;
+					}, {})
+			);
+			
 				setLoading({ isLoading: false, message: "" });
 				
 			},
@@ -444,10 +453,11 @@ const Customer = () => {
 		);
 
 	}, [userDetails?.access_token])
+	console.log("edit row",editRowId)
 
-	// useEffect(()=>{
-	// 	getDetails()
-	// },[userDetails?.access_token])
+	useEffect(()=>{
+		getDetails()
+	},[userDetails?.access_token,triggerApi?.getApi])
 
 	const handelPrint = () => {
 		window.print();
@@ -459,14 +469,14 @@ const Customer = () => {
 		setSelectedState("")
 	}
 
-	useEffect(() => {
-		setFilteredCustomers((prevCustomers) =>
-			prevCustomers.map((customer) => ({
-				...customer,
-				address: `${customer.address}, ${customer.area}, ${customer.state}, ${customer.pinCode}`,
-			}))
-		);
-	}, []);
+	// useEffect(() => {
+	// 	setFilteredCustomers((prevCustomers) =>
+	// 		prevCustomers.map((customer) => ({
+	// 			...customer,
+	// 			address: `${customer.address}, ${customer.area}, ${customer.state}, ${customer.pinCode}`,
+	// 		}))
+	// 	);
+	// }, []);
 
 	return (
 		<div className="flex h-screen  bg-[#ffff] rounded-md">
@@ -683,8 +693,12 @@ const Customer = () => {
 							</div>
 						</div>
 					)}
-					<SuccessMessage onClose={handleModalClose} showMsg={successMsg?.create} />
-
+					{successMsg?.create &&
+					<SuccessMessage onClose={handleModalClose} showMsg={successMsg?.create} content={"Supplier details have been created successfully!"}/>
+					}
+								{successMsg?.update &&
+					<SuccessMessage onClose={handleModalClose} showMsg={successMsg?.update} content={"Supplier details have been Updated successfully!"}/>
+					}
 					{/* ------------------------Confirm Delete Model--------------------------- */}
 					{deleteMessage && (
 						<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -733,6 +747,10 @@ const Customer = () => {
 					inputRef={inputRef}
 					setLoading={setLoading}
 					setSuccessMsg={setSuccessMsg}
+					setCustomers={setCustomers}
+					filteredCustomers={filteredCustomers}
+					setFilteredCustomers={setFilteredCustomers}
+					setTriggerApi={setTriggerApi}
 				 />
 
 				{showModal && (

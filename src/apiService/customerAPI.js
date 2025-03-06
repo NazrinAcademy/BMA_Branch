@@ -32,8 +32,8 @@ export function Customerget(config, callback, errorcallback) {
 
 // update api function:
 
-export function CustomerUpdate(data, config, callback, errorcallback){
-  axios.put(`${BASE_URL}/customer/update/${data.id}`, data, config)
+export function CustomerUpdate(id,data, config, callback, errorcallback){
+  axios.put(`${BASE_URL}/customer/update?object_id=${id}`, data, config)
     .then((response) => {
       if(callback) {
         callback(response);
