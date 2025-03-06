@@ -16,7 +16,8 @@ const CustomerTable = ({
 	setCustomers,
 	setFilteredCustomers,
 	filteredCustomers,
-  setTriggerApi
+  setTriggerApi,
+  handleDelete
 }) => {
 	const menuRef = useRef(null);
 	const inputRefs = useRef({});
@@ -314,7 +315,7 @@ const CustomerTable = ({
 								Edit
 							</li>
 							<li
-								onClick={() => handledelete(editDropdown.data)}
+								onClick={() => handleDelete(editDropdown.data)}
 								className="px-6 py-2 hover:bg-gray-100 cursor-pointer">
 								Delete
 							</li>

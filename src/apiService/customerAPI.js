@@ -49,7 +49,7 @@ export function CustomerUpdate(id,data, config, callback, errorcallback){
 // delete api function:
 
 export function CustomerDelete(id, config, callback, errorcallback){
-  axios.delete(`${BASE_URL}/customer/delete/${id}`, config)
+  axios.delete(`${BASE_URL}/customer/delete?object_id=${id}`, config)
   .then((response) => {
     if(callback) {
       callback(response);

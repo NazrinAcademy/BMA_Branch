@@ -274,7 +274,7 @@ const [triggerApi,setTriggerApi]=useState({getApi:false})
 	//----------- delete function:
 
 	const handleDelete = (tableData) => {
-		setSelectedRowId(tableData.id);
+		setSelectedRowId(tableData.Customer_id);
 		setDeleteMessage(true);
 		setEditDropdown(null);
 	};
@@ -751,6 +751,7 @@ const [triggerApi,setTriggerApi]=useState({getApi:false})
 					filteredCustomers={filteredCustomers}
 					setFilteredCustomers={setFilteredCustomers}
 					setTriggerApi={setTriggerApi}
+					handleDelete={handleDelete}
 				 />
 
 				{showModal && (
