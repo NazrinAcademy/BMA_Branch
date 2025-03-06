@@ -214,7 +214,7 @@ export const addNewUnit = async (unitData,config) => {
 // Delete a unit
 export const deleteUnit = async (unitId, config) => {
   try {
-    const response = await axios.delete(`${BASE_URL}/unit/delete/${unitId}`, config);
+    const response = await axios.delete(`${BASE_URL}/unit/delete?object_id=${unitId}`, config);
     return response.data;
   } catch (error) {
     console.error("Error deleting unit:", error);
@@ -225,7 +225,7 @@ export const deleteUnit = async (unitId, config) => {
 // Update a unit
 export const updateUnit = async (unitId, updatedData, config) => {
   try {
-    const response = await axios.put(`${BASE_URL}/unit/update/${unitId}`, updatedData, config, {
+    const response = await axios.put(`${BASE_URL}/unit/update?object_id=${unitId}`, updatedData, config, {
       headers: {
         "Content-Type": "application/json",
       },

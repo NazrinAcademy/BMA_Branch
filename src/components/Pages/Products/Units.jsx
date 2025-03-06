@@ -173,7 +173,13 @@ const Units = () => {
                     alert("Unit and Full Name are required!");
                     return;
                 }
-                await updateUnit(editingUnit, updatedUnit);
+                const payload={
+                  unit: updatedUnit?.unit,
+                  fullname:updatedUnit?. fullName,
+                  allow_decimal: updatedUnit?.allowDecimal
+              }
+              
+                await updateUnit(editingUnit, payload);
                 setUnits((prevUnits) =>
                     prevUnits.map((unit) =>
                         unit.id === editingUnit ? { ...unit, ...updatedUnit } : unit
@@ -196,8 +202,8 @@ const Units = () => {
         setEditingUnit(unit.id);
         setUpdatedUnit({
           unit: unit?.unit || "",
-          fullName: unit?.fullName || "",
-          allowDecimal: unit?.allowDecimal || false,
+          fullName: unit?.fullname || "",
+          allowDecimal: unit?.allow_decimal || false,
         });
         setContextMenu(null);
       };
@@ -391,7 +397,7 @@ const handleInputChange = (e, field) => {
                   className="text-center w-full px-2 py-1 focus:outline-none"
                 />
               ) : (
-                unit.fullname
+                unit.unit
               )}
             </td>
 
