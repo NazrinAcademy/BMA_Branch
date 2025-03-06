@@ -183,7 +183,7 @@ export const deleteBrand = async (brandId) => {
 // Fetch all units
 export const fetchUnits = async (config) => {
   try {
-    const response = await fetch(`${BASE_URL}/unit/get`, config);
+    const response = await fetch(`${BASE_URL}/unit/get/all`, config);
     if (!response.ok) throw new Error("Failed to fetch units");
     return await response.json();
   } catch (error) {

@@ -25,24 +25,24 @@ const Units = () => {
   const newUnitRef = useRef(null);
   const newFullNameRef = useRef(null);
   const newAllowDecimalRef = useRef(null);
-
+  const loadUnits = async () => {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userDetails.access_token}`,
+      },
+    };
+      try {
+          const fetchedUnits = await fetchUnits(config);
+          console.log("Fetched Units:", fetchedUnits); // Debugging
+          setUnits(fetchedUnits?.unit_all);
+      } catch (error) {
+          console.error("Error loading units:", error);
+      }
+  };
   // Fetch units from API when the component mounts
   useEffect(() => {
-    const loadUnits = async () => {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userDetails.access_token}`,
-        },
-      };
-        try {
-            const fetchedUnits = await fetchUnits(config);
-            console.log("Fetched Units:", fetchedUnits); // Debugging
-            setUnits(fetchedUnits);
-        } catch (error) {
-            console.error("Error loading units:", error);
-        }
-    };
+   
     loadUnits();
 }, []);
 
@@ -72,6 +72,7 @@ const Units = () => {
         setUnitName("");
         setUnitFullName("");
         setAllowDecimal("yes");
+        loadUnits();
         handleCloseOverlay();
       } catch (error) {
         console.error("Error saving unit:", error);
@@ -224,7 +225,7 @@ const handleInputChange = (e, field) => {
       };
   }, [contextMenu]);
 
-  
+  console.log("unitalll",units)
 
   return (
     <div className="bg-white h-full px-7 py-3 rounded shadow-md w-full max-w-6xl font-['Plus Jakarta Sans'] mx-auto">
@@ -369,8 +370,8 @@ const handleInputChange = (e, field) => {
       </tr>
     </thead>
     <tbody>
-      {paginatedUnits.length > 0 ? (
-        paginatedUnits.map((unit, index) => (
+      {units.length > 0 ? (
+        units.map((unit, index) => (
           <tr
             key={unit.id}
             className="border-b text-sm text-center font-normal"
@@ -390,7 +391,7 @@ const handleInputChange = (e, field) => {
                   className="text-center w-full px-2 py-1 focus:outline-none"
                 />
               ) : (
-                unit.unit
+                unit.fullname
               )}
             </td>
 
@@ -405,7 +406,7 @@ const handleInputChange = (e, field) => {
                   className="text-center w-full px-2 py-1 focus:outline-none"
                 />
               ) : (
-                unit.fullName
+                unit.fullname
               )}
             </td>
 
