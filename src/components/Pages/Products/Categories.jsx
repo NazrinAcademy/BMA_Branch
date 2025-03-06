@@ -53,7 +53,7 @@ const Categories = () => {
   
       try {
         const fetchedCategories = await fetchCategories(config);
-        setCategories(fetchedCategories);
+        setCategories(fetchedCategories?.all_stock);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
@@ -74,7 +74,7 @@ const Categories = () => {
   };
     try {
       const category = {
-        categoryName: newCategory.categoryName,
+        name: newCategory.categoryName,
         igst: newCategory.igst,
         cgst: newCategory.cgst,
         sgst: newCategory.sgst,
@@ -382,8 +382,8 @@ const [updatedCategory, setUpdatedCategory] = useState(null);
             </tr>
           </thead>
           <tbody>
-  {paginatedCategories.length > 0 ? (
-    paginatedCategories.map((category, index) => (
+  {categories.length > 0 ? (
+    categories.map((category, index) => (
       <tr
         key={category.id}
         className="border-b text-sm text-center font-normal"
@@ -402,7 +402,7 @@ const [updatedCategory, setUpdatedCategory] = useState(null);
               autoFocus
               className="text-center w-full px-2 py-1 focus:outline-none"/>
           ) : (
-            category.categoryName
+            category.name
           )}
         </td>
         

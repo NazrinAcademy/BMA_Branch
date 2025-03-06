@@ -241,7 +241,7 @@ export const updateUnit = async (unitId, updatedData, config) => {
 // Fetch all categories
 export const fetchCategories = async (config) => {
   try {
-    const response = await axios.get(`${BASE_URL}/category/get`, config);
+    const response = await axios.get(`${BASE_URL}/category/get/all`, config);
     return response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
