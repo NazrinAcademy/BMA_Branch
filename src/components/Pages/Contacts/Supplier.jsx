@@ -484,7 +484,7 @@ const Supplier = () => {
     Supplierget(
       config,
       (res) => {
-        setSuppliers(res?.data)
+        // setSuppliers(res?.data)
         setLoading({ isLoading: false, message: "" });
       },
       (err) => {
@@ -498,7 +498,7 @@ const Supplier = () => {
 
   useEffect(() => {
     getDetails();
-  }, [getDetails]);
+  }, []);
 
 
 
@@ -652,7 +652,6 @@ const Supplier = () => {
                             "supplierName",
                             "phoneNo",
                             "email",
-
                             "address",
                             "openingBalance",
                             "gstNumber",

@@ -9,6 +9,38 @@ import { toast, ToastContainer } from "react-toastify";
 
 
 const Brand = () => {
+    const brandData={
+        "brand": [
+            {
+                "brand_id": "67c5d6381d19e185136c5783",
+                "brand_name": "addas"
+            },
+            {
+                "brand_id": "67c5d65f1d19e185136c5785",
+                "brand_name": "{'brand_name': 'Brand'}"
+            },
+            {
+                "brand_id": "67c9fdb2c67a67ae0ed2997e",
+                "brand_name": "addas"
+            },
+            {
+                "brand_id": "67c9fddfc67a67ae0ed29980",
+                "brand_name": "addas"
+            },
+            {
+                "brand_id": "67c9fe06c67a67ae0ed29982",
+                "brand_name": "{'brand_name': 'testing'}"
+            },
+            {
+                "brand_id": "67c9fe80c67a67ae0ed29984",
+                "brand_name": "{'brand_name': 'gg'}"
+            },
+            {
+                "brand_id": "67c9ff0dc67a67ae0ed29986",
+                "brand_name": "{'brand_name': 'testig'}"
+            }
+        ]
+    }
     const [brands, setBrands] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
@@ -33,8 +65,8 @@ const Brand = () => {
           };
           try {
               const fetchedBrands = await getBrands(config);
-              console.log("Fetched Brands:", fetchedBrands);
-              setBrands(fetchedBrands.data || []);
+              console.log("Fetched Brands:", fetchedBrands?.brand);
+              setBrands(fetchedBrands.brand || []);
               setLoading({ isLoading: false, message: "" });
           } catch (error) {
               console.error("Error fetching brands:", error);
@@ -44,12 +76,15 @@ const Brand = () => {
   
       fetchBrands();
   }, []); // Empty dependency array ensures it runs only once
+
+  console.log("brandeddata",brandData)
   
     // Handle Overlay
     const handleOpenOverlay = () => setShowOverlay(true);
     const handleCloseOverlay = () => setShowOverlay(false);
 
     // Handle Save Brand
+    console.log("newBrandName",newBrandName)
     const handleSaveBrand = async () => {
         const userData = JSON.parse(localStorage.getItem("user"));
     
@@ -71,6 +106,7 @@ const Brand = () => {
                 if (newBrand?.data) {
                     setBrands([...brands, newBrand.data]);
                 }
+                getBrands()
                 setNewBrandName("");
                 handleCloseOverlay();
             } catch (error) {
@@ -136,6 +172,7 @@ const Brand = () => {
 
        // Handle Delete Click
        const handleDelete = (brand) => {
+        console.log("handledeleted",brand)
         setSelectedBrand(brand);
         setShowDeleteConfirm(true);
         setContextMenu(null);
@@ -150,9 +187,10 @@ const Brand = () => {
         },
     };
       try {
-        await deleteBrand(selectedBrand.id, config); // API call
+        await deleteBrand(selectedBrand, config); // API call
         setBrands(brands.filter((brand) => brand.id !== selectedBrand.id));
         setShowDeleteConfirm(false);
+        getBrands()
         // alert("Category deleted successfully!");
       } catch (error) {
         console.error("Error deleting category:", error);
@@ -181,8 +219,7 @@ const Brand = () => {
     
                 // Fetch updated brands list
                 const fetchedBrands = await getBrands(config);
-                setBrands(fetchedBrands.data || []);
-    
+                getBrands()
                 setEditingBrand(null);
                 setUpdatedBrand(null);
     
@@ -198,12 +235,13 @@ const Brand = () => {
  
     
     const handleEdit = (brand) => {
-        setEditingBrand(brand.id);
+        setEditingBrand(brand?.brand_id);
         setUpdatedBrand({ ...brand }); // Ensure updatedBrand is set properly
         setContextMenu(null); 
     };
     
     const handleInputChange = (e, field) => {
+        console.log("hqandleinputchange",field)
         setUpdatedBrand((prev) => ({
             ...prev,
             [field]: e.target.value,
@@ -342,7 +380,7 @@ const Brand = () => {
         </thead>
         <tbody>
             {paginatedBrands.length > 0 ? (
-                paginatedBrands.map((brand, index) => (
+                brands?.map((brand, index) => (
                     <tr 
                         key={brand.id || index} 
                         className="border-b text-sm font-normal"
@@ -352,17 +390,17 @@ const Brand = () => {
 
                         {/* Brand Name Column */}
                         <td className="px-6 py-4">
-                            {editingBrand === brand.id ? (
+                            {editingBrand === brand.brand_id ? (
                                 <input
                                     type="text"
-                                    value={updatedBrand?.name || ""}
-                                    onChange={(e) => handleInputChange(e, brand.id, "name")} 
+                                    value={updatedBrand?.brand_name || ""}
+                                    onChange={(e) => handleInputChange(e, "brand_name")} 
                                     onKeyDown={handleKeyPress}
                                     autoFocus
                                     className="text-center w-full px-2 py-1 focus:outline-none"
                                 />
                             ) : (
-                                brand.name
+                                brand.brand_name
                             )}
                         </td>
                     </tr>

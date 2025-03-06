@@ -3,7 +3,7 @@ import axios from 'axios';
 // Base URL for the json-server
 const API_URL = 'http://localhost:5000';
 
-const BASE_URL="http://127.0.0.1:8000"
+const BASE_URL="http://127.0.0.1:8000/Mathavan"
 
 // Function to fetch all products
 export const fetchProducts = async () => {
@@ -134,7 +134,7 @@ export const getSubCategories = async () => {
 // Add a new brand
 export const addBrand = async (brandName, config) => {
   try {
-    const response = await axios.post(`${BASE_URL}/brand/add`, { brand_name: brandName }, config);
+    const response = await axios.post(`${BASE_URL}/brand/api/add`, { brand_name: brandName }, config);
     return response.data;
   } catch (error) {
     console.error("Error adding brand:", error);
@@ -145,7 +145,7 @@ export const addBrand = async (brandName, config) => {
 // Get all brands
 export const getBrands = async (config) => {
   try {
-    const response = await axios.get(`${BASE_URL}/brand/get`, config);
+    const response = await axios.get(`${BASE_URL}/brand/api/get/all`, config);
     console.log("API Response:", response.data); // Debugging
     return response.data;
   } catch (error) {
@@ -157,7 +157,7 @@ export const getBrands = async (config) => {
 // Update brand
 export const updateBrand = async (brandId, updatedBrand) => {
   try {
-    const response = await axios.put(`${BASE_URL}/brand/update/${brandId}`, updatedBrand);
+    const response = await axios.put(`${BASE_URL}/brand/api/update?object_id=${brandId}`, updatedBrand);
     return response.data;
   } catch (error) {
     console.error("Error updating brand:", error);
@@ -168,7 +168,7 @@ export const updateBrand = async (brandId, updatedBrand) => {
 // Delete brand
 export const deleteBrand = async (brandId) => {
   try {
-    await axios.delete(`${BASE_URL}/brand/delete/${brandId}`);
+    await axios.delete(`${BASE_URL}/brand/api/delete?object_id=${brandId}`);
     return { success: true };
   } catch (error) {
     console.error("Error deleting brand:", error);
