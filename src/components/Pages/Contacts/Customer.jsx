@@ -15,6 +15,7 @@ import { CustomerAdd, CustomerDelete, Customerget, CustomerUpdate } from "../../
 import { useSelector } from "react-redux";
 import SuccessMessage from "../../SuccessMessage";
 import CustomerTable from "./CustomerDetails/customerTable";
+import CustomerModal from "./CustomerDetails/customerModal";
 
 const Customer = () => {
 	const allCustomers =[
@@ -181,6 +182,7 @@ const [triggerApi,setTriggerApi]=useState({getApi:false})
 	const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 	const [successMsg, setSuccessMsg] = useState({ create: "", update: "" })
 	const [loading, setLoading] = useState({ isLoading: false, message: "" });
+	const [isShowModal,setIsShowModal]=useState({edit:false})
 	
 	
 	const [deleteMessage, setDeleteMessage] = useState(false);
@@ -230,36 +232,35 @@ const [triggerApi,setTriggerApi]=useState({getApi:false})
 	// };
 
 	// --------- update function:
-	const handleUpdate = () => {
-		if(!editingCustomer) return;
+	// const handleUpdate = () => {
+	// 	if(!editingCustomer) return;
 
-		const config = {
-			headers : {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${userDetails?.access_token}`,
-			},
-		};
+	// 	const config = {
+	// 		headers : {
+	// 			"Content-Type": "application/json",
+	// 			Authorization: `Bearer ${userDetails?.access_token}`,
+	// 		},
+	// 	};
 
-		CustomerUpdate(
-			{ id: editingCustomer, ...editUpdateCustomer},
-			config,
-			(res) => {
-				setFilteredCustomers((prevCustomers) =>
-					prevCustomers.map((customer) => 
-					customer.id === editingCustomer ? { ...customer, ...editUpdateCustomer} : customer
-					)
-				);
-				setEditingCustomer(null);
-				setShowSuccessMessage(true);
-				setTimeout(() => setShowSuccessMessage(false), 2000);
-			},
-			(err) => {
-				console.log(err);
-				alert("update failed");
-			}
-		);
-	};
-
+	// 	CustomerUpdate(
+	// 		{ id: editingCustomer, ...editUpdateCustomer},
+	// 		config,
+	// 		(res) => {
+	// 			setFilteredCustomers((prevCustomers) =>
+	// 				prevCustomers.map((customer) => 
+	// 				customer.id === editingCustomer ? { ...customer, ...editUpdateCustomer} : customer
+	// 				)
+	// 			);
+	// 			setEditingCustomer(null);
+	// 			setShowSuccessMessage(true);
+	// 			setTimeout(() => setShowSuccessMessage(false), 2000);
+	// 		},
+	// 		(err) => {
+	// 			console.log(err);
+	// 			alert("update failed");
+	// 		}
+	// 	);
+	// };
 	const handleKeyClick = (e) => {
 		if (e.key === "Enter") {
 			handleUpdate();
@@ -366,6 +367,7 @@ const [triggerApi,setTriggerApi]=useState({getApi:false})
 		console.log("onchange---", e.target.name, e.target.value);
 		setform({ ...form, [e.target.name]: e.target.value });
 	};
+	console.log("selectedstate",selectedState)
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -466,6 +468,7 @@ const [triggerApi,setTriggerApi]=useState({getApi:false})
 	const handleModalClose = () => {
 		setShowModal(false)
 		setform({})
+		setIsShowModal((prevState)=>({...prevState,edit:false}))
 		setSelectedState("")
 	}
 
@@ -477,6 +480,54 @@ const [triggerApi,setTriggerApi]=useState({getApi:false})
 	// 		}))
 	// 	);
 	// }, []);
+
+	const handleUpdate = (e) => {
+		e.preventDefault();
+		if (!editRowId) return;
+		setLoading({ isLoading: true, message: "Updating customer..." });
+		const config = {
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${userDetails?.access_token}`,
+			},
+		};
+		const payload = {
+			User_id: userDetails?.access_token,
+			customer_name: form?.customerName,
+			mobile_no: form?.phoneNo,
+			email: form?.email,
+			address: form?.address,
+			area: form?.Area,
+			pincode: form?.pinCode,
+			state: selectedState,
+			opening_balance: form?.openingBalance,
+			gst_number: form?.gstNumber,
+		};
+    setTriggerApi((prevState)=>({...prevState,getApi:false}))
+		CustomerUpdate(
+			editRowId,
+			payload,
+			config,
+			(res) => {
+				console.log("triggered edit")
+				// setIsShowModal((prevState)=>({...prevState,edit:false}))
+				handleModalClose()
+				setSuccessMsg((prevState) => ({ ...prevState, update: true }));
+        setTriggerApi((prevState)=>({...prevState,getApi:true}))
+				setLoading({ isLoading: false, message: "" });
+				setEditRowId(null);
+			},
+			(err) => {
+				console.log(err);
+				alert("Update failed");
+				if (err?.response?.data?.message) {
+					alert("Update failed");
+				}
+				setCustomers(filteredCustomers);
+				setLoading({ isLoading: false, message: "" });
+			}
+		);
+	};
 
 	return (
 		<div className="flex h-screen  bg-[#ffff] rounded-md">
@@ -693,6 +744,7 @@ const [triggerApi,setTriggerApi]=useState({getApi:false})
 							</div>
 						</div>
 					)}
+					{console.log("successMsg",successMsg)}
 					{successMsg?.create &&
 					<SuccessMessage onClose={handleModalClose} showMsg={successMsg?.create} content={"Supplier details have been created successfully!"}/>
 					}
@@ -752,210 +804,45 @@ const [triggerApi,setTriggerApi]=useState({getApi:false})
 					setFilteredCustomers={setFilteredCustomers}
 					setTriggerApi={setTriggerApi}
 					handleDelete={handleDelete}
+					setForm={setform}
+					form={form}
+					setShowModal={setShowModal}
+					setSelectedState={setSelectedState}
+					handleModalClose={handleModalClose}
+					isShowModal={isShowModal}
+					setIsShowModal={setIsShowModal}
+				
 				 />
 
 				{showModal && (
-					<div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-						<div className="bg-white p-6 fixed top-0 rounded-lg w-[800px] shadow-lg">
-							<h2 className="text-[#202020] font-semibold text-center font-jakarta text-xl">
-								Add New Customer
-							</h2>
-							<form
-								className="grid grid-cols-3 gap-6 my-6"
-								onSubmit={handleSubmit}>
-								<div className="relative flex gap-4">
-									<input
-										type="text"
-										id="customerName"
-										name="customerName"
-										className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-										placeholder=""
-										value={form.customerName}
-										onChange={(e) => handleChange(e)}
-										required
-									/>
-									<label
-										htmlFor="supplierName"
-										className="absolute left-4 -top-2 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white">
-										Customer Name *
-									</label>
-								</div>
-								<div className="relative flex gap-4">
-									<input
-										type="text"
-										id="phoneNo"
-										name="phoneNo"
-										className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-										placeholder=""
-										value={form.phoneNo}
-										onChange={handleChange}
-										required
-									/>
-									<label
-										htmlFor="phoneNo"
-										className="absolute left-4 -top-2 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white">
-										Mobile No
-									</label>
-								</div>
-								<div className="relative flex gap-4">
-									<input
-										type="email"
-										id="email"
-										name="email"
-										className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-										placeholder=""
-										value={form.email}
-										onChange={handleChange}
-										required
-									/>
-									<label
-										htmlFor="email"
-										className="absolute left-4 -top-2 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white">
-										Email
-									</label>
-								</div>
-								<div className="relative flex gap-4">
-									<input
-										type="text"
-										id="address"
-										name="address"
-										className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-										placeholder=""
-										value={form.address}
-										onChange={handleChange}
-										required
-									/>
-									<label
-										htmlFor="address"
-										className="absolute left-4 -top-3 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white">
-										Address
-									</label>
-								</div>
-								<div className="relative flex gap-4">
-									<input
-										type="text"
-										id="Area"
-										name="Area"
-										className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-										placeholder=""
-										value={form.Area}
-										onChange={handleChange}
-										required
-									/>
-									<label
-										htmlFor="Area"
-										className="absolute left-4 -top-3 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white">
-										Area
-									</label>
-								</div>
-								<div className="relative flex gap-4">
-									<input
-										type="text"
-										id="pinCode"
-										name="pinCode"
-										className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-										placeholder=""
-										value={form.pinCode}
-										onChange={handleChange}
-										required
-									/>
-									<label
-										htmlFor="pinCode"
-										className="absolute left-4 -top-3 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white">
-										PinCode
-									</label>
-								</div>
-								<div className="relative ">
-									<select
-										id="State"
-										name="State"
-										value={selectedState}
-										onChange={(e) => setSelectedState(e.target.value)}
-										className="peer w-full h-11 px-2 text-sm border border-gray-300 focus:outline-none focus:border-[#593FA9] rounded bg-white"
-										required>
-										<option value="" disabled>
-											Select state
-										</option>
-
-										<option value="Tamil Nadu">Tamil Nadu</option>
-										<option value="Andhra Pradesh">Andhra Pradesh</option>
-										<option value="Kerala">Kerala</option>
-										<option value="Karnataka">Karnataka</option>
-										<option value="Telangana">Telangana</option>
-									</select>
-									<label
-										htmlFor="state"
-										className="absolute left-4 -top-2 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white">
-										State
-									</label>
-									<span className="absolute right-4 top-2 text-gray-500 pointer-events-none"></span>
-								</div>
-								<div className="relative flex gap-4">
-									<input
-										type="text"
-										id="openingBalance"
-										name="openingBalance"
-										className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-										placeholder=""
-										value={form.balanceAmount}
-										onChange={handleChange}
-										required
-									/>
-									<label
-										htmlFor="openingBalance"
-										className="absolute left-4 -top-2 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white">
-										Opening Balance
-									</label>
-								</div>
-								<div className="relative flex gap-4">
-									<input
-										type="text"
-										id="gstNumber"
-										name="gstNumber"
-										className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-										placeholder=""
-										value={form.balanceAmount}
-										onChange={handleChange}
-										required
-									/>
-									<label
-										htmlFor="gstNumber"
-										className="absolute left-4 -top-2 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white">
-										GST Number
-									</label>
-								</div>
-								<div className=" flex gap-6 p-[390px] py-2">
-									<button
-										className="px-14 py-2 bg-[#fff] border border-t border-[#593fa9] font-jakarta font-semibold text-[#593fa9] rounded"
-										onClick={handleModalClose}>
-										Cancel
-									</button>
-									<button className="px-16 py-2 text-[#fff] bg-[#593fa9] text-base font-semibold font-jakarta rounded">
-										Save
-									</button>
-								</div>
-							</form>
-						</div>
-					</div>
+					
+					<CustomerModal  
+					form={form}
+					handleSubmit={handleSubmit}
+					handleChange={handleChange}
+					setSelectedState={setSelectedState}
+					handleModalClose={handleModalClose}
+					content={"Add Customer"}
+					setForm={setform}
+					selectedState={selectedState}
+				
+					/>
 				)}
+				{
+					isShowModal?.edit &&(
+						<CustomerModal  
+						form={form}
+						handleSubmit={handleUpdate}
+						handleChange={handleChange}
+						setSelectedState={setSelectedState}
+						handleModalClose={handleModalClose}
+						content={"Edit Customer"}
+						setForm={setform}
+						selectedState={selectedState}
+					
+						/>
+					)
+				}
 			</div>
 		</div>
 	);

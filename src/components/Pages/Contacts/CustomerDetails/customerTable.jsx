@@ -17,7 +17,13 @@ const CustomerTable = ({
 	setFilteredCustomers,
 	filteredCustomers,
   setTriggerApi,
-  handleDelete
+  handleDelete,
+	setForm,
+	setShowModal,
+	setSelectedState,
+	handleModalClose,
+	isShowModal,
+	setIsShowModal
 }) => {
 	const menuRef = useRef(null);
 	const inputRefs = useRef({});
@@ -63,6 +69,21 @@ const CustomerTable = ({
 		//     ...prevState,
 		//     [customer?.Customer_id]: true // Update only the specific key
 		// }));
+		setIsShowModal((prevState)=>({...prevState,edit:true}))
+		console.log("customer state---",customer?.state)
+		setShowModal(true)
+		setForm({
+			customerName: customer?.customer_name,
+			phoneNo: customer?.Mobile_no,
+			email: customer?.email,
+			address: customer?.address,
+			Area: customer?.area,
+			pinCode: customer?.pincode,
+			State: customer?.state,
+			openingBalance: customer?.opening_balance,
+			gstNumber: customer?.GST_No,
+		})
+		setSelectedState(customer?.state)
 		setEditData(customer);
 		setEditDropdown(null);
 		setTimeout(() => inputRef.current?.focus(), 0);
@@ -84,49 +105,7 @@ const CustomerTable = ({
 
 
 	// -------------- function to handle saving the edit:
-	const handleUpdate = (id) => {
-		if (!editRowId) return;
-		setLoading({ isLoading: true, message: "Updating customer..." });
-		const config = {
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${userDetails?.access_token}`,
-			},
-		};
-		const payload = {
-			User_id: editData?.User_id,
-			customer_name: editData?.customer_name,
-			mobile_no: editData?.Mobile_no,
-			email: editData?.email,
-			address: editData?.address,
-			area: editData?.area,
-			pincode: editData?.pincode,
-			state: editData?.state,
-			opening_balance: editData?.opening_balance,
-			gst_number: editData?.GST_No,
-		};
-    setTriggerApi((prevState)=>({...prevState,getApi:false}))
-		CustomerUpdate(
-			editRowId,
-			payload,
-			config,
-			(res) => {
-				setSuccessMsg((prevState) => ({ ...prevState, update: true }));
-        setTriggerApi((prevState)=>({...prevState,getApi:true}))
-				setLoading({ isLoading: false, message: "" });
-				setEditRowId(null);
-			},
-			(err) => {
-				console.log(err);
-				alert("Update failed");
-				if (err?.response?.data?.message) {
-					alert("Update failed");
-				}
-				setCustomers(filteredCustomers);
-				setLoading({ isLoading: false, message: "" });
-			}
-		);
-	};
+
 
 	const handleKeyDown = (e, id) => {
 		if (e.key === "Enter") {
@@ -183,7 +162,7 @@ const CustomerTable = ({
 
 											{/* Customer Name */}
 											<td className="p-2 text-sm w-[20%]">
-												{editRowId === customer.Customer_id ? (
+												{/* {editRowId === customer.Customer_id ? (
 													<input
 														ref={(el) =>
 															(inputRefs.current[customer.Customer_id] = el)
@@ -198,14 +177,14 @@ const CustomerTable = ({
 															handleKeyDown(e, customer.Customer_id)
 														}
 													/>
-												) : (
-													customer.customer_name
-												)}
+												) : ( */}
+													{customer.customer_name}
+												{/* // )} */}
 											</td>
 
 											{/* Mobile No */}
 											<td className="p-2 text-sm w-[17%]">
-												{editRowId === customer.Customer_id ? (
+												{/* {editRowId === customer.Customer_id ? (
 													<input
 														className="text-center w-full px-2 py-1 focus:outline-none border border-gray-300"
 														type="text"
@@ -213,14 +192,14 @@ const CustomerTable = ({
 														onChange={(e) => handleInputChange(e, "Mobile_no")}
 														onKeyDown={handleKeyDown}
 													/>
-												) : (
-													customer.Mobile_no
-												)}
+												) : ( */}
+													{customer.Mobile_no}
+												{/* // )} */}
 											</td>
 
 											{/* Email */}
 											<td className="p-2 text-sm w-[20%]">
-												{editRowId === customer.Customer_id ? (
+												{/* {editRowId === customer.Customer_id ? (
 													<input
 														className="text-center w-full px-2 py-1 focus:outline-none border border-gray-300"
 														type="text"
@@ -228,14 +207,14 @@ const CustomerTable = ({
 														onChange={(e) => handleInputChange(e, "email")}
 														onKeyDown={handleKeyDown}
 													/>
-												) : (
-													customer.email
-												)}
+												) : ( */}
+													{customer.email}
+												{/* )} */}
 											</td>
 
 											{/* Address */}
 											<td className="p-2 text-sm w-[15%]">
-												{editRowId === customer.Customer_id ? (
+												{/* {editRowId === customer.Customer_id ? (
 													<input
 														className="text-center w-full px-2 py-1 focus:outline-none border border-gray-300"
 														type="text"
@@ -243,14 +222,14 @@ const CustomerTable = ({
 														onChange={(e) => handleInputChange(e, "address")}
 														onKeyDown={handleKeyDown}
 													/>
-												) : (
-													customer.address
-												)}
+												) : ( */}
+													{customer.address}
+												{/* )} */}
 											</td>
 
 											{/* Opening Balance */}
 											<td className="p-2 text-sm w-[10%]">
-												{editRowId === customer.Customer_id ? (
+												{/* {editRowId === customer.Customer_id ? (
 													<input
 														className="text-center w-full px-2 py-1 focus:outline-none border border-gray-300"
 														type="text"
@@ -262,9 +241,9 @@ const CustomerTable = ({
 														}
 														onKeyDown={handleKeyDown}
 													/>
-												) : (
-													customer.opening_balance.toLocaleString()
-												)}
+												) : ( */}
+													{customer.opening_balance.toLocaleString()}
+												{/* )} */}
 											</td>
 
 											{/* Balance Amount */}
@@ -323,6 +302,7 @@ const CustomerTable = ({
 					</div>
 				)}
 			</div>
+			
 		</>
 	);
 };
