@@ -225,4 +225,5 @@ const SupplierTable = ({
 		</>
 	);
 };
-export default SupplierTable;
+
+export default React.memo(SupplierTable)
