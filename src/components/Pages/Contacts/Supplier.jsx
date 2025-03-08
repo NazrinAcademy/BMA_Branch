@@ -466,6 +466,7 @@ const [selectedItem, setSelectedItem] = useState(null);
         (res) => {
           setSuccessMsg((prevState) => ({ ...prevState, create: true }))
           setform({})
+          getDetails()
           setShowModal(false);
         },
         (err) => {

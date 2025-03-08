@@ -1,6 +1,6 @@
 import React from 'react'
 
-const SupplierModal = (
+const SupplierModal = ({
     form,
     setForm,
     handleSubmit,
@@ -9,6 +9,7 @@ const SupplierModal = (
     selectedState,
     handleModalClose,
     content
+}
 ) => {
     console.log("content",content);
     console.log("form data", form);
@@ -24,7 +25,7 @@ const SupplierModal = (
                     </h2>
                     <form
                         className="grid grid-cols-3 gap-6 my-6"
-                        onSubmit={handleSubmit}>
+                        onSubmit={(e)=>handleSubmit(e)}>
                         <div className="relative flex gap-4">
                             <input
                                 type="text"

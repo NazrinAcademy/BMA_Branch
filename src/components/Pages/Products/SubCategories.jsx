@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import successImage from '../../../assets/success.png'
 import { useSelector } from "react-redux";
-import { useSelector } from "react-redux";
 
 import * as XLSX from 'xlsx';
 import { jsPDF } from "jspdf";
