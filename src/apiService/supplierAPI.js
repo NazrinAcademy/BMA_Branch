@@ -54,7 +54,7 @@ export function SupplierUpdate(data, config, callback, errorcallback) {
 // delete api function:
 
 export function SupplierDelete(id, config, callback, errorcallback) {
-    axios.delete(`${BASE_URL}/supplier/delete/${id}`, config)
+    axios.delete(`${BASE_URL}/supplier/delete?object_id=${id}`, config)
         .then((response) => {
             if (callback) {
                 callback(response);

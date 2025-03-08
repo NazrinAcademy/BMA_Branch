@@ -331,7 +331,7 @@ const [selectedItem, setSelectedItem] = useState(null);
   // ----------------- delete functions ------------------
 
   const handleDelete = (tableData) => {
-    setSelectedRowId(tableData.Supplier_id);
+    setSelectedRowId(tableData.supplier_id);
     setDeleteMessage(true);
     setContextDropdown(null);
   };
@@ -457,7 +457,7 @@ const [selectedItem, setSelectedItem] = useState(null);
         area: form?.Area,
         pincode: form?.pinCode,
         state: selectedState,
-        openging_balance: form?.openingBalance,
+        opening_balance: form?.openingBalance,
         gst_number: form?.gstNumber,
       };
       SupplierAdd(
@@ -536,11 +536,12 @@ const [selectedItem, setSelectedItem] = useState(null);
     setIsShowModal((prevState) => ({...prevState, edit:false}))
     setSelectedState("")
   }
-
+console.log("editRowId--",editData)
   // ----- update function:
   const handleUpdate = (e) => {
     e.preventDefault();
-    if (!editRowId) return;
+    // if (!editRowId) return;
+    // console.log("supplier fetching")
     setLoading({ isLoading: true, message:"updating supplier..."})
     const config = {
       headers: {
@@ -563,18 +564,15 @@ const [selectedItem, setSelectedItem] = useState(null);
 
     setTriggerApi((prevState) => ({...prevState, getApi:false}))
     SupplierUpdate(
-      editRowId,
+      editData?.supplier_id,
       payload,
       config,
-      (res) => {
-        console.log("triggered edit");
-        
+      (res) => {        
         handleModalClose()
 				setSuccessMsg((prevState) => ({ ...prevState, update: true }));
         setTriggerApi((prevState)=>({...prevState,getApi:true}))
 				setLoading({ isLoading: false, message: "" });
 				setEditRowId(null);
-
       },
       (err) => {
         console.log(err);

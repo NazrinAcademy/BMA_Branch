@@ -72,14 +72,14 @@ const SupplierTable = ({
 		setShowModal(true)
 		setForm({
 			supplierName:supplier?.supplier_name,
-			phoneNo: supplier?.Mobile_no,
+			phoneNo: supplier?.mobile_no,
 			email: supplier?.email,
 			address:supplier?.address,
 			Area: supplier?.area,
 			pinCode: supplier?.pincode,
 			State: supplier?.state,
-			openiningBalance: supplier?.opening_balance,
-			gstNumber: supplier?.GST_No,
+			openingBalance: supplier?.opening_balance,
+			gstNumber: supplier?.gst_number,
 		})
 		setSelectedState(supplier?.state)
 		setEditData(supplier);
@@ -162,7 +162,8 @@ const SupplierTable = ({
 											<td className="p-2 text-sm w-[20%]">{supplier.supplier_name}</td>
 
 											{/* Mobile No */}
-											<td className="p-2 text-sm w-[17%]">{supplier.Mobile_no}</td>
+											<td className="p-2 text-sm w-[17%]">{supplier.mobile_no
+											}</td>
 
 											{/* Email */}
 											<td className="p-2 text-sm w-[20%]">{supplier.email}</td>
