@@ -306,4 +306,4 @@ const CustomerTable = ({
 		</>
 	);
 };
-export default CustomerTable;
+export default React.memo(CustomerTable)

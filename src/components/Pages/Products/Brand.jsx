@@ -9,38 +9,7 @@ import { toast, ToastContainer } from "react-toastify";
 
 
 const Brand = () => {
-    const brandData={
-        "brand": [
-            {
-                "brand_id": "67c5d6381d19e185136c5783",
-                "brand_name": "addas"
-            },
-            {
-                "brand_id": "67c5d65f1d19e185136c5785",
-                "brand_name": "{'brand_name': 'Brand'}"
-            },
-            {
-                "brand_id": "67c9fdb2c67a67ae0ed2997e",
-                "brand_name": "addas"
-            },
-            {
-                "brand_id": "67c9fddfc67a67ae0ed29980",
-                "brand_name": "addas"
-            },
-            {
-                "brand_id": "67c9fe06c67a67ae0ed29982",
-                "brand_name": "{'brand_name': 'testing'}"
-            },
-            {
-                "brand_id": "67c9fe80c67a67ae0ed29984",
-                "brand_name": "{'brand_name': 'gg'}"
-            },
-            {
-                "brand_id": "67c9ff0dc67a67ae0ed29986",
-                "brand_name": "{'brand_name': 'testig'}"
-            }
-        ]
-    }
+ 
     const [brands, setBrands] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
@@ -66,7 +35,7 @@ const Brand = () => {
           try {
               const fetchedBrands = await getBrands(config);
               console.log("Fetched Brands:", fetchedBrands?.brand);
-              setBrands(fetchedBrands.brand || []);
+              setBrands(fetchedBrands.brand);
               setLoading({ isLoading: false, message: "" });
           } catch (error) {
               console.error("Error fetching brands:", error);
@@ -77,7 +46,6 @@ const Brand = () => {
       fetchBrands();
   }, []); // Empty dependency array ensures it runs only once
 
-  console.log("brandeddata",brandData)
   
     // Handle Overlay
     const handleOpenOverlay = () => setShowOverlay(true);
@@ -102,10 +70,10 @@ const Brand = () => {
     
         if (newBrandName.trim() !== "") {
             try {
-                const newBrand = await addBrand(payload, config);
-                if (newBrand?.data) {
-                    setBrands([...brands, newBrand.data]);
-                }
+                const newBrand = await addBrand(newBrandName, config);
+                // if (newBrand?.data) {
+                //     setBrands([...brands, newBrand.data]);
+                // }
                 getBrands()
                 setNewBrandName("");
                 handleCloseOverlay();
@@ -172,14 +140,14 @@ const Brand = () => {
 
        // Handle Delete Click
        const handleDelete = (brand) => {
-        console.log("handledeleted",brand)
-        setSelectedBrand(brand);
+        console.log("handledeleted",brand?.brand_id)
+        setSelectedBrand(brand?.brand_id);
         setShowDeleteConfirm(true);
         setContextMenu(null);
     };
     
    const confirmDelete = async () => {
-      if (!selectedBrand) return;
+    //   if (!selectedBrand) return;
       const config = {
         headers: {
             "Content-Type": "application/json",
@@ -188,7 +156,7 @@ const Brand = () => {
     };
       try {
         await deleteBrand(selectedBrand, config); // API call
-        setBrands(brands.filter((brand) => brand.id !== selectedBrand.id));
+        // setBrands(brands.filter((brand) => brand.id !== selectedBrand.id))
         setShowDeleteConfirm(false);
         getBrands()
         // alert("Category deleted successfully!");
@@ -379,7 +347,7 @@ const Brand = () => {
             </tr>
         </thead>
         <tbody>
-            {paginatedBrands.length > 0 ? (
+            {brands.length > 0 ? (
                 brands?.map((brand, index) => (
                     <tr 
                         key={brand.id || index} 

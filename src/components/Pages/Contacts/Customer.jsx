@@ -295,6 +295,7 @@ const [triggerApi,setTriggerApi]=useState({getApi:false})
 				setFilteredCustomers((prevData) => 
 					prevData.filter((item) => item.id !== selectedRowId)
 				);
+				getDetails()
 				setDeleteMessage(false);
 			},
 			(err) => {

@@ -166,9 +166,9 @@ export const updateBrand = async (brandId, updatedBrand) => {
 };
 
 // Delete brand
-export const deleteBrand = async (brandId) => {
+export const deleteBrand = async (brandId,config) => {
   try {
-    await axios.delete(`${BASE_URL}/brand/api/delete?object_id=${brandId}`);
+    await axios.delete(`${BASE_URL}/brand/api/delete?object_id=${brandId}`,config);
     return { success: true };
   } catch (error) {
     console.error("Error deleting brand:", error);
@@ -400,7 +400,7 @@ export const fetchSubCategories = async () => {
 // Add a new subcategory
 export const addSubCategory = async (newSubCategory) => {
   try {
-    const response = await axios.post(BASE_URL, newSubCategory);
+    const response = await axios.post(`${BASE_URL}/subcategory/add`, newSubCategory);
     return response.data;
   } catch (error) {
     console.error('Error adding subcategory:', error);
