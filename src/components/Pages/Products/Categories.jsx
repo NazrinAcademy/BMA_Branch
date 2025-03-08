@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
 import { Search, Sheet, FileText, Printer, ChevronLeft, ChevronRight, TriangleAlert, X } from "lucide-react";
-import { fetchCategories, addCategory, deleteCategory, updateCategory } from "../../../apiService/AddProductAPI"; // Import API functions
+import { fetchCategories, addCategory, deleteCategory, updateCategory, getCategories } from "../../../apiService/AddProductAPI"; // Import API functions
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import successImage from '../../../assets/success.png'
 import { useSelector } from "react-redux";
+import CategoryModal from "./CategoryPage/categoryModal";
+import SuccessMessage from "../../SuccessMessage";
 
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [showOverlay, setShowOverlay] = useState(false);
+  const [isShowModal,setIsShowModal]=useState({edit:false})
   const [newCategory, setNewCategory] = useState({
     categoryName: "",
     igst: "",
@@ -20,6 +23,7 @@ const Categories = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const {userDetails}=useSelector((state)=>(state.auth))
+  const [successMsg,setSuccessMsg]=useState({add:false,edit:false})
 
 
 
@@ -38,31 +42,27 @@ const Categories = () => {
       sgst: (parseFloat(igstValue) / 2).toFixed(2),
     });
   };
+  const getCategoriesData = async () => {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userDetails.access_token}`,
+      },
+    };
 
+    try {
+      const fetchedCategories = await fetchCategories(config);
+      setCategories(fetchedCategories?.all_stock);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
   // Fetch categories when the component loads
   useEffect(() => {
     if (!userDetails?.access_token) return; // Prevents fetching if access_token is not available
-  
-    const getCategoriesData = async () => {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userDetails.access_token}`,
-        },
-      };
-  
-      try {
-        const fetchedCategories = await fetchCategories(config);
-        setCategories(fetchedCategories?.all_stock);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-  
     getCategoriesData();
   }, [userDetails?.access_token]); // Added dependency for token updates
   
-
 
   // Handle Save Category
   const handleSaveCategory = async () => {
@@ -82,14 +82,29 @@ const Categories = () => {
       const savedCategory = await addCategory(category, config); 
 
       setCategories((prevCategories) => [...prevCategories, savedCategory]);
-
+      setSuccessMsg((prevState)=>({...prevState,add:true}))
       setShowOverlay(false); 
+      handleModalClose()
       setNewCategory({ categoryName: "", igst: "", cgst: "", sgst: "" }); 
+      getCategoriesData()
+
     } catch (error) {
       console.error("Error saving category:", error);
     }
   };
 
+  useEffect(() => {
+		setTimeout(() => {
+			setSuccessMsg((prevState) => ({ ...prevState, add:false,edit:false }))
+		}, 2000);
+	}, [ successMsg?.add,successMsg?.edit]);
+
+  const handleModalClose=()=>{
+    setShowOverlay(false)
+    setNewCategory({ categoryName: "", igst: "", cgst: "", sgst: "" }); 
+    setIsShowModal((prevState)=>({...prevState,edit:false}))
+    // setSuccessMsg((prevState) => ({ ...prevState, add: false,edit:false }))
+  }
 
   // Handle Export to Excel
   const handleExportExcel = () => {
@@ -173,35 +188,45 @@ XLSX.writeFile(wb, "categories.xlsx");
       await deleteCategory(selectedCategory.id, config); // Using API function
       setCategories(categories.filter((cat) => cat.id !== selectedCategory.id));
       setShowDeleteConfirm(false);
+      getCategories()
       // alert("Category deleted successfully!");
     } catch (error) {
       console.error("Error deleting category:", error);
-      alert("Failed to delete category!");
+      // alert("Failed to delete category!");
     }
   };
   // -----------------------edit functions---------------------
   const [editingCategory, setEditingCategory] = useState(null);
 const [updatedCategory, setUpdatedCategory] = useState(null);
 
-  const handleKeyPress = async (e) => {
-    if (e.key === "Enter") {
+  const handleUpdate = async (e) => {
+    // if (e.key === "Enter") {
       try {
-        await updateCategory(editingCategory, updatedCategory); // Call API
-        setCategories((prevCategories) =>
-          prevCategories.map((cat) =>
-            cat.id === editingCategory ? updatedCategory : cat
-          )
-        );
-        setEditingCategory(null); // Exit edit mode
-        setShowSuccessMessageUpdate(true); // Show success message
+       const response= await updateCategory(editingCategory, newCategory); // Call API
+        // setCategories((prevCategories) =>
+        //   prevCategories.map((cat) =>
+        //     cat.id === editingCategory ? updatedCategory : cat
+        //   )
+        // );
+        if(response){
+          setSuccessMsg((prevState)=>({...prevState,edit:true}))
+
+          // getCategoriesData()
+          console.log("updated category")
+          setEditingCategory(null); // Exit edit mode
+          handleModalClose()
+        }
+       
+        // setShowSuccessMessageUpdate(true); //h Show success message
   
-        setTimeout(() => setShowSuccessMessageUpdate(false), 3000); // Hide message after 3s
+        // setTimeout(() => setShowSuccessMessageUpdate(false), 3000); // Hide message after 3s
       } catch (error) {
         console.error("Error updating category:", error);
         alert("Failed to update category!");
       }
-    }
+    // }
   };
+  console.log("category edit",successMsg)
 
   const handleInputChange = (e, field) => {
     setUpdatedCategory({
@@ -212,6 +237,10 @@ const [updatedCategory, setUpdatedCategory] = useState(null);
 
   const handleEdit = (category) => {
     setEditingCategory(category.id);
+    setNewCategory({ categoryName: category?.name, igst: category?.igst, cgst: category?.cgst, sgst: category?.sgst
+
+    })
+    setIsShowModal((prevState)=>({...prevState,edit:true}))
     setUpdatedCategory({ ...category }); // Clone category data for editing
     setContextMenu(null); // Close context menu
   };
@@ -259,62 +288,31 @@ const [updatedCategory, setUpdatedCategory] = useState(null);
       {/* Overlay Form */}
       {/* Overlay Form */}
       {showOverlay && (
-        <div className="fixed inset-0 z-50 flex pt-5 justify-center bg-black bg-opacity-50">
-          <div className="bg-white overflow-hidden rounded-lg w-[692px] h-72 px-7 py-6">
-            <h3 className="text-xl font-semibold text-center text-gray-700 mb-4">
-              Add New Category
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              {["categoryName", "igst", "cgst", "sgst"].map((field) => (
-                <div key={field} className="relative">
-                  <input
-                    type={field === "categoryName" ? "text" : "number"}
-                    name={field}
-                    value={newCategory[field]}
-                    onChange={(e) => {
-                      if (field === "igst") {
-                        handleIGSTChange(e); // Auto-fill CGST/SGST if IGST changes
-                      } else {
-                        setNewCategory({
-                          ...newCategory,
-                          [field]: e.target.value,
-                        });
-                      }
-                    }}
-                    placeholder=""
-                    className="peer w-full h-11 pl-4 pr-8 rounded border border-[#c9c9cd] text-sm focus:outline-none focus:border-purpleCustom"
-                  />
-                  <label
-                    className="absolute left-3 -top-2 text-sm font-normal text-[#838383] bg-white px-1 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-[#838383] peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#838383] peer-focus:bg-white"
-                  >
-                    {field.toUpperCase()} {field === "categoryName" ? "*" : ""}
-                  </label>
-                  {field !== "categoryName" && (
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                      %
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-end gap-4 mt-6">
-              <button
-                onClick={() => setShowOverlay(false)}
-                className="border-[1px] border-purpleCustom font-semibold px-12 py-2 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveCategory}
-                className="bg-purpleCustom text-white font-semibold px-14 py-2 rounded"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+       <CategoryModal
+       newCategory={newCategory}
+       setNewCategory={setNewCategory}
+       handleIGSTChange={handleIGSTChange}
+       handleModalClose={handleModalClose}
+       setIsShowModal={setIsShowModal}
+       handleSubmit={handleSaveCategory}
 
+       />
+      )}
+      {isShowModal?.edit && (
+       <CategoryModal
+       newCategory={newCategory}
+       setNewCategory={setNewCategory}
+       handleSubmit={handleUpdate}
+       handleIGSTChange={handleIGSTChange}
+       handleModalClose={handleModalClose}
+       setIsShowModal={setIsShowModal}
+       />
+      )}
+{successMsg?.add &&
+<SuccessMessage  showMsg={successMsg?.add} onClose={handleModalClose} content={"Category Add SuccessFully"}/>}
+
+{successMsg?.edit &&
+<SuccessMessage showMsg={successMsg?.edit} onClose={handleModalClose} content={"Category Edit SuccessFully"}/>}
       {/* Pagination Controls */}
       <div className="my-4 flex flex-col sm:flex-row justify-between text-[#838383] items-center">
         <div className="flex items-center gap-2">
@@ -367,8 +365,6 @@ const [updatedCategory, setUpdatedCategory] = useState(null);
           </button>
         </div>
       </div>
-
-
       {/* Table */}
       <div className="max-h-[350px] overflow-y-auto rounded border border-[#c9c9cd]">
       <table className="w-full ">
@@ -393,7 +389,7 @@ const [updatedCategory, setUpdatedCategory] = useState(null);
 
         {/* Categories Column */}
         <td className="px-6 py-4">
-          {editingCategory === category.id ? (
+          {/* {editingCategory === category.id ? (
             <input
               type="text"
               value={updatedCategory.categoryName}
@@ -401,51 +397,51 @@ const [updatedCategory, setUpdatedCategory] = useState(null);
               onKeyDown={handleKeyPress}
               autoFocus
               className="text-center w-full px-2 py-1 focus:outline-none"/>
-          ) : (
-            category.name
-          )}
+          ) : ( */}
+            {category.name}
+          {/* // )} */}
         </td>
         
         {/* IGST Column */}
         <td className="px-6 py-4">
-          {editingCategory === category.id ? (
+          {/* {editingCategory === category.id ? (
             <input
               type="number"
               value={updatedCategory.igst}
               onChange={(e) => handleInputChange(e, "igst")}
               onKeyDown={handleKeyPress}
               className="text-center w-full px-2 py-1 focus:outline-none"/>
-            ) : (
-            `${category.igst}%`
-          )}
+            ) : ( */}
+            {category.igst}%
+          {/* // )} */}
         </td>
         
         {/* CGST Column */}
         <td className="px-6 py-4">
-          {editingCategory === category.id ? (
+          {/* {editingCategory === category.id ? (
             <input
               type="number"
               value={updatedCategory.cgst}
               onChange={(e) => handleInputChange(e, "cgst")}
               onKeyDown={handleKeyPress}
               className="text-center w-full px-2 py-1 focus:outline-none"/>
-            ) : (
-            `${category.cgst}%`
-          )}
+            ) : ( */}
+            {category.cgst}%
+          {/* )} */}
         </td>
 
         {/* SGST Column */}
         <td className="px-6 py-4">
-          {editingCategory === category.id ? (
+          {/* {editingCategory === category.id ? (
             <input
               type="number"
               value={updatedCategory.sgst}
               onChange={(e) => handleInputChange(e, "sgst")}
               onKeyDown={handleKeyPress}
               className="text-center w-full px-2 py-1 focus:outline-none"/>
-            ) : (
-            `${category.sgst}%`
-          )}
+            ) : ( */}
+            {category.sgst}%
+          {/* )} */}
         </td>
       </tr>
     ))

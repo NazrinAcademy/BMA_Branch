@@ -242,7 +242,7 @@ export const updateUnit = async (unitId, updatedData, config) => {
 export const fetchCategories = async (config) => {
   try {
     const response = await axios.get(`${BASE_URL}/category/get/all`, config);
-    return response.data;
+    return response?.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
     throw error;
@@ -272,11 +272,8 @@ export const addCategory = async (category, config) => {
 // Update a category
 export const updateCategory = async (id, updatedCategory, config) => {
   try {
-    const response = await axios.put(`${BASE_URL}/category/update/${id}`, updatedCategory,config,  {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.put(`${BASE_URL}/category/update?object_id=${id}`, updatedCategory,config);
+    console.log("response",response)
 
     return response.data;
   } catch (error) {
@@ -288,11 +285,11 @@ export const updateCategory = async (id, updatedCategory, config) => {
 // Delete a category
 export const deleteCategory = async (id, config) => {
   try {
-    const response = await axios.delete(`${BASE_URL}/category/delete/${id}`, config);
+    const response = await axios.delete(`${BASE_URL}/category/delete?object_id=${id}`, config);
 
-    if (!response.status === 200) {
-      throw new Error("Failed to delete category");
-    }
+    // if (!response.status === 200) {
+    //   throw new Error("Failed to delete category");
+    // }
 
     return { success: true, id };
   } catch (error) {
