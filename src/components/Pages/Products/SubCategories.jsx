@@ -85,7 +85,9 @@ const SubCategories = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Overlay Open & Close Functions
-  const handleOpenOverlay = () => setShowOverlaySubCategory(true);
+  const handleOpenOverlay = () => {
+    setIsShowModal({ add: true });
+    setShowOverlaySubCategory(true);}
   const handleCloseOverlay = () => {
     console.log("Modal Closed");
     setIsShowModal({ add: false, edit: false });
@@ -128,7 +130,8 @@ const SubCategories = () => {
   }, [userDetails?.access_token]); // ✅ Trigger fetch when token updates
 
   // Handle Save Category
-  const handleSaveSubCategory = async () => {
+  const handleSaveSubCategory = async (e) => {
+    e.preventDefault()
     if (!selectedCategory || !newSubCategory ) {
       alert("Please select a category, enter a subcategory name, and provide a stock category ID.");
       return;
@@ -499,7 +502,7 @@ const SubCategories = () => {
               <Printer size={18} />
             </button>
           </div>
-        </div>
+        </div>{console.log("isShowModal",isShowModal)}
 
         {isShowModal?.add && (
   <SubCategoryModal
