@@ -337,10 +337,10 @@ const [triggerApi,setTriggerApi]=useState({getApi:false})
 		let y = 15;
 		Customers.forEach((Custom, index) => {
 			doc.text(
-				`${index + 1}-${Custom.supplierName} - PhoneNo: ${Custom.phoneNo
-				} -Email: ${Supp.email}-Address ${Custom.address}-Area ${Custom.area
-				}-PinCode${Supp.pinCode}-State${Custom.state}-OpeningBalance${Custom.openingBalance
-				}-BalanceAmount${Custom.balanceAmount}`,
+				`${index + 1}-${Custom.customer_name} - PhoneNo: ${Custom.phoneNo
+				} -Email: ${Custom.email}-Address ${Custom.address}-Area ${Custom.area
+				}-PinCode${Custom.pincode}-State${Custom.state}-OpeningBalance${Custom.opening_balance
+				}-BalanceAmount${Custom.balance_amount}`,
 				15,
 				y
 			);

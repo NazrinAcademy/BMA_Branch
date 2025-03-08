@@ -17,189 +17,222 @@ import { toast, ToastContainer } from "react-toastify";
 import { Link, useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { SupplierAdd, SupplierDelete, Supplierget, SupplierUpdate } from "../../../apiService/supplierAPI";
+import SuccessMessage from "../../SuccessMessage";
+import SupplierTable from "./CustomerDetails/supplierTable";
+import SupplierModal from "./CustomerDetails/supplierModal";
 
 const Supplier = () => {
   const allSuppliers = [
     {
-      id: 1,
-      supplierName: "Niyas",
-      phoneNo: 7695822683,
-      email: "niyas@gmail.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      openingBalance: 20000,
-      gstNumber: 5000,
+      "Supplier_id": 1,
+      "User_id":"252",
+      "supplier_name": "Niyas",
+      "Mobile_no": 7695822683,
+      "email": "niyas@gmail.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "opening_balance": 20000,
+      "balance_amount":null,
+      "GST_No": 5000,
     },
     {
-      id: 2,
-      supplierName: "Mohamed",
-      phoneNo: 9695822683,
-      email: "mohamed@gmail.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      openingBalance: 30000,
-      gstNumber: 1000,
+      "Supplier_id": 2,
+      "User_id":"324",
+      "supplier_name": "Mohamed",
+      "Mobile_no": 9695822683,
+      "email": "mohamed@gmail.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "opening_balance": 30000,
+      "balance_amount":null,
+      "GST_No": 1000,
     },
     {
-      id: 3,
-      supplierName: "Ismail",
-      phoneNo: 7995822683,
-      email: "ismai@gmaill.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      openingBalance: 40000,
-      gstNumber: 2000,
+      "Supplier_id": 3,
+      "User_id":"222",
+      "supplier_name": "Ismail",
+      "Mobile_no": 7995822683,
+      "email": "ismai@gmaill.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "opening_balance": 40000,
+      "balance_amount":null,
+      "GST_No": 2000,
     },
     {
-      id: 4,
-      supplierName: "Raja",
-      phoneNo: 8895822683,
-      email: "raja@gmail.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      openingBalance: 9000,
-      gstNumber: 3000,
+      "Supplier_id": 4,
+      "User_id":"021",
+      "supplier_name": "Raja",
+      "Mobile_no": 8895822683,
+      "email": "raja@gmail.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "opening_balance": 9000,
+      "balance_amount":null,
+      "GST_No": 3000,
     },
     {
-      id: 5,
-      supplierName: "joe",
-      phoneNo: 7195822681,
-      email: "joe@gmail.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      openingBalance: 80000,
-      gstNumber: 4000,
+      "Supplier_id": 5,
+      "User_id":"192",
+      "supplier_name": "joe",
+      "Mobile_no": 7195822681,
+      "email": "joe@gmail.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "opening_balance": 80000,
+      "balance_amount":null,
+      "GST_No": 4000,
     },
     {
-      id: 6,
-      supplierName: "Maddy",
-      phoneNo: 8695822688,
-      email: "maddy@gmail.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      openingBalance: 70000,
-      gstNumber: 5000,
+      "Supplier_id": 6,
+      "User_id":"718",
+      "supplier_name": "Maddy",
+      "Mobile_no": 8695822688,
+      "email": "maddy@gmail.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "opening_balance": 70000,
+      "balance_amount":null,
+      "GST_No": 5000,
     },
     {
-      id: 7,
-      supplierName: "Ram",
-      phoneNo: 7611822684,
-      email: "ram@gmail.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      openingBalance: 60000,
-      gstNumber: 6000,
+      "Supplier_id": 7,
+      "User_id":"161",
+      "supplier_name": "Ram",
+      "Mobile_no": 7611822684,
+      "email": "ram@gmail.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "opening_balance": 60000,
+      "balance_amount":null,
+      "GST_No": 6000,
     },
     {
-      id: 8,
-      supplierName: "Vincy",
-      phoneNo: 7695822685,
-      email: "vinc@gmail.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      openingBalance: 90000,
-      gstNumber: 7000,
+      "Supplier_id": 8,
+      "User_id":"415",
+      "supplier_name": "Vincy",
+      "Mobile_no": 7695822685,
+      "email": "vinc@gmail.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "opening_balance": 90000,
+      "balance_amount":null,
+      "GST_No": 7000,
     },
     {
-      id: 9,
-      supplierName: "Kalai",
-      phoneNo: 6595822685,
-      email: "kalai@gmail.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      openingBalance: 110000,
-      gstNumber: 9000,
+      "Supplier_id": 9,
+      "User_id":"131",
+      "supplier_name": "Kalai",
+      "Mobile_no": 6595822685,
+      "email": "kalai@gmail.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "opening_balance": 110000,
+      "balance_amount":null,
+      "GST_No": 9000,
     },
     {
-      id: 10,
-      supplierName: "niyas",
-      phoneNo: 7695822683,
-      email: "niyas@g.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      openingBalance: 20000,
-      gstNumber: 5000,
+      "Supplier_id": 10,
+      "User_id":"112",
+      "supplier_name": "niyas",
+      "Mobile_no": 7695822683,
+      "email": "niyas@g.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "opening_balance": 20000,
+      "balance_amount":null,
+      "GST_No": 5000,
     },
     {
-      id: 11,
-      supplierName: "niyas",
-      phoneNo: 7695822683,
-      email: "niyas@g.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      openingBalance: 20000,
-      gstNumber: 5000,
+      "Supplier_id": 11,
+      "User_id":"101",
+      "supplier_name": "niyas",
+      "Mobile_no": 7695822683,
+      "email": "niyas@g.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "opening_balance": 20000,
+      "balance_amount":null,
+      "GST_No": 5000,
     },
     {
-      id: 12,
-      supplierName: "niyas",
-      phoneNo: 7695822683,
-      email: "niyas@g.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      openingBalance: 20000,
-      gstNumber: 5000,
+      "Supplier_id": 12,
+      "User_id":"789",
+      "supplier_name": "niyas",
+      "Mobile_no": 7695822683,
+      "email": "niyas@g.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "opening_balance": 20000,
+      "balance_amount":null,
+      "GST_No": 5000,
     },
     {
-      id: 13,
-      supplierName: "niyas",
-      phoneNo: 7695822683,
-      email: "niyas@g.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      openingBalance: 20000,
-      gstNumber: 5000,
+      "Supplier_id": 13,
+      "User_id":"456",
+      "supplier_name": "niyas",
+      "Mobile_no": 7695822683,
+      "email": "niyas@g.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "opening_balance": 20000,
+      "balance_amount":null,
+      "GST_No": 5000,
     },
     {
-      id: 14,
-      supplierName: "niyas",
-      phoneNo: 7695822683,
-      email: "niyas@g.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      pinCode: 627811,
-      openingBalance: 20000,
-      gstNumber: 5000,
+      "Supplier_id": 14,
+      "User_id":"123",
+      "supplier_name": "niyas",
+      "Mobile_no": 7695822683,
+      "email": "niyas@g.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "pincode": 627811,
+      "opening_balance": 20000,
+      "balance_amount":null,
+      "GST_No": 5000,
     },
     {
-      id: 15,
-      supplierName: "niyas",
-      phoneNo: 7695822683,
-      email: "niyas@g.com",
-      area: "Tenkasi",
-      pinCode: "627814",
-      state: "TamilNadu",
-      address: "South Main Road",
-      openingBalance: 20000,
-      gstNumber: 5000,
+      "Supplier_id": 15,
+      "User_id":"124",
+      "supplier_name": "niyas",
+      "Mobile_no": 7695822683,
+      "email": "niyas@g.com",
+      "area": "Tenkasi",
+      "pincode": "627814",
+      "state": "TamilNadu",
+      "address": "South Main Road",
+      "opening_balance": 20000,
+      "balance_amount":null,
+      "GST_No": 5000,
     },
   ];
 
@@ -207,6 +240,7 @@ const Supplier = () => {
   const [loading, setLoading] = useState({ isLoading: false, message: "" });
 
   const [Suppliers, setSuppliers] = useState(allSuppliers);
+  const [triggerApi, setTriggerApi] = useState({getApi:false})
   // const navigate = useNavigate();
 
   // -------------------Pagenation Function----------------------------z
@@ -221,88 +255,66 @@ const Supplier = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState(null);
-  const [SuccessMeg, setSuccessMsg] = useState({ create: "", update: "" })
   const [filteredSuppliers, setFilteredSuppliers] = useState(Suppliers); 
   const inputRef = useRef(null);
+  
+  const [successMsg, setSuccessMsg] = useState({ create: "", update: "" })
+    const [editRowId, setEditRowId] = useState({});
+    const [isShowModal,setIsShowModal]=useState({edit:false})
+    const [editData, setEditData] = useState({})
+const [editDropdown, setEditDropdown] = useState(null);
+
+const [selectedItem, setSelectedItem] = useState(null);
 
 
 
 
+
+  // useEffect(() => {
+  //   const handlePressOutside = (event) => {
+  //     if (contextDropdown && !event.target.closest(".context-dropdown")) {
+  //       setContextDropdown(null);
+  //     }
+  //   };
+
+  //   document.addEventListener("click", handlePressOutside);
+  //   return () => {
+  //     document.removeEventListener("click", handlePressOutside);
+  //   };
+  // }, [contextDropdown]);
 
   useEffect(() => {
-    const handlePressOutside = (event) => {
-      if (contextDropdown && !event.target.closest(".context-dropdown")) {
-        setContextDropdown(null);
-      }
-    };
-
-    document.addEventListener("click", handlePressOutside);
-    return () => {
-      document.removeEventListener("click", handlePressOutside);
-    };
-  }, [contextDropdown]);
-
-  useEffect(() => {
-    if (showSuccessMessage) {
       setTimeout(() => {
         setShowSuccessMessage(false);
+        setSuccessMsg((prevState) => ({...prevState, create:false, update:false}))
       }, 2000);
-    }
-  }, [showSuccessMessage]);
+    
+  }, [showSuccessMessage, successMsg?.create, successMsg?.update]);
 
   //-------------- edit function-----------------
 
-  const handleEditing = (tableData) => {
-    setEditingSupplier(tableData.id);
+  // const handleEditing = (tableData) => {
+  //   setEditingSupplier(tableData.id);
 
-    if (!tableData.address.includes(tableData.area)) {
-      setUpdateSupplier({
-        ...tableData,
-        address: ` ${tableData.area}, ${tableData.state}, ${tableData.pinCode}`,
-      });
-    } else {
-      setUpdateSupplier(tableData);
-    }
-  };
+  //   if (!tableData.address.includes(tableData.area)) {
+  //     setUpdateSupplier({
+  //       ...tableData,
+  //       address: ` ${tableData.area}, ${tableData.state}, ${tableData.pinCode}`,
+  //     });
+  //   } else {
+  //     setUpdateSupplier(tableData);
+  //   }
+  // };
 
 
-  const handleInputChanges = (e, field) => {
-    setUpdateSupplier({
-      ...editUpdateSupplier,
-      [field]: e.target.value,
-    });
-  };
+  // const handleInputChanges = (e, field) => {
+  //   setUpdateSupplier({
+  //     ...editUpdateSupplier,
+  //     [field]: e.target.value,
+  //   });
+  // };
 
-  const handleUpdate = () => {
-    if (!editingSupplier) return;
-
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${userDetails?.access_token}`,
-      },
-    };
-
-    SupplierUpdate(
-      { id: editingSupplier, ...editUpdateSupplier },
-      config,
-      (res) => {
-        setFilteredSuppliers((prevSuppliers) =>
-          prevSuppliers.map((supplier) =>
-            supplier.id === editingSupplier ? { ...supplier, ...editUpdateSupplier } : supplier
-          )
-        );
-        setEditingSupplier(null);
-        setShowSuccessMessage(true);
-        setTimeout(() => setShowSuccessMessage(false), 2000);
-      },
-      (err) => {
-        console.log(err);
-        alert("Update failed!");
-      }
-    );
-  };
-
+  
 
   const handleKeyClick = (e) => {
     if (e.key === "Enter") {
@@ -310,16 +322,16 @@ const Supplier = () => {
     }
   };
 
-  const handleRightClick = (event, tableData) => {
-    event.preventDefault();
-    setContextDropdown({ x: event.pageX, y: event.pageY, tableData });
-  };
+  // const handleRightClick = (event, tableData) => {
+  //   event.preventDefault();
+  //   setContextDropdown({ x: event.pageX, y: event.pageY, tableData });
+  // };
 
 
   // ----------------- delete functions ------------------
 
   const handleDelete = (tableData) => {
-    setSelectedRowId(tableData.id);
+    setSelectedRowId(tableData.Supplier_id);
     setDeleteMessage(true);
     setContextDropdown(null);
   };
@@ -349,18 +361,18 @@ const Supplier = () => {
   };
 
   // ----------------------Search Function------------------------------
-  useEffect(() => {
-    const filteredData = Suppliers.filter(
-      (supplier) =>
-        supplier.supplierName
-          .toLowerCase()
-          .includes(searchQurey.toLowerCase()) ||
-        supplier.phoneNo.toString().includes(searchQurey) ||
-        supplier.email.toLowerCase().includes(searchQurey.toLowerCase()) ||
-        supplier.address.toLowerCase().includes(searchQurey.toLowerCase())
-    );
-    setFilteredSuppliers(filteredData);
-  }, [searchQurey, Suppliers]);
+  // useEffect(() => {
+  //   const filteredData = Suppliers.filter(
+  //     (supplier) =>
+  //       supplier.supplierName
+  //         .toLowerCase()
+  //         .includes(searchQurey.toLowerCase()) ||
+  //       supplier.phoneNo.toString().includes(searchQurey) ||
+  //       supplier.email.toLowerCase().includes(searchQurey.toLowerCase()) ||
+  //       supplier.address.toLowerCase().includes(searchQurey.toLowerCase())
+  //   );
+  //   setFilteredSuppliers(filteredData);
+  // }, [searchQurey, Suppliers]);
 
   const totalPage = Math.ceil(filteredSuppliers.length / perPage);
   const starterIndex = (currentPage - 1) * perPage;
@@ -381,10 +393,10 @@ const Supplier = () => {
     let y = 15;
     Suppliers.forEach((Supp, index) => {
       doc.text(
-        `${index + 1}-${Supp.supplierName} - PhoneNo: ${Supp.phoneNo} -Email: ${Supp.email
-        }-Address ${Supp.address}-Area ${Supp.area}-PinCode${Supp.pinCode
-        }-State${Supp.state}-OpeningBalance${Supp.openingBalance
-        }-BalanceAmount${Supp.balanceAmount}`,
+        `${index + 1}-${Supp.supplier_name} - PhoneNo: ${Supp.phoneNo} -Email: ${Supp.email
+        }-Address ${Supp.address}-Area ${Supp.area}-PinCode${Supp.pincode
+        }-State${Supp.state}-OpeningBalance${Supp.opening_balance
+        }-BalanceAmount${Supp.balance_amount}`,
         15,
         y
       );
@@ -414,6 +426,7 @@ const Supplier = () => {
   });
 
   const handleChange = (e) => {
+    console.log("onchange---", e.target.name, e.target.value);
     setform({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -484,7 +497,17 @@ const Supplier = () => {
     Supplierget(
       config,
       (res) => {
-        // setSuppliers(res?.data)
+        console.log("supplier response",res?.data?.Supplier)
+        setSuppliers(res?.data?.Supplier)
+        setFilteredSuppliers(res?.data?.Supplier)
+
+        setEditRowId(
+          res?.data?.Supplier.reduce((acc, el) => {
+            acc[el?.Supplier_id] = false;
+            return acc;
+          }, {})
+        );
+
         setLoading({ isLoading: false, message: "" });
       },
       (err) => {
@@ -495,21 +518,84 @@ const Supplier = () => {
 
 
   }, [userDetails?.access_token])
+  console.log("edit row", editRowId);
+  
 
   useEffect(() => {
     getDetails();
-  }, []);
+  }, [userDetails?.access_token, triggerApi?.getApi]);
 
+  const handlePrint = () => {
+    window.print();
+  }
 
+  const handleModalClose = () => {
+    setShowModal(false)
+    setform({})
+    setIsShowModal((prevState) => ({...prevState, edit:false}))
+    setSelectedState("")
+  }
 
-  useEffect(() => {
-    setFilteredSuppliers((prevSuppliers) =>
-      prevSuppliers.map((supplier) => ({
-        ...supplier,
-        address: `${supplier.address}, ${supplier.area}, ${supplier.state}, ${supplier.pinCode}`,
-      }))
+  // ----- update function:
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    if (!editRowId) return;
+    setLoading({ isLoading: true, message:"updating supplier..."})
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userDetails?.access_token}`,
+      },
+    };
+    const payload = {
+			User_id: userDetails?.access_token,
+			supplier_name: form?.supplierName,
+			mobile_no: form?.phoneNo,
+			email: form?.email,
+			address: form?.address,
+			area: form?.Area,
+			pincode: form?.pinCode,
+			state: selectedState,
+			opening_balance: form?.openingBalance,
+			gst_number: form?.gstNumber,
+		};
+
+    setTriggerApi((prevState) => ({...prevState, getApi:false}))
+    SupplierUpdate(
+      editRowId,
+      payload,
+      config,
+      (res) => {
+        console.log("triggered edit");
+        
+        handleModalClose()
+				setSuccessMsg((prevState) => ({ ...prevState, update: true }));
+        setTriggerApi((prevState)=>({...prevState,getApi:true}))
+				setLoading({ isLoading: false, message: "" });
+				setEditRowId(null);
+
+      },
+      (err) => {
+        console.log(err);
+        alert("Update failed!");
+        if (err?.response?.data?.message) {
+					alert("Update failed");
+				}
+				setSuppliers(filteredSuppliers);
+				setLoading({ isLoading: false, message: "" });
+      }
     );
-  }, []);
+  };
+
+
+  // useEffect(() => {
+  //   setFilteredSuppliers((prevSuppliers) =>
+  //     prevSuppliers.map((supplier) => ({
+  //       ...supplier,
+  //       address: `${supplier.address}, ${supplier.area}, ${supplier.state}, ${supplier.pinCode}`,
+  //     }))
+  //   );
+  // }, []);
 
   return (
     <>
@@ -606,7 +692,7 @@ const Supplier = () => {
               </button>
             </div>
           </div>
-          <div className="mt-5 rounded-md border border-[#c9c9cd]">
+          {/* <div className="mt-5 rounded-md border border-[#c9c9cd]">
             <div className="max-h-[350px] overflow-y-auto">
               {loading.isLoading ? (
                 <div className="p-4 text-center text-sm text-[#202020]">
@@ -695,7 +781,7 @@ const Supplier = () => {
             </div>
 
             {/*---------------------- Context Dropdown (Right Click)------------------------ */}
-            {contextDropdown && (
+            {/* {contextDropdown && (
               <div
                 className="absolute z-100 bg-white shadow-md border rounded"
                 style={{ top: contextDropdown.y, left: contextDropdown.x }}
@@ -718,7 +804,7 @@ const Supplier = () => {
                   </li>
                 </ul>
               </div>
-            )}
+            )} */} 
 
             {/* ----------------------------Success Message Model------------------------------ */}
             {showSuccessMessage && (
@@ -744,6 +830,16 @@ const Supplier = () => {
                 </div>
               </div>
             )}
+
+                      {console.log("successMsg",successMsg)}
+                      {successMsg?.create &&
+                      <SuccessMessage onClose={handleModalClose} showMsg={successMsg?.create} content={"Supplier details have been created successfully!"}/>
+                      }
+                            {successMsg?.update &&
+                      <SuccessMessage onClose={handleModalClose} showMsg={successMsg?.update} content={"Supplier details have been Updated successfully!"}/>
+                      }
+            
+
             {/* ------------------------Confirm Delete Model--------------------------- */}
             {deleteMessage && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -787,224 +883,63 @@ const Supplier = () => {
               </div>
             )}
 
+          {/* </div> */}
+          <SupplierTable
+					Suppliers={Suppliers}
+					editRowId={editRowId}
+					setEditRowId={setEditRowId}
+					editData={editData}
+					setEditData={setEditData}
+					editDropdown={editDropdown}
+					setEditDropdown={setEditDropdown}
+					inputRef={inputRef}
+					setLoading={setLoading}
+					setSuccessMsg={setSuccessMsg}
+					setSuppliers={setSuppliers}
+					filteredSuppliers={filteredSuppliers}
+					setFilteredSuppliers={setFilteredSuppliers}
+					setTriggerApi={setTriggerApi}
+					handleDelete={handleDelete}
+					setForm={setform}
+					form={form}
+					setShowModal={setShowModal}
+					setSelectedState={setSelectedState}
+					handleModalClose={handleModalClose}
+					isShowModal={isShowModal}
+					setIsShowModal={setIsShowModal}
+				
+				 />
+
+				{showModal && (
+					
+					<SupplierModal
+					form={form}
+					handleSubmit={handleSubmit}
+					handleChange={handleChange}
+					setSelectedState={setSelectedState}
+					handleModalClose={handleModalClose}
+					content={"Add Supplier"}
+					setForm={setform}
+					selectedState={selectedState}
+				
+					/>
+				)}
+				{
+					isShowModal?.edit &&(
+						<SupplierModal
+						form={form}
+						handleSubmit={handleUpdate}
+						handleChange={handleChange}
+						setSelectedState={setSelectedState}
+						handleModalClose={handleModalClose}
+						content={"Edit Supplier"}
+						setForm={setform}
+						selectedState={selectedState}
+					
+						/>
+					)
+				}
           </div>
-          {/* ------------------------Supplier from page -------------------------- */}
-
-          {showModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-              <div className="bg-white p-6 fixed top-0 rounded-lg w-[800px] shadow-lg">
-                <h2 className="text-[#202020] font-semibold text-center font-jakarta text-xl">
-                  Add New Supplier
-                </h2>
-                <form
-                  className="grid grid-cols-3 gap-6 my-6"
-                  onSubmit={handleSubmit}
-                >
-                  <div className="relative flex gap-4">
-                    <input
-                      type="text"
-                      id="supplierName"
-                      name="supplierName"
-                      className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-                      placeholder=""
-                      value={form.supplierName}
-                      onChange={handleChange}
-                      required
-                    />
-                    <label
-                      htmlFor="supplierName"
-                      className="absolute left-4 -top-2 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white"
-                    >
-                      Supplier Name *
-                    </label>
-                  </div>
-                  <div className="relative flex gap-4">
-                    <input
-                      type="text"
-                      id="phoneNo"
-                      name="phoneNo"
-                      className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-                      placeholder=""
-                      value={form.mobileNumber}
-                      onChange={handleChange}
-                      required
-                    />
-                    <label
-                      htmlFor="phoneNo"
-                      className="absolute left-4 -top-2 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white"
-                    >
-                      Mobile No
-                    </label>
-                  </div>
-                  <div className="relative flex gap-4">
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-                      placeholder=""
-                      value={form.email}
-                      onChange={handleChange}
-                      required
-                    />
-                    <label
-                      htmlFor="email"
-                      className="absolute left-4 -top-2 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white"
-                    >
-                      Email
-                    </label>
-                  </div>
-                  <div className="relative flex gap-4">
-                    <input
-                      type="text"
-                      id="address"
-                      name="address"
-                      className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-                      placeholder=""
-                      value={form.address}
-                      onChange={handleChange}
-                      required
-                    />
-                    <label
-                      htmlFor="address"
-                      className="absolute left-4 -top-3 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white"
-                    >
-                      Address
-                    </label>
-                  </div>
-                  <div className="relative flex gap-4">
-                    <input
-                      type="text"
-                      id="Area"
-                      name="Area"
-                      className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-                      placeholder=""
-                      value={form.Area}
-                      onChange={handleChange}
-                      required
-                    />
-                    <label
-                      htmlFor="Area"
-                      className="absolute left-4 -top-3 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white"
-                    >
-                      Area
-                    </label>
-                  </div>
-                  <div className="relative flex gap-4">
-                    <input
-                      type="text"
-                      id="pinCode"
-                      name="pinCode"
-                      className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-                      placeholder=""
-                      value={form.pinCode}
-                      onChange={handleChange}
-                      required
-                    />
-                    <label
-                      htmlFor="pinCode"
-                      className="absolute left-4 -top-3 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white"
-                    >
-                      PinCode
-                    </label>
-                  </div>
-                  <div className="relative ">
-                    <select
-                      id="State"
-                      name="State"
-                      value={selectedState}
-                      onChange={(e) => setSelectedState(e.target.value)}
-                      className="peer w-full h-11 px-2 text-sm border border-gray-300 focus:outline-none focus:border-[#593FA9] rounded bg-white"
-                      required
-                    >
-                      <option value="" disabled>
-                        Select state
-                      </option>
-
-                      <option value="Tamil Nadu">Tamil Nadu</option>
-                      <option value="Andhra Pradesh">Andhra Pradesh</option>
-                      <option value="Kerala">Kerala</option>
-                      <option value="Karnataka">Karnataka</option>
-                      <option value="Telangana">Telangana</option>
-                    </select>
-                    <label
-                      htmlFor="state"
-                      className="absolute left-4 -top-2 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white"
-                    >
-                      State
-                    </label>
-                    <span className="absolute right-4 top-2 text-gray-500 pointer-events-none"></span>
-                  </div>
-                  <div className="relative flex gap-4">
-                    <input
-                      type="text"
-                      id="openingBalance"
-                      name="openingBalance"
-                      className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-                      placeholder=""
-                      value={form.balanceAmount}
-                      onChange={handleChange}
-                      required
-                    />
-                    <label
-                      htmlFor="openingBalance"
-                      className="absolute left-4 -top-2 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white"
-                    >
-                      Opening Balance
-                    </label>
-                  </div>
-                  <div className="relative flex gap-4">
-                    <input
-                      type="text"
-                      id="gstNumber"
-                      name="gstNumber"
-                      className="peer w-64 h-11 px-2 text-sm border border-[#c9c9cd] focus:outline-none focus:border-[#593FA9] rounded"
-                      placeholder=""
-                      value={form.balanceAmount}
-                      onChange={handleChange}
-                      required
-                    />
-                    <label
-                      htmlFor="gstNumber"
-                      className="absolute left-4 -top-2 text-xs text-[#202020] bg-white px-1 transition-all 
-                   peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-                   peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white"
-                    >
-                      GST Number
-                    </label>
-                  </div>
-                  <div className=" flex gap-6 p-[390px] py-2">
-                    <button
-                      className="px-14 py-2 bg-[#fff] border border-t border-[#593fa9] font-jakarta font-semibold text-[#593fa9] rounded"
-                      onClick={() => setShowModal(false)}
-                    >
-                      Cancel
-                    </button>
-                    <button className="px-16 py-2 text-[#fff] bg-[#593fa9] text-base font-semibold font-jakarta rounded">
-                      Save
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
       <ToastContainer />
     </>
