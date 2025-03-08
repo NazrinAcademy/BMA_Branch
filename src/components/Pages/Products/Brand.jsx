@@ -6,8 +6,6 @@ import { jsPDF } from "jspdf";
 import successImage from '../../../assets/success.png'
 import { useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
-import BrandTable from "./ProductDetails/BrandTable";
-import BrandModal from "./ProductDetails/BrandModal";
 
 
 const Brand = () => {
@@ -333,22 +331,9 @@ const Brand = () => {
                 </div>
             </div>
 
-            <BrandTable
-        brands={brands}
-        loading={loading}
-        startIndex={0}
-        onEdit={handleEdit}
-      />
-      <BrandModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSave={handleSaveBrand}
-        selectedBrand={selectedBrand}
-      />
-
             {/* Table */}
 {/* Table */}
-{/* <div className="max-h-[350px] overflow-y-auto rounded border border-[#c9c9cd]">
+<div className="max-h-[350px] overflow-y-auto rounded border border-[#c9c9cd]">
 {loading.isLoading ? (
                 <div className="p-4 text-center text-sm text-[#202020]">
                   {loading.message || "Loading brands..."}
@@ -371,6 +356,7 @@ const Brand = () => {
                     >
                         <td className="px-6 py-4">{startIndex + index + 1}</td>
 
+                        {/* Brand Name Column */}
                         <td className="px-6 py-4">
                             {editingBrand === brand.brand_id ? (
                                 <input
@@ -395,10 +381,10 @@ const Brand = () => {
         </tbody>
     </table>
               )}
-</div> */}
+</div>
             
         {/* ------------------------------------------ Context Menu -----------------------------------------------*/}
-        {/* {contextMenu && (
+        {contextMenu && (
           <div
             className="absolute z-100 bg-white shadow-md border rounded"
             style={{ top: contextMenu.y, left: contextMenu.x }}
@@ -421,7 +407,7 @@ const Brand = () => {
           </div>
         )}
 
-          */}
+         
           {/* --------------------------- update successfull message --------------------------------- */}
         
           {showSuccessMessageUpdate && (
