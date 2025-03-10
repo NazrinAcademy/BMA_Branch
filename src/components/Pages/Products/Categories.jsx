@@ -210,6 +210,7 @@ const [updatedCategory, setUpdatedCategory] = useState(null);
         // );
         if(response){
           setSuccessMsg((prevState)=>({...prevState,edit:true}))
+          getCategoriesData()
 
           // getCategoriesData()
           console.log("updated category")

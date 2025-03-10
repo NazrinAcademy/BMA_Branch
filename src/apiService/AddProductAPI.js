@@ -24,7 +24,7 @@ export const addProduct = async (product) => {
       image: product.image, 
     };
 
-    const response = await axios.post(`${API_URL}/products`, newProduct);
+    const response = await axios.post(`${BASE_URL}/product/all/details/add`, product);
     return response.data;
   } catch (error) {
     console.error('Error adding product:', error);
@@ -420,6 +420,28 @@ export const updateSubCategory = async (id, updatedData) => {
 export const deleteSubCategory = async (id) => {
   try {
     await axios.delete(`${BASE_URL}/${id}`);
+  } catch (error) {
+    console.error('Error deleting subcategory:', error);
+    throw error;
+  }
+};
+
+
+//category based subcategory
+
+export const fetchSubcategoryBasedCategory = async (id) => {
+  try {
+    await axios.delete(`${BASE_URL}/${id}`);
+  } catch (error) {
+    console.error('Error deleting subcategory:', error);
+    throw error;
+  }
+};
+
+export const fetchSubcategoryBasedCategoryID = async (id) => {
+  try {
+    const response= await axios.get(`${BASE_URL}/subcategory/get?StockCategory_id=${id}`);
+    return  response?.data
   } catch (error) {
     console.error('Error deleting subcategory:', error);
     throw error;

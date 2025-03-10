@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Barcode from 'react-barcode';
-import { addCategory, addSubCategory, getCategories, getBrands, addBrand, getSubCategories, addNewUnit, addProduct, savePriceDetails, updateStockData, addStockData, fetchStockData, getPriceDetails } from "../../../apiService/AddProductAPI";
+import { addCategory, addSubCategory, getCategories, getBrands, addBrand, getSubCategories, addNewUnit, addProduct, savePriceDetails, updateStockData, addStockData, fetchStockData, getPriceDetails, fetchCategories, fetchSubcategoryBasedCategoryID } from "../../../apiService/AddProductAPI";
 import { fetchUnits as fetchUnitsAPI } from "../../../apiService/AddProductAPI";
 import { ImagePlus, X, CirclePlus, ChevronDown, ScanBarcode, Edit, Printer } from "lucide-react";
 import successImage from '../../../assets/success.png'
@@ -8,8 +8,6 @@ import { getPersonalDetails } from "../../../apiService/PGapi";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
-
-
 
 const AddProduct = () => {
 
@@ -19,6 +17,7 @@ const AddProduct = () => {
   const { userDetails } = useSelector((state) => (state.auth))
 
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
+  const [categoryList,setCategoryList]=useState([])
 
 
   const [categories, setCategories] = useState([]);
@@ -162,7 +161,7 @@ const AddProduct = () => {
   };
 
 
-  // -------------------------- barcode function --------------------------
+  // ------------F-------------- barcode function --------------------------
 
   const generateRandomBarcode = () => {
     return Math.floor(10000000000 + Math.random() * 90000000000).toString();
@@ -190,7 +189,7 @@ const AddProduct = () => {
     setShowOverlaySubCategory(false);
     setShowOverlayBrand(false);
     setShowOverlayUnit(false);
-    setNewCategory({ categoryName: "", igst: "", cgst: "", sgst: "" });
+    setNewCategory({id:"", categoryName: "", igst: "", cgst: "", sgst: "" });
     setNewSubCategory("");
     setNewBrandName("");
     setUnitName("");
@@ -240,18 +239,18 @@ const AddProduct = () => {
 
 
 
-  useEffect(() => {
-    const fetchCategoriesOnLoad = async () => {
-      try {
-        const data = await getSubCategories();
-        setSubCategories(data);
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchCategoriesOnLoad = async () => {
+  //     try {
+  //       const data = await getSubCategories();
+  //       setSubCategories(data);
+  //     } catch (error) {
+  //       console.error("Failed to fetch categories:", error);
+  //     }
+  //   };
 
-    fetchCategoriesOnLoad();
-  }, []);
+  //   fetchCategoriesOnLoad();
+  // }, []);
 
 
   // Handle saving a new category
@@ -277,6 +276,47 @@ const AddProduct = () => {
       alert("All fields are required!");
     }
   };
+
+   const getCategoriesData = async () => {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userDetails.access_token}`,
+        },
+      };
+  
+      try {
+        const fetchedCategories = await fetchCategories(config);
+        setCategoryList(fetchedCategories?.all_stock);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    useEffect(()=>{
+      getCategoriesData()
+    },[])
+
+    const getSubCategoriesData = async () => {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userDetails.access_token}`,
+        },
+      };
+  
+      try {
+        const fetchedCategories = await fetchSubcategoryBasedCategoryID(newCategory?.id,config);
+        setSubCategoryList(fetchedCategories || []); 
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+useEffect(()=>{
+  if(newCategory?.id){
+  getSubCategoriesData()
+  }
+},[newCategory?.id])
 
   // Handle saving a new subcategory
   // const handleSaveSubCategory = async () => {
@@ -347,11 +387,12 @@ const AddProduct = () => {
     try {
       const brandList = await getBrands(config);
       console.log("brandlist:", brandList)
-      setBrands(brandList.data || []);
+      setBrands(brandList?.brand);
     } catch (error) {
       console.error("Error fetching brands:", error);
     }
   };
+  console.log("brandadata",imageName)
 
   useEffect(() => {
     fetchBrands();
@@ -404,11 +445,12 @@ const AddProduct = () => {
     try {
       const unitList = await fetchUnitsAPI(config);
       console.log("unitList:", unitList);
-      setUnits(unitList.data || []);
+      setUnits(unitList.unit_all || []);
     } catch (error) {
       console.error("Error fetching units:", error);
     }
   };
+  console.log("unit-----",units)
 
   useEffect(() => {
     fetchUnits();
@@ -458,7 +500,7 @@ const AddProduct = () => {
   // ---------------------------------- update product name -------------------------
   const [brand, setBrand] = useState('');
   const [productModel, setProductModel] = useState('');
-  const [subCategory, setSubCategory] = useState('');
+  const [subCategory, setSubCategory] = useState({});
   const [productName, setProductName] = useState('');
   const [hsnSacCode, setHsnSacCode] = useState("");
   const [description, setDescription] = useState("");
@@ -469,7 +511,7 @@ const AddProduct = () => {
   // Automatically update productName when brand, productModel, or subCategory change
   useEffect(() => {
     if (brand && productModel && subCategory) {
-      setProductName(`${brand} ${productModel} ${subCategory}`);
+      setProductName(`${brand?.brand_name||""} ${productModel} ${subCategory?.subCategoryname||""}`);
     }
   }, [brand, productModel, subCategory]);
 
@@ -484,6 +526,8 @@ const AddProduct = () => {
       setImageName(file.name); // Set image name
     }
   };
+
+  console.log("image----",image)
 
   const handleCancel = () => {
     setImage(null);
@@ -503,25 +547,27 @@ const AddProduct = () => {
   const [filteredSubCategories, setFilteredSubCategories] = useState([]);
   const [filteredUnits, setFilteredUnits] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState([]);
-
-
+  const [subCategoryList,setSubCategoryList]=useState([])
+console.log("filteredUnits",filteredUnits)
   // ---------filtered brand:
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const handleSearchBrands = (searchText) => {
-    setBrand(searchText);
+    setBrand((prevState)=>({...prevState,brand_name:searchText}));
+    console.log("searchtext",searchText)
     if (searchText.trim() === "") {
       setFilteredBrands([]);
       setSelectedIndex(-1);
     } else {
       const filtered = brands.filter((b) =>
-        b.name.toLowerCase().startsWith(searchText.toLowerCase())
+        b.brand_name.toLowerCase().startsWith(searchText.toLowerCase())
       );
       setFilteredBrands(filtered);
       setDropdownBOpen(true);
       setSelectedIndex(-1);
     }
   };
+  console.log("filetereddd",filteredBrands)
 
   const handleSelectBrand = (selectedBrand) => {
     setBrand(selectedBrand);
@@ -559,24 +605,24 @@ const AddProduct = () => {
   const [focusedIndex, setFocusedIndex] = useState(-1);
 
   const handleSearchSubCategory = (searchText) => {
-    setSubCategory(searchText);
+    setSubCategory((prevState)=>({...prevState,subCategoryname:searchText}));
 
     if (searchText.trim() === "") {
       setFilteredSubCategories([]);
       setDropdownSOpen(false);
     } else {
       // Ensure categories is defined and contains valid data
-      const allSubCategories = categories?.flatMap((category) =>
+      const allSubCategories = subCategories?.map((category) =>
         Array.isArray(category.subCategories)
           ? category.subCategories.map((sub) => ({
-            name: sub.name,
-            hsnCode: sub.hsnCode
+            name: sub.subCategoryname,
+            hsnCode: sub.hsn_sac_code
           }))
           : []
       ) || [];
 
-      const filtered = allSubCategories.filter((sub) =>
-        sub.name.toLowerCase().startsWith(searchText.toLowerCase())
+      const filtered = subCategoryList.filter((sub) =>
+        sub.subCategoryname.toLowerCase().startsWith(searchText.toLowerCase())
       );
 
       setFilteredSubCategories(filtered);
@@ -588,13 +634,13 @@ const AddProduct = () => {
 
 
   const handleSelectSubCategory = (selectedSubCategory) => {
-    setSubCategory(selectedSubCategory.name || selectedSubCategory);
+    setSubCategory(selectedSubCategory);
 
     // Check if selectedSubCategory is an object and has hsnCode
     if (typeof selectedSubCategory === "object" && selectedSubCategory.hsnCode) {
       setPriceData((prevData) => ({
         ...prevData,
-        hsnCode: selectedSubCategory.hsnCode, // Auto-fill HSN/SAC Code
+        hsnCode: selectedSubCategory.hsn_sac_code, // Auto-fill HSN/SAC Code
       }));
     }
 
@@ -633,15 +679,15 @@ const AddProduct = () => {
       handleSelectUnit(filteredUnits[selectedUIndex].unit);
     }
   };
-
   const handleSearchUnits = (searchText) => {
     setUnit(searchText);
     if (searchText.trim() === "") {
       setFilteredUnits([]);
     } else {
       const filtered = units.filter((u) =>
-        u.unit.toLowerCase().startsWith(searchText.toLowerCase())
+        u.fullname.toLowerCase().startsWith(searchText.toLowerCase())
       );
+      console.log("filtered-----",filtered)
       setFilteredUnits(filtered);
       setDropdownUOpen(true);
     }
@@ -659,12 +705,14 @@ const AddProduct = () => {
   const [focusedCIndex, setFocusedCIndex] = useState(-1);
 
   const handleSearchCategories = (searchText) => {
+    console.log("searchText",searchText)
     if (searchText.trim() === "") {
       setFilteredCategories([]);
     } else {
-      const filtered = categories.filter((c) =>
-        c.categoryName.toLowerCase().includes(searchText.toLowerCase())
+      const filtered = categoryList.filter((c) =>
+        c.name.toLowerCase().includes(searchText.toLowerCase())
       );
+      console.log("filtered categories",filtered)
       setFilteredCategories(filtered);
       setDropdownCOpen(true);
     }
@@ -743,7 +791,8 @@ const AddProduct = () => {
     setNewCategory((prev) => {
       const updatedCategory = {
         ...prev,
-        categoryName: selectedCategory.categoryName,
+        id:selectedCategory?.id,
+        categoryName: selectedCategory.name,
         igst: selectedCategory.igst,
         cgst: selectedCategory.cgst,
         sgst: selectedCategory.sgst,
@@ -764,19 +813,19 @@ const AddProduct = () => {
 
 
 
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/categories");
-      const data = await response.json();
-      setCategories(data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
+  // const fetchCategories = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:5000/categories");
+  //     const data = await response.json();
+  //     setCategories(data);
+  //   } catch (error) {
+  //     console.error("Error fetching categories:", error);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  // useEffect(() => {
+  //   fetchCategories();
+  // }, []);
 
   const handleInputChangeGST = (e, field) => {
     let value = e.target.value.replace(/[^0-9]/g, '');
@@ -1050,11 +1099,22 @@ const AddProduct = () => {
 
   // submit function:
 
+
+  console.log("addproduct", brand,
+    productModel,
+    subCategory,
+    productName,
+    barcodeValue,
+    description,
+    unit,
+    categories,
+    )
+
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission
 
     // Validate form data before submitting
-    if (!validateForm()) return;
+    // if (!validateForm()) return;
 
     // Construct new product object
     const newProduct = {
@@ -1069,6 +1129,42 @@ const AddProduct = () => {
       image: image // Base64 image data
     };
 
+    const Payload={
+      "customer_Id": 123,
+      "brand": brand?.brand_id,
+      "category": newCategory?.id,
+      "subcategory": subCategory?.subCategory_Id,
+      "product_name": productName,
+      "unit": unit?.id,
+      "bar_oq_code": barcodeValue,
+      "description": description,
+      "product_model": productModel,
+      "igst":priceData.igst ,
+      // "igstprice": priceData?.i,
+      "cgst":newCategory?.cgst,
+      // "cgstprice": 3600.00,
+      "sgst": newCategory?.sgst,
+      // "sgstprice": 3600.00,
+      "cess": newCategory?.cess,
+      "cessprice": 400.00,
+      "totalamount": priceData?.totalAmount,
+      image:image,
+  
+      "purchaseprice": priceData?.purchasePrice,
+      "saleprice":priceData?.salePrice,
+      "min_sale_price": priceData?.minSalePrice,
+      "mrp": priceData?.mrp,
+      "hsn_sac_code": priceData?.hsnCode,
+      "discount":priceData?.discount,
+  
+      "opening_stock": stockData?.openingStock,
+      "opening_stock_values": stockData?.openingStockValue,
+      "low_stock_qty":stockData?.lowStockQty,
+      "date": stockData?.date,
+      "location": stockData?.location
+  }
+
+  console.log("payload----",Payload)
     try {
       await addProduct(newProduct);
       await savePriceDetails(priceData);
@@ -1129,7 +1225,7 @@ const AddProduct = () => {
               type="text"
               placeholder=""
               ref={brandRef}
-              value={brand}
+              value={brand?.brand_name}
               onKeyDown={(e) => {
                 handleKeyPress(e, productModelRef, null);
 
@@ -1162,11 +1258,12 @@ const AddProduct = () => {
               <ul className="absolute left-0 top-14 w-full bg-white border rounded shadow-md z-10 max-h-40 overflow-auto">
                 {filteredBrands.map((filteredBrand, index) => (
                   <li
-                    key={filteredBrand.id}
+                    key={filteredBrand.brand_id
+                    }
                     className={`px-4 py-2 text-sm cursor-pointer ${selectedIndex === index ? "bg-gray-200" : "hover:bg-gray-100"}`}
-                    onMouseDown={() => handleSelectBrand(filteredBrand.name)}
+                    onMouseDown={() => handleSelectBrand(filteredBrand)}
                   >
-                    {filteredBrand.name}
+                    {filteredBrand.brand_name}
                   </li>
                 ))}
               </ul>
@@ -1231,7 +1328,7 @@ const AddProduct = () => {
           </label>
         </div>
 
-
+{console.log("subCategory",subCategory)}
         {/* Sub Category Dropdown */}
         <div className="relative">
           <div
@@ -1242,7 +1339,7 @@ const AddProduct = () => {
             <input
               type="text"
               placeholder=""
-              value={subCategory}
+              value={subCategory.subCategoryname }
               ref={subCategoryRef}
               onKeyDown={(e) => {
                 handleKeyPress(e, productNameRef, productModelRef);
@@ -1282,7 +1379,7 @@ const AddProduct = () => {
                       handleSelectSubCategory(filteredSubCategory);
                     }}
                   >
-                    {filteredSubCategory.name || filteredSubCategory} {/* Display the name */}
+                    {filteredSubCategory.subCategoryname || filteredSubCategory} {/* Display the name */}
                   </li>
                 ))}
               </ul>
@@ -1421,7 +1518,7 @@ const AddProduct = () => {
               className="peer w-full h-11 rounded  border-[#c9c9cd] text-sm focus:outline-none focus:border-purpleCustom"
               placeholder=""
               ref={unitRef}
-              value={unit}
+              value={unit?.fullname}
               onKeyDown={(e) => {
                 handleKeyPress(e, categoryRef, productNameRef);
 
@@ -1459,10 +1556,10 @@ const AddProduct = () => {
                   <li
                     key={filteredUnit.id}
                     className={`px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${selectedUIndex === index ? 'bg-gray-200' : ''}`}
-                    onMouseDown={() => handleSelectUnit(filteredUnit.unit)}
+                    onMouseDown={() => handleSelectUnit(filteredUnit)}
                     onMouseEnter={() => setSelectedUIndex(index)}
                   >
-                    {filteredUnit.unit}
+                    {filteredUnit.fullname}
                   </li>
                 ))}
               </ul>
@@ -1566,6 +1663,7 @@ const AddProduct = () => {
             onKeyDown={(e) => handleShortcut(e, handleOpenOverlayCategory)}>
 
             {/* Input Field */}
+            {console.log("newCategory.categoryName",newCategory.categoryName)}
             <input
               type="text"
               className="peer w-full h-11 rounded border-[#c9c9cd] text-sm focus:outline-none focus:border-purpleCustom"
@@ -1617,7 +1715,7 @@ const AddProduct = () => {
                       }`} // Highlight the selected item
                     onMouseDown={() => handleSelectCategory(filteredCategory)} // Pass the entire category object
                   >
-                    {filteredCategory.categoryName} {/* Display categoryName */}
+                    {filteredCategory.name} {/* Display categoryName */}
                   </li>
                 ))}
               </ul>
@@ -1898,8 +1996,6 @@ const AddProduct = () => {
                 </label>
               </div>
             </div>
-
-
             {/* M.R.P */}
             <div className="relative">
               <div className="flex items-center">
@@ -1967,8 +2063,6 @@ const AddProduct = () => {
                 >
                   <ChevronDown size={24} />
                 </button>
-
-
                 {/* Dropdown */}
                 {dropdownDiscountOpen && (
                   <ul className="absolute left-0 top-14 w-full bg-white border rounded shadow-md z-10 max-h-40 overflow-auto">

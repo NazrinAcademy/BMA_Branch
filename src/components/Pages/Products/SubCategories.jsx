@@ -102,29 +102,30 @@ const SubCategories = () => {
   //     setNewSubCategory(value);
   //   }
   // };
+  const getCategoriesData = async () => {
+    console.log("Fetching category data...");
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userDetails.access_token}`,
+      },
+    };
+
+    try {
+      const fetchedCategories = await fetchCategories(config);
+      console.log("Fetched categories:", fetchedCategories);
+
+      setCategories(fetchedCategories?.all_stock || []); // ✅ Set categories
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
   useEffect(() => {
 
     if (!userDetails?.access_token) return;
     console.log("Access token found, fetching categories...");
 
-    const getCategoriesData = async () => {
-      console.log("Fetching category data...");
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userDetails.access_token}`,
-        },
-      };
-
-      try {
-        const fetchedCategories = await fetchCategories(config);
-        console.log("Fetched categories:", fetchedCategories);
-
-        setCategories(fetchedCategories?.all_stock || []); // ✅ Set categories
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
+ 
 
     getCategoriesData();
   }, [userDetails?.access_token]); // ✅ Trigger fetch when token updates
@@ -156,14 +157,9 @@ const SubCategories = () => {
       console.log("Saving subcategory...", newEntry); 
       const savedSubCategory = await addSubCategory(newEntry, config);
   
-      if (!savedSubCategory) {
-        throw new Error("Failed to save subcategory");
-      }
-  
-      console.log("Subcategory saved successfully:", savedSubCategory);
-  
       // Update state only after a successful API response
-      setsubCategories([...subCategories, savedSubCategory]);
+      // setsubCategories([...subCategories, savedSubCategory]);
+      getCategoriesData()
       setShowOverlaySubCategory(false);
       setNewSubCategory("");
       setSelectedCategory(""); // Clear stock category ID field
