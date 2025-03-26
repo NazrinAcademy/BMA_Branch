@@ -25,6 +25,8 @@ import PrintInvoice from "../pages/sales/PrintInvoice";
 
 import SupplierView from '../pages/contact/supplier/SupplierView'
 import CustomerView from '../pages/contact/customer/CustomerView'
+import AddPurchaseReturn from "../pages/purchaseReturn/AddPurchaseReturn";
+import PurchaseReturnList from "../pages/purchaseReturn/PurchaseReturnList";
 
 // Authentication Check
 const isAuthenticated = () => {
@@ -56,10 +58,12 @@ const Route1 = () => {
          <Route path="customer" element={<Customer />} />
          <Route path="viewPage" element={<SupplierView />} />
          <Route path="customerView" element={<CustomerView />} />
-                  <Route path="addSale" element={<AddSale />} />
+          <Route path="addSale" element={<AddSale />} />
          <Route path="/dashboard/saleInvoiceList/printInvoice" element={<PrintInvoice />} />
          <Route path="saleInvoiceList" element={<SaleInvoiceList />}/>
          <Route path="addPurchase" element={<AddPurchase />} />
+         <Route path="purchaseReturn" element={<AddPurchaseReturn />} />
+         <Route path="purchaseReturnList" element={<PurchaseReturnList />} />
          <Route path="purchaseInvoiceList" element={<PurchaseInvoiceList />} />
        </Route>
        

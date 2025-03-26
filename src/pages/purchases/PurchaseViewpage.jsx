@@ -1,142 +1,283 @@
 import React, { useState } from 'react'
-import { X, Printer } from "lucide-react";
+import { X, Printer, ChevronDown } from "lucide-react";
+import PrintInvoice from '../sales/PrintInvoice';
 
 const PurchaseViewpage = ({ selectedInvoice, closeModal }) => {
-     const [showPrintView, setShowPrintView] = useState(false);
-     if (!selectedInvoice) return null;
+    const [showPrintView, setShowPrintView] = useState(false);
+    if (!selectedInvoice) return null;
 
     return (
         <>
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    {showPrintView ? (
-        <PrintInvoice invoiceData={selectedInvoice} closePrint={() => setShowPrintView(false)} />
-      ) : (
-                        <div className="bg-white w-[90%] max-w-5xl rounded shadow-lg p-3 relative">
-                            {/* Modal Header */}
-                            <div className="border-b p-2 flex justify-between items-center">
-                                <h2 className="text-lg font-semibold">
-                                    Sale Detail (Invoice No: {selectedInvoice.id})
-                                </h2>
-                                <button
-                                    onClick={closeModal}
-                                    className="p-2 rounded-full hover:bg-gray-200"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </div>
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-20">
+                {showPrintView ? (
+                    <PrintInvoice invoiceData={selectedInvoice} closePrint={() => setShowPrintView(false)} />
+                ) : (
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-5xl max-h-[500px] overflow-y-auto">
 
-                            {/* Modal Body */}
-                            <div className="p-4 space-y-4">
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                                    {/* invoice Details (Middle) */}
-                                    <div>
-                                        <h3 className="text-lg font-semibold">Invoice Details</h3>
-                                        <div className="flex flex-col gap-2 text-base font-normal mt-2">
-                                            <p><span className="text-[#838383]">Invoice No:</span> {selectedInvoice.id}</p>
-                                            <p><span className="text-[#838383]">Invoice Date:</span>{selectedInvoice.date}</p>
-                                            <p><span className="text-[#838383]">Due Date:</span>{selectedInvoice.due_date}</p>
-                                        </div>
-                                    </div>
+                        {/* Modal Header */}
+                        <div className="flex justify-between items-center border-b p-4">
+                            <h2 className="text-neutral-800 text-xl font-semibold font-jakarta">
+                                Purchase Detail (Invoice No : {selectedInvoice.invoice_no})
+                            </h2>
+                            <button
+                                onClick={closeModal}
+                                className="text-gray-500 hover:text-gray-700 text-xl"
+                            >
+                                &times;
+                            </button>
+                        </div>
 
-                                    {/* Custemer Details (Middle) */}
-                                    <div>
-                                        <h3 className="text-lg font-semibold">Customer Details</h3>
-                                        <div className="flex flex-col gap-2 text-base font-normal mt-2">
-                                            <p><span className="text-[#838383]">Name :</span> {selectedInvoice.store}</p>
-                                            <p><span className="text-[#838383]">Mobile No:</span>{selectedInvoice.mobile}</p>
-                                            <p><span className="text-[#838383]">GST No:</span>{selectedInvoice.gst_no}</p>
-                                        </div>
-                                    </div>
-                                    {/* invoice Details (Middle) */}
-                                    <div>
-                                        <h3 className="text-lg font-semibold">Billing Address</h3>
-                                        <div className="flex flex-col gap-2 text-base font-normal mt-2">
-                                            <p className="text-[#838383]">{selectedInvoice.billing_address}</p>
-                                        </div>
-                                    </div>
-                                    {/* invoice Details (Middle) */}
-                                    <div>
-                                        <h3 className="text-lg font-semibold">Shipping Address </h3>
-                                        <div className="flex flex-col gap-2 text-base font-normal mt-2">
-                                            <p className="text-[#838383]"> {selectedInvoice.shipping_address}</p>
-                                        </div>
-                                    </div>
+                        {/* Modal Content */}
+                        <div className="p-4 space-y-6 text-gray-700 text-sm">
+                            {/* Top Section - Invoice, Supplier, Address */}
+                            <div className="grid grid-cols-4 gap-2">
+                                {/* Invoice Details */}
+                                <div>
+                                    <h3 className=" text-neutral-800 text-lg font-semibold font-jakarta">
+                                        Invoice Details
+                                    </h3>
+                                    <p className="text-zinc-500 text-base font-normal font-jakarta">
+                                        Invoice No :{" "}
+                                        <span className=" text-neutral-800 text-base font-normal font-jakarta">
+                                            {selectedInvoice.invoice_no}
+                                        </span>
+                                    </p>
+                                    <p className="text-zinc-500 text-base font-normal font-jakarta">
+                                        Invoice Date :{" "}
+                                        <span className=" text-neutral-800 text-base font-normal font-jakarta">
+                                            {selectedInvoice.invoice_date}
+                                        </span>
+                                    </p>
+                                    <p className="text-zinc-500 text-base font-normal font-jakarta">
+                                        Due Date :{" "}
+                                        <span className=" text-neutral-800 text-base font-normal font-jakarta">
+                                            {selectedInvoice.due_date}
+                                        </span>
+                                    </p>
                                 </div>
 
+                                {/* Supplier Details */}
+                                <div>
+                                    <h3 className="text-neutral-800 text-lg font-semibold font-jakarta">
+                                        Supplier Details
+                                    </h3>
+                                    <p className="text-zinc-500 text-base font-normal font-jakarta">
+                                        Name :{" "}
+                                        <span className=" text-neutral-800 text-base font-normal font-jakarta">
+                                            {selectedInvoice.supplier_name}
+                                        </span>
+                                    </p>
+                                    <p className="text-zinc-500 text-base font-normal font-jakarta">
+                                        Mobile No :{" "}
+                                        <span className=" text-neutral-800 text-base font-normal font-jakarta">
+                                            {selectedInvoice.mobile_no}
+                                        </span>
+                                    </p>
+                                    <p className="text-zinc-500 text-base font-normal font-jakarta">
+                                        GST No :{" "}
+                                        <span className=" text-neutral-800 text-base font-normal font-jakarta">
+                                            {selectedInvoice.gst_no}
+                                        </span>
+                                    </p>
+                                </div>
 
+                                {/* Supplier Address + Dropdowns */}
+                                <div>
+                                    <h3 className="text-neutral-800 text-lg font-semibold font-jakarta">
+                                        Supplier Address
+                                    </h3>
+                                    <p className=" text-neutral-800 text-base font-normal font-jakarta">
+                                        {selectedInvoice.address}
+                                    </p>
+                                  
+                                </div>
 
-                                {/* Invoice Table */}
-                                <table className="w-full border text-sm">
-                                    <thead className="bg-gray-100">
-                                        <tr>
-                                            <th className="p-2">Product</th>
-                                            <th className="p-2">Qty</th>
-                                            <th className="p-2">Rate</th>
-                                            <th className="p-2">Discount</th>
-                                            <th className="p-2">CGST</th>
-                                            <th className="p-2">SGST</th>
-                                            <th className="p-2">Total</th>
+                                {/* Dropdowns */}
+                                <div className="flex flex-col gap-4">
+                                    {/* Payment Type */}
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            className="peer w-52 h-11 pl-4 rounded border border-[#c9c9cd] justify-start items-center inline-flex overflow-hidden px-2 text-sm focus:outline-none focus:border-purpleCustom"
+                                            placeholder=" "
+                                            value={selectedInvoice.invoice_type}
+                                        />
+                                        <label className="absolute left-3 -top-2 text-sm font-normal text-[#838383] bg-white px-1 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-[#838383] peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#838383] peer-focus:bg-white">
+                                            Invoice Type
+                                        </label>
+                                        <ChevronDown
+                                            className="absolute right-14 top-3 text-gray-500 pointer-events-none"
+                                            size={16}
+                                        />
+                                    </div>
+
+                                    {/* Payment Status */}
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={selectedInvoice.purchase_status}
+                                            className="peer w-52 h-11 pl-4 rounded border border-[#c9c9cd] justify-start items-center inline-flex overflow-hidden px-2 text-sm focus:outline-none focus:border-purpleCustom"
+                                            placeholder=" "
+                                        />
+                                        <label className="absolute left-3 -top-2 text-sm font-normal text-[#838383] bg-white px-1 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-[#838383] peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#838383] peer-focus:bg-white">
+                                            Invoice Status
+                                        </label>
+                                        <ChevronDown
+                                            className="absolute right-14 top-3 text-gray-500 pointer-events-none"
+                                            size={16}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Product Table */}
+                            <div className="border rounded-md overflow-hidden">
+                                <table className="w-full border-collapse border text-center ">
+                                    <thead>
+                                        <tr className="bg-[#f7f7f7] text-sm font-semibold">
+                                            <th rowSpan="2" className="p-1 border w-48 text-neutral-800 text-sm font-semibold font-jakarta">
+                                                Product
+                                            </th>
+                                            <th rowSpan="2" className="p-1 border w-24 text-neutral-800 text-sm font-semibold font-jakarta">
+                                                HSN/SAC Code
+                                            </th>
+                                            <th rowSpan="2" className="p-1 border w-24 text-neutral-800 text-sm font-semibold font-jakarta">
+                                                Qty
+                                            </th>
+                                            <th rowSpan="2" className="p-1 border w-24 text-neutral-800 text-sm font-semibold font-jakarta">
+                                                Rate (₹)
+                                            </th>
+                                            <th colSpan="2" className="p-1 border font-jakarta text-neutral-800 text-sm font-semibold">
+                                                Discount
+                                            </th>
+                                            <th colSpan="2" className="p-1 border text-neutral-800 text-sm font-semibold font-jakarta">
+                                                CGST
+                                            </th>
+                                            <th colSpan="2" className="p-1 border text-neutral-800 text-sm font-semibold font-jakarta">
+                                                SGST
+                                            </th>
+                                            <th rowSpan="2" className="p-1 border w-22 text-neutral-800 text-sm font-semibold font-jakarta">
+                                                Total Amount
+                                            </th>
+                                        </tr>
+                                        <tr className="bg-[#f7f7f7] text-sm font-semibold">
+                                            <th className="p-1 border">%</th>
+                                            <th className="p-1 border">₹</th>
+                                            <th className="p-1 border">%</th>
+                                            <th className="p-1 border">₹</th>
+                                            <th className="p-1 border">%</th>
+                                            <th className="p-1 border">₹</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr className="border-t">
-                                            <td className="p-2">{selectedInvoice.product}</td>
-                                            <td className="p-2">{selectedInvoice.qty}</td>
-                                            <td className="p-2">{selectedInvoice.rate}</td>
-                                            <td className="p-2">{selectedInvoice.discount}</td>
-                                            <td className="p-2">{selectedInvoice.cgst}</td>
-                                            <td className="p-2">{selectedInvoice.sgst}</td>
-                                            <td className="p-2">{selectedInvoice.total}</td>
-                                        </tr>
+                                    {selectedInvoice.products?.map((product, index) => (
+    <tr key={index} className="border border-gray-300">
+                                          
+                                                <td className="border border-gray-300 px-4 py-4 text-neutral-800 text-sm font-normal font-jakarta">
+                                                    {product.product_name}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-4 text-neutral-800 text-sm font-normal font-jakarta">
+                                                {product.hsn_sac_code}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-4 text-neutral-800 text-sm font-normal font-jakarta">
+                                                {product.quantity}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-4 text-neutral-800 text-sm font-normal font-jakarta">
+                                                {product.rate}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-4 text-neutral-800 text-sm font-normal font-jakarta">
+                                                {product.discount}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-4 text-neutral-800 text-sm font-normal font-jakarta">
+                                                {product.discount_price}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-4 text-neutral-800 text-sm font-normal font-jakarta">
+                                                {product.cgst}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-4 text-neutral-800 text-sm font-normal font-jakarta">
+                                                {product.cgst_price}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-4 text-neutral-800 text-sm font-normal font-jakarta">
+                                                {product.sgst}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-4 text-neutral-800 text-sm font-normal font-jakarta">
+                                                {product.sgst_price}
+                                                </td>
+                                                <td className="border border-gray-300 px-4 py-4 text-neutral-800 text-sm font-normal font-jakarta">
+                                                {product.total_amount}
+                                                </td>
+                                            </tr>
+                                    ))}
                                     </tbody>
                                 </table>
+                            </div>
+                            <div className="text-right text-neutral-800 text-sm font-normal font-jakarta">
+  No of items: {selectedInvoice.products?.length || 0}
+</div>
+                            {/* Payment Type and Status */}
+                            <div className="px-20 rounded-md flex justify-between">
+                                {/* Payment Details */}
+                                <div className="flex flex-col gap-4">
+                                    {/* Payment Type */}
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            className="peer w-full h-11 pl-4 rounded border border-[#c9c9cd] justify-start items-center inline-flex overflow-hidden px-2 text-sm focus:outline-none focus:border-purpleCustom"
+                                            placeholder=" "
+                                            value={selectedInvoice.payment_type}
+                                        />
+                                        <label className="absolute left-3 -top-2 text-sm font-normal text-[#838383] bg-white px-1 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-[#838383] peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#838383] peer-focus:bg-white">
+                                            Payment Type
+                                        </label>
 
 
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-6 justify-center text-sm border-t pt-4">
-                                    <div>
-                                        <div className="flex flex-col gap-2 text-base font-normal mt-2">
+                                    </div>
 
-                                            <select className="border rounded p-2">
-                                                <option>{selectedInvoice.method}</option>
-                                            </select>
-                                            <select className="border rounded p-2">
-                                                <option>{selectedInvoice.method}</option>
-                                            </select>
-                                            <select className="border rounded p-2">
-                                                <option>{selectedInvoice.status}</option>
-                                            </select>
-                                        </div>
+                                    {/* Payment Status */}
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={selectedInvoice.payment_status}
+                                            className="peer w-full h-11 pl-4 rounded border border-[#c9c9cd] justify-start items-center inline-flex overflow-hidden px-2 text-sm focus:outline-none focus:border-purpleCustom"
+                                            placeholder=" "
+                                        />
+                                        <label className="absolute left-3 -top-2 text-sm font-normal text-[#838383] bg-white px-1 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-[#838383] peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#838383] peer-focus:bg-white">
+                                            Payment Status
+                                        </label>
+
                                     </div>
-                                    {/* Custemer Details (Middle) */}
-                                    <div>
-                                        <div className="flex flex-col gap-2 text-base font-normal mt-2">
-                                            <p><span className="text-[#838383]">Total Amount :</span> {selectedInvoice.amount}</p>
-                                            <p><span className="text-[#838383]">Received:</span>{selectedInvoice.received}</p>
-                                            <p><span className="text-[#838383]">Balance:</span>{selectedInvoice.balance}</p>
-                                        </div>
-                                    </div>
-                                    {/* Custemer Details (Middle) */}
-                                    <div>
-                                        <div className="flex flex-col gap-2 text-base font-normal mt-2">
-                                            <p><span className="text-[#838383]">Total Amount Before Tax :</span> {selectedInvoice.total_amount_before_tax}</p>
-                                            <p><span className="text-[#838383]">CGST:</span>{selectedInvoice.total_cgst}</p>
-                                            <p><span className="text-[#838383]">SGST:</span>{selectedInvoice.total_sgst}</p>
-                                        </div>
-                                    </div>
+                                </div>
+
+                                <div className="py-2 text-neutral-800 text-base font-normal font-jakarta">
+                                    <p>Total Amount : ₹{selectedInvoice.total_amount}</p>
+                                    <p> Received : ₹{selectedInvoice.balance_amount}</p>
+                                    <p>Balance : ₹{selectedInvoice.balance_amount}</p>
+                                </div>
+
+                                <div className="py-2 text-neutral-800 text-base font-normal font-jakarta">
+                                    <p>Total Amount Before Tax : ₹{selectedInvoice.total_before_tax}</p>
+                                    <p>CGST : ₹{selectedInvoice.cgst_total}</p>
+                                    <p>SGST : ₹{selectedInvoice.sgst_total}</p>
+                                    <p>Grand Total : ₹{selectedInvoice.grand_total}</p>
                                 </div>
                             </div>
 
-                            {/* Modal Footer */}
-                            <div className=" p-4 flex items-right justify-end">
-
-                                <button className="bg-purpleCustom text-white px-8 py-2 text-base font-semibold rounded flex items-center space-x-2">
-                                    <span>Print</span>
+                            {/* Print Button */}
+                            <div className="flex justify-end">
+                                <button className="px-11 py-2 text-white text-base font-semibold bg-violet-800 font-jakarta rounded-md"
+                                 onClick={() => setShowPrintView(true)}>
+                                    Print
                                 </button>
                             </div>
                         </div>
-                         )}
                     </div>
-       
+                )}
+            </div>
+
         </>
     )
 }

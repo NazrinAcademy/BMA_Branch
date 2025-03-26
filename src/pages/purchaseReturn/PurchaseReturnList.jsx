@@ -5,67 +5,67 @@ import { Link } from 'react-router-dom'
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import successImage from '../../assets/success.png'
-import PurchaseViewpage from "./PurchaseViewpage";
+import PurchaseReturnViewpage from "./PurchaseReturnViewpage";
 
 
-const PurchaseInvoiceList = () => {
+const PurchaseReturnList = () => {
   const invoices = [
     {
       
-      "supplier_name": "ABC Suppliers",
-      "mobile_no": "9876543210",
-      "email": "supplier@example.com",
-      "address": "123 Street, City, State",
-      "gst_no": "22AAAAA0000A1Z5",
-      "invoice_no": "001",
-      "invoice_date": "2025-03-05",
-      "due_date": "2025-03-15",
-      "invoice_type": "with tax",
-      "products": [
-          {
-              "product_name": "Product A",
-              "hsn_sac_code": "1001",
-              "quantity": 10,
-              "rate": 50.0,
-              "discount": 5.0,
-              "discount_price": 2.5,
-              "cgst": 9.0,
-              "cgst_price": 4.5,
-              "sgst": 9.0,
-              "sgst_price": 4.5,
-              "total_amount": 500.0
-          },
-          {
-              "product_name": "Product B",
-              "hsn_sac_code": "1002",
-              "quantity": 1,
-              "rate": 100.0,
-              "discount": 10.0,
-              "discount_price": 5.0,
-              "cgst": 9.0,
-              "cgst_price": 9.0,
-              "sgst": 9.0,
-              "sgst_price": 9.0,
-              "total_amount": 500.0
-          }
-      ],
-      "total_amount": 1000.0,
-      "received_amount": 500.0,
-      "balance_amount": 500.0,
-      "total_before_tax": 950.0,
-      "cgst": 18.0,
-      "sgst": 18.0,
-      "discount": 15.0,
-      "grand_total": 1000.0,
-      "payment_type": "cash",
-      "payment_status": "Paid",
-      "purchase_status": "Pending",
-      "billing_address": "No. 20, Fish Market, Coimbatore",
-      "shipping_address": "No. 22, Beach Road, Coimbatore",
-      "notes": "Urgent order"
-  }
-   ];
- 
+        "supplier_name": "ABC Suppliers",
+        "mobile_no": "9876543210",
+        "email": "supplier@example.com",
+        "address": "123 Street, City, State",
+        "gst_no": "22AAAAA0000A1Z5",
+        "return_no": "001",
+        "invoice_date": "2025-03-05",
+        "due_date": "2025-03-15",
+        "invoice_type": "with tax",
+        "products": [
+            {
+                "product_name": "Product A",
+                "hsn_sac_code": "1001",
+                "quantity": 10,
+                "rate": 50.0,
+                "discount": 5.0,
+                "discount_price": 2.5,
+                "cgst": 9.0,
+                "cgst_price": 4.5,
+                "sgst": 9.0,
+                "sgst_price": 4.5,
+                "total_amount": 500.0
+            },
+            {
+                "product_name": "Product B",
+                "hsn_sac_code": "1002",
+                "quantity": 1,
+                "rate": 100.0,
+                "discount": 10.0,
+                "discount_price": 5.0,
+                "cgst": 9.0,
+                "cgst_price": 9.0,
+                "sgst": 9.0,
+                "sgst_price": 9.0,
+                "total_amount": 500.0
+            }
+        ],
+        "total_amount": 1000.0,
+        "received_amount": 500.0,
+        "balance_amount": 500.0,
+        "total_before_tax": 950.0,
+        "cgst": 18.0,
+        "sgst": 18.0,
+        "discount": 15.0,
+        "grand_total": 1000.0,
+        "payment_type": "cash",
+        "payment_status": "Received",
+        "purchase_status": "Pending",
+        "billing_address": "No. 20, Fish Market, Coimbatore",
+        "shipping_address": "No. 22, Beach Road, Coimbatore",
+        "notes": "Urgent order"
+    }
+  ]  
+
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
@@ -76,8 +76,8 @@ const PurchaseInvoiceList = () => {
   const [mobileFilter, setMobileFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [showFilter, setShowFilter] = useState(false);
-    const [selectedInvoice, setSelectedInvoice] = useState(null);
-  
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+
 
   // Toggle Filter Form
   const toggleFilter = () => {
@@ -163,42 +163,42 @@ const PurchaseInvoiceList = () => {
 
   // .--------------------- delete functions ------------------------
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-const [selectedRowId, setSelectedRowId] = useState(null);
+  const [selectedRowId, setSelectedRowId] = useState(null);
 
 
-// Common Delete Function ----
-const handleDelete = (ids) => {
-  setPaginatedInvoices((prevData) =>
-    prevData.filter((invoice) => !ids.includes(invoice.id))
-  );
+  // Common Delete Function ----
+  const handleDelete = (ids) => {
+    setPaginatedInvoices((prevData) =>
+      prevData.filter((invoice) => !ids.includes(invoice.id))
+    );
 
-  setCheckedInvoices([]); 
-};
+    setCheckedInvoices([]);
+  };
 
 
-// Delete Single Invoice (Right-Click) --
-const handleSingleDelete = (invoice) => {
-  setSelectedRowId(invoice.id);
-  setShowDeleteConfirm(true);
-};
-
-// Bulk Delete Checked Invoices -----------------------
-const handleBulkDelete = () => {
-  if (checkedInvoices.length > 0) {
+  // Delete Single Invoice (Right-Click) --
+  const handleSingleDelete = (invoice) => {
+    setSelectedRowId(invoice.id);
     setShowDeleteConfirm(true);
-  }
-};
+  };
 
-// Confirm Delete -----------------------
-const confirmDelete = () => {
-  if (selectedRowId) {
-    handleDelete([selectedRowId]);
-  } else if (checkedInvoices.length > 0) {
-    handleDelete(checkedInvoices); 
-  }
-  setShowDeleteConfirm(false);
-  setSelectedRowId(null);
-};
+  // Bulk Delete Checked Invoices -----------------------
+  const handleBulkDelete = () => {
+    if (checkedInvoices.length > 0) {
+      setShowDeleteConfirm(true);
+    }
+  };
+
+  // Confirm Delete -----------------------
+  const confirmDelete = () => {
+    if (selectedRowId) {
+      handleDelete([selectedRowId]);
+    } else if (checkedInvoices.length > 0) {
+      handleDelete(checkedInvoices);
+    }
+    setShowDeleteConfirm(false);
+    setSelectedRowId(null);
+  };
 
   // --------------------------------- view functions ---------------------------
   const [showModal, setShowModal] = useState(false);
@@ -338,8 +338,8 @@ const confirmDelete = () => {
 
 
   return (
-<div className="bg-white h-full px-7 py-3 rounded shadow-md w-full max-w-full xl:max-w-7xl 2xl:max-w-screen-2xl font-['Plus Jakarta Sans'] mx-auto">
-        <div className="flex justify-between items-center border-b text-nowrap py-4">
+    <div className="bg-white h-full px-7 py-3 rounded shadow-md w-full max-w-full xl:max-w-7xl 2xl:max-w-screen-2xl font-['Plus Jakarta Sans'] mx-auto">
+      <div className="flex justify-between items-center border-b text-nowrap py-4">
         <h2 className="text-xl font-semibold">Purchase Invoice List</h2>
         <div className="flex items-center gap-3">
           <button onClick={toggleFilter} className="flex items-center px-4 py-2 border rounded text-gray-700">
@@ -356,7 +356,7 @@ const confirmDelete = () => {
               className="border p-2 pl-10 w-full rounded focus:ring-1 focus:ring-[#838383] focus:outline-none"
             />
           </div>
-          <Link to={"/dashboard/addPurchase"}
+          <Link to={"/dashboard/purchaseReturn"}
             className="bg-purpleCustom text-nowrap text-white px-4 py-2 text-base font-semibold rounded flex items-center gap-2">
             Purchase Invoice
           </Link>
@@ -471,8 +471,8 @@ const confirmDelete = () => {
         <div className="flex gap-4 mt-4 sm:mt-0">
           {checkedInvoices.length > 0 && (
             <button className=" text-[#e5484d] p-2 rounded flex items-center justify-center"
-            onClick={handleBulkDelete}>
-            <Trash2 size={20} />
+              onClick={handleBulkDelete}>
+              <Trash2 size={20} />
             </button>
           )}
 
@@ -489,111 +489,95 @@ const confirmDelete = () => {
       </div>
 
 
-{/* ------------------------ table ------------------------ */}
-<div className="overflow-x-auto">
-  <div className="max-h-[350px] overflow-y-auto rounded border border-[#c9c9cd]">
-    <table className="w-full">
-      <thead className="sticky top-0 bg-[#f8f8f8]">
-        <tr className="text-sm font-semibold">
-          <th className="py-3 px-4 w-10">
-            <input
-              type="checkbox"
-              onChange={(e) => {
-                if (e.target.checked) {
-                  setCheckedInvoices(invoices.map((inv) => inv.id));
-                } else {
-                  setCheckedInvoices([]);
-                }
-              }}
-              checked={checkedInvoices.length > 0 && checkedInvoices.length === invoices.length}
-            />
-          </th>
-          {[
-            "Invoice No",
-            "Date",
-            "Purchase Status",
-            "Billing From",
-            "Total Amount",
-            "Payment Due",
-            "Payment Method",
-            "Payment Status",
-          ].map((heading, index) => (
-            <th key={index} className="py-3 px-4 w-[12.5%]">{heading}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {paginatedInvoices.length > 0 ? (
-          paginatedInvoices.map((invoice) => (
-            <tr
-              key={invoice.id}
-              className="border-t text-sm text-center cursor-pointer"
-              onContextMenu={(e) => handleRightClick(e, invoice)} // Right-click event
-            >
-              <td className="py-3 px-4">
-                <input
-                  type="checkbox"
-                  checked={checkedInvoices.includes(invoice.id)}
-                  onChange={() => handleRowCheckbox(invoice.id)}
-                />
-              </td>
+      {/* ------------------------ table ------------------------ */}
+      <div className="overflow-x-auto">
+        <div className="max-h-[350px] overflow-y-auto rounded border border-[#c9c9cd]">
+          <table className="w-full">
+            <thead className="sticky top-0 bg-[#f8f8f8]">
+              <tr className="text-sm font-semibold">
+                <th className="py-3 px-4 w-10">
+                  <input
+                    type="checkbox"
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setCheckedInvoices(invoices.map((inv) => inv.id));
+                      } else {
+                        setCheckedInvoices([]);
+                      }
+                    }}
+                    checked={checkedInvoices.length > 0 && checkedInvoices.length === invoices.length}
+                  />
+                </th>
+                {[
+                  "Return No",
+                  "Date",
+                  "Return To",
+                  "Total Amount",
+                  "Payment Due",
+                  "Payment Method",
+                  "Payment Status",
+                ].map((heading, index) => (
+                  <th key={index} className="py-3 px-4 w-[12.5%]">{heading}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedInvoices.length > 0 ? (
+                paginatedInvoices.map((invoice) => (
+                  <tr
+                    key={invoice.id}
+                    className="border-t text-sm text-center cursor-pointer"
+                    onContextMenu={(e) => handleRightClick(e, invoice)} // Right-click event
+                  >
+                    <td className="py-3 px-4">
+                      <input
+                        type="checkbox"
+                        checked={checkedInvoices.includes(invoice.id)}
+                        onChange={() => handleRowCheckbox(invoice.id)}
+                      />
+                    </td>
 
-              {["invoice_no", "invoice_date", "purchase_status", "supplier_name", "total_amount", "balance_amount", "payment_type"].map((key) => (
-                <td key={key} className="px-2 py-3 w-[12.5%]">
-                  {editingInvoice === invoice.id ? (
-                    <input
-                      type="text"
-                      value={updatedInvoice[key] || ""}
-                      onChange={(e) => handleInputChange(e, key)}
-                      onKeyPress={handleKeyPress} // Save on Enter
-                      className="text-center w-full px-2 py-1 focus:outline-none"
-                    />
-                  ) : key === "purchase_status" ? (
-                    <span
-                      className={`px-3 py-1 text-sm font-semibold border rounded
-                        ${
-                          invoice[key] === "Received"
-                            ? "border-green-500 text-green-500"
-                            : invoice[key] === "Pending"
-                            ? "border-yellow-500 text-yellow-500"
-                            : invoice[key] === "Ordered"
-                            ? "border-sky-500 text-sky-500" 
-                            : "border-gray-300 text-gray-500"
-                        }`}
-                    >
-                      {invoice[key]}
-                    </span>
-                  ) : (
-                    invoice[key]
-                  )}
-                </td>
-              ))}
+                    {["return_no", "invoice_date", "supplier_name", "total_amount", "balance_amount", "payment_type"].map((key) => (
+                      <td key={key} className="px-2 py-3 w-[12.5%]">
+                        {editingInvoice === invoice.id ? (
+                          <input
+                            type="text"
+                            value={updatedInvoice[key] || ""}
+                            onChange={(e) => handleInputChange(e, key)}
+                            onKeyPress={handleKeyPress} // Save on Enter
+                            className="text-center w-full px-2 py-1 focus:outline-none"
+                          />
+                        
+                        ) : (
+                          invoice[key]
+                        )}
+                      </td>
+                    ))}
 
-              {/* Payment Status Column */}
-              <td className="py-3 px-2 w-[12.5%]">
-                <span
-                  className={`px-2 py-1 text-sm rounded ${
-                    invoice.payment_status === "Paid"
-                      ? "bg-[#d9ffef] text-[#17be78]"
-                      : "bg-[#FFF7DF] text-[#FFC107]"
-                  }`}
-                >
-                  {invoice.payment_status}
-                </span>
-              </td>
-            </tr>
-          ))
-        ) : (
-          <tr>
-            <td colSpan="9" className="py-4 text-gray-500">
-              No data found
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  </div>
-</div>
+                    {/* Payment Status Column */}
+                    <td className="py-3 px-2 w-[12.5%]">
+                      <span
+                        className={`px-2 py-1 text-sm rounded ${invoice.payment_status === "Received"
+                            ? "bg-[#d9ffef] text-[#17be78]"
+                            : "bg-[#FFF7DF] text-[#FFC107]"
+                          }`}
+                      >
+                        {invoice.payment_status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" className="py-4 text-gray-500">
+                    No data found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
 
 
@@ -696,18 +680,18 @@ const confirmDelete = () => {
         </div>
       )}
 
-{showModal && (
-        <PurchaseViewpage
+      {showModal && (
+        <PurchaseReturnViewpage
           selectedInvoice={selectedInvoice}
           closeModal={() => setShowModal(false)}
         />
       )}
 
-    
+
     </div>
 
 
   );
 }
 
-export default PurchaseInvoiceList; 
+export default PurchaseReturnList; 

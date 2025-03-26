@@ -13,208 +13,87 @@ import ViewInvoiceModal from "./ViewInvoiceModal";
 const SaleInvoiceList = () => {
   const invoices = [
     {
-      invoice_no: "001",
-      invoice_date: "10/02/2024",
-      due_date: "15/02/2024",
-      billing_to: "Mydeen Store",
-      mobile_no: "9876543234",
-      gst_no: "GSTIN123456",
-      billing_address: "No. 10, Market Street, Chennai",
-      shipping_address: "No. 5, Main Road, Chennai",
-      amount: 111510,
-      received: "₹ 100000",
-      balance: "₹ 11510",
-      total_amount_before_tax: "₹ 95000",
-      total_cgst: "₹ 8000",
-      total_sgst: "₹ 8000",
-      payment_method: "Cash",
-      status: "Paid",
-      product_name: "Electronic Items",
-      hsn_sac_code:12345,
-      qty: 5,
-      rate: " 20000",
-      discount_percentage:"0",
-      discount_value: "2000",
-      cgst_percentage:"9",
-      cgst_value: "4000",
-      sgst_percentage:"9",
-      sgst_value: "4000",
-      total_amount: "111510"
-    },
-    {
-      invoice_no: "002",
-      invoice_date: "11/02/2024",
-      due_date: "16/02/2024",
-      billing_to: "Kadal Whole Store",
-      mobile_no: "7658953149",
-      gst_no: "GSTIN987654",
-      billing_address: "No. 20, Fish Market, Coimbatore",
-      shipping_address: "No. 22, Beach Road, Coimbatore",
-      amount: "₹ 15000",
-      received: "₹ 10000",
-      balance: "₹ 5000",
-      total_amount_before_tax: "₹ 13000",
-      total_cgst: "₹ 1000",
-      total_sgst: "₹ 1000",
-      payment_method: "Cash",
-      status: "Paid",
-      product_name: "Seafood Supplies",
-      hsn_sac_code:78985,
-      qty: 10,
-      rate: "₹ 1500",
-      discount_percentage:"0",
-      discount_value: "500",
-      cgst_percentage:"9",
-      cgst_value: "750",
-      sgst_percentage:"9",
-      sgst_value: "750",
-      total_amount: "15000"
-    },
-    {
-      invoice_no: "003",
-      invoice_date: "11/02/2024",
-      due_date: "18/02/2024",
-      billing_to: "Anil Electronics",
-      mobile_no: "9876543212",
-      gst_no: "GSTIN543210",
-      billing_address: "No. 30, Tech Street, Bangalore",
-      shipping_address: "No. 31, Silicon Valley, Bangalore",
-      amount: "₹ 1200",
-      received: "₹ 0",
-      balance: "₹ 1200",
-      total_amount_before_tax: "₹ 1000",
-      total_cgst: "₹ 100",
-      total_sgst: "₹ 100",
-      payment_method: "Cash",
-      status: "Un Paid",
-      product_name: "Mobile Accessories",
-      hsn_sac_code:97662,
-      qty: 2,
-      rate: "₹ 600",
-      discount_percentage:"0",
-      discount_value: "50",
-      cgst_percentage:"6",
-      cgst_value: "50",
-      sgst_percentage:"6",
-      sgst_value: "50",
-      total_amount: "1200"
-    },
-    {
-      invoice_no: "004",
-      invoice_date: "12/02/2024",
-      due_date: "20/02/2024",
-      billing_to: "Mydeen Store",
-      mobile_no: "9876543234",
-      gst_no: "GSTIN123456",
-      billing_address: "No. 10, Market Street, Chennai",
-      shipping_address: "No. 5, Main Road, Chennai",
-      amount: "₹ 2500",
-      received: "₹ 2500",
-      balance: "₹ 0",
-      total_amount_before_tax: "₹ 2000",
-      total_cgst: "₹ 250",
-      total_sgst: "₹ 250",
-      payment_method: "Cash",
-      status: "Paid",
-      product_name: "Grocery Items",
-      hsn_sac_code:98765,
-      qty: 10,
-      rate: "₹ 250",
-      discount_percentage:"0",
-      discount_value: "0",
-      cgst_percentage:"8",
-      cgst_value: "125",
-      sgst_percentage:"8",
-      sgst_value: "125",
-      total_amount: "2500"
-    },
-    {
-      invoice_no: "005",
-      invoice_date: "12/02/2024",
-      due_date: "22/02/2024",
-      billing_to: "Fasil Papers",
-      mobile_no: "3987120943",
-      gst_no: "GSTIN678905",
-      billing_address: "No. 40, Paper Street, Madurai",
-      shipping_address: "No. 41, Industrial Road, Madurai",
-      amount: "₹ 5000",
-      received: "₹ 0",
-      balance: "₹ 5000",
-      total_amount_before_tax: "₹ 4500",
-      total_cgst: "₹ 250",
-      total_sgst: "₹ 250",
-      payment_method: "Card",
-      status: "Un Paid",
-      product_name: "Stationery Supplies",
-      hsn_sac_code:97457,
-      qty: 20,
-      rate: "₹ 250",
-      discount_percentage:"2",
-      discount_value: "500",
-      cgst_percentage:"9",
-      cgst_value: "250",
-      sgst_percentage:"9",
-      sgst_value: "250",
-      total_amount: "5000"
-    },
-    {
-      invoice_no: "006",
-      invoice_date: "13/02/2024",
-      due_date: "24/02/2024",
-      billing_to: "Marsh Fabrics",
-      mobile_no: "5678901234",
-      gst_no: "GSTIN345678",
-      billing_address: "No. 50, Textile Market, Tiruppur",
-      shipping_address: "No. 51, Garment Street, Tiruppur",
-      amount: "₹ 7000",
-      received: "₹ 5000",
-      balance: "₹ 2000",
-      total_amount_before_tax: "₹ 6000",
-      total_cgst: "₹ 500",
-      total_sgst: "₹ 500",
-      payment_method: "Cash",
-      status: "Paid",
-      product_name: "Cotton Fabrics",
-      hsn_sac_code:93647,
-      qty: 35,
-      rate: "₹ 200",
-      discount_percentage:"0",
-      discount_value: "500",
-      cgst_percentage:"9",
-      cgst_value: "750",
-      sgst_percentage:"9",
-      sgst_value: "750",
-      total_amount: "7000"
-    },
-    {
-      invoice_no: "007",
-      invoice_date: "14/02/2024",
-      due_date: "25/02/2024",
-      billing_to: "Vedha Store",
-      mobile_no: "6548962509",
-      gst_no: "GSTIN789012",
-      billing_address: "No. 60, General Market, Trichy",
-      shipping_address: "No. 61, Bazaar Street, Trichy",
-      amount: "₹ 2750",
-      received: "₹ 2750",
-      balance: "₹ 0",
-      total_amount_before_tax: "₹ 2500",
-      total_cgst: "₹ 125",
-      total_sgst: "₹ 125",
-      payment_method: "Cash",
-      status: "Paid",
-      product_name: "General Goods",
-      hsn_sac_code:53736,
-      qty: 11,
-      rate: "₹ 250",
-      discount_percentage:"0",
-      discount_value: "0",
-      cgst_percentage:"5",
-      cgst_value: "125",
-      sgst_percentage:"5",
-      sgst_value: "125",
-      total_amount: "2750"
-    }
+      "customer_id": "12754",
+      "customer_name": "John Doe",
+      "mobile_no": "9876543210",
+      "gst_no": "22AAAAA0000A1Z5",
+      "invoice_no": "001",
+      "invoice_date": "2025-03-04",
+      "due_date": "2025-03-10",
+      "invoice_type": "with Tax",
+      "products": [
+          {
+              "product_Id": "67c94b48bead52ecec5865ba",
+              "name": "Product A",
+              "hsn_sac_code": "123456",
+              "quantity": 35,
+              "rate": 500.00,
+              "discount": 10,
+              "discount_price": 50.00,
+              "cgst": 9,
+              "cgst_price": 81.00,
+              "sgst": 9,
+              "sgst_price": 81.00,
+              "total_amount": 1012.00
+          }
+      ],
+      "total_amount": 2133.00,
+      "received_amount": 1500.00,
+      "balance_amount": 633.00,
+      "total_before_tax": 2000.00,
+      "cgst": 166.50,
+      "sgst": 166.50,
+      "discount": 100.00,
+      "grand_total": 2133.00,
+      "payment_type": "Cash",
+      "payment_status": "Pending",
+      "billing_address": "123, Main Street, City, State, 123456",
+      "shipping_address": "456, Another Street, City, State, 123456",
+      "sale_notes": "Deliver on time",
+      "require_invoice": true
+  },
+  {
+    "customer_id": "12754",
+    "customer_name": "John Doe",
+    "mobile_no": "9876543210",
+    "gst_no": "22AAAAA0000A1Z5",
+    "invoice_no": "002",
+    "invoice_date": "2025-03-04",
+    "due_date": "2025-03-10",
+    "invoice_type": "with Tax",
+    "products": [
+        {
+            "product_Id": "67c94b48bead52ecec5865ba",
+            "name": "Product A",
+            "hsn_sac_code": "123456",
+            "quantity": 35,
+            "rate": 500.00,
+            "discount": 10,
+            "discount_price": 50.00,
+            "cgst": 9,
+            "cgst_price": 81.00,
+            "sgst": 9,
+            "sgst_price": 81.00,
+            "total_amount": 1012.00
+        }
+    ],
+    "total_amount": 2133.00,
+    "received_amount": 1500.00,
+    "balance_amount": 633.00,
+    "total_before_tax": 2000.00,
+    "cgst": 166.50,
+    "sgst": 166.50,
+    "discount": 100.00,
+    "grand_total": 2133.00,
+    "payment_type": "Cash",
+    "payment_status": "Pending",
+    "billing_address": "123, Main Street, City, State, 123456",
+    "shipping_address": "456, Another Street, City, State, 123456",
+    "sale_notes": "Deliver on time",
+    "require_invoice": true
+}
+
+  
   ];
   
   
@@ -639,8 +518,8 @@ const SaleInvoiceList = () => {
                 <th className="py-3 px-4">Invoice No</th>
                 <th className="py-3 px-4">Date</th>
                 <th className="py-3 px-4">Billing To</th>
-                <th className="py-3 px-4">Mobile No</th>
-                <th className="py-3 px-4">Amount</th>
+                <th className="py-3 px-4">Total Amount</th>
+                <th className="py-3 px-4">Payment Due</th>
                 <th className="py-3 px-4">Payment Method</th>
                 <th className="py-3 px-4">Status</th>
               </tr>
@@ -661,7 +540,7 @@ const SaleInvoiceList = () => {
                       />
                     </td>
 
-                    {["invoice_no", "invoice_date", "billing_to", "mobile_no", "amount", "payment_method"].map((key, index) => (
+                    {["invoice_no", "invoice_date", "customer_name", "total_amount", "balance_amount", "payment_type"].map((key, index) => (
                       <td key={key} className="px-2 py-3">
                         {editingInvoice === invoice.id ? (
                           <input
@@ -682,8 +561,8 @@ const SaleInvoiceList = () => {
                     <td className="py-3 px-2">
                       {editingInvoice === invoice.id ? (
                         <select
-                          value={updatedInvoice.status}
-                          onChange={(e) => handleInputChange(e, "status")}
+                          value={updatedInvoice.payment_status}
+                          onChange={(e) => handleInputChange(e, "payment_status")}
                           onKeyDown={handleKeyPress}
                           className="text-center w-full px-2 py-1 focus:outline-none"
                         >
@@ -692,7 +571,7 @@ const SaleInvoiceList = () => {
                         </select>
                       ) : (
                         <span
-                          className={`px-2 py-1 text-sm rounded ${invoice.status === "Paid"
+                          className={`px-2 py-1 text-sm rounded ${invoice.payment_status === "Paid"
                               ? "bg-[#d9ffef] text-[#17be78]"
                               : "bg-[#ffdbe7] text-[#e5484d]"
                             }`}
@@ -816,136 +695,7 @@ const SaleInvoiceList = () => {
           closeModal={() => setShowModal(false)}
         />
       )}
-      {/* -------------------------------- view invoice-------------------- */}
-      {/* Modal */}
-      {/* {showModal && selectedInvoice && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white w-[90%] max-w-5xl rounded shadow-lg p-3 relative">
-            <div className="border-b p-2 flex justify-between items-center">
-              <h2 className="text-lg font-semibold">
-                Sale Detail (Invoice No: {selectedInvoice.invoice_no})
-              </h2>
-              <button
-                onClick={closeModal}
-                className="p-2 rounded-full hover:bg-gray-200"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-4 space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <h3 className="text-lg font-semibold">Invoice Details</h3>
-                  <div className="flex flex-col gap-2 text-base font-normal mt-2">
-                    <p><span className="text-[#838383]">Invoice No:</span> {selectedInvoice.invoice_no}</p>
-                    <p><span className="text-[#838383]">Invoice Date:</span>{selectedInvoice.invoice_date}</p>
-                    <p><span className="text-[#838383]">Due Date:</span>{selectedInvoice.due_date}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold">Customer Details</h3>
-                  <div className="flex flex-col gap-2 text-base font-normal mt-2">
-                    <p><span className="text-[#838383]">Name :</span> {selectedInvoice.billing_to}</p>
-                    <p><span className="text-[#838383]">Mobile No:</span>{selectedInvoice.mobile_no}</p>
-                    <p><span className="text-[#838383]">GST No:</span>{selectedInvoice.gst_no}</p>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">Billing Address</h3>
-                  <div className="flex flex-col text-wrap w-44 gap-2 text-base font-normal mt-2">
-                    <p className="text-[#838383]">{selectedInvoice.billing_address}</p>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">Shipping Address </h3>
-                  <div className="flex flex-col gap-2 text-wrap w-44 text-base font-normal mt-2">
-                    <p className="text-[#838383]"> {selectedInvoice.shipping_address}</p>
-                  </div>
-                </div>
-              </div>
-<div className="p-2">
-  <table className="w-full border-collapse border text-center">
-    <thead>
-      <tr className="bg-[#f7f7f7] text-sm font-semibold">
-        <th rowSpan="2" className="p-1 border w-48">Product</th>
-        <th rowSpan="2" className="p-1 border w-24">HSN/SAC Code</th>
-        <th rowSpan="2" className="p-1 border w-24">Qty</th>
-        <th rowSpan="2" className="p-1 border w-24">Rate (₹)</th>
-        <th colSpan="2" className="p-1 border">Discount</th>
-        <th colSpan="2" className="p-1 border">CGST</th>
-        <th colSpan="2" className="p-1 border">SGST</th>
-        <th rowSpan="2" className="p-1 border w-22">Total Amount (₹)</th>
-      </tr>
-      <tr className="bg-[#f7f7f7] text-sm font-semibold">
-        <th className="p-1 border">%</th>
-        <th className="p-1 border">₹</th>
-        <th className="p-1 border">%</th>
-        <th className="p-1 border">₹</th>
-        <th className="p-1 border">%</th>
-        <th className="p-1 border">₹</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr className="border-t">
-        <td className="p-2 border">{selectedInvoice.product_name}</td>
-        <td className="p-2 border">{selectedInvoice.hsn_sac_code}</td>
-        <td className="p-2 border">{selectedInvoice.qty}</td>
-        <td className="p-2 border">{selectedInvoice.rate}</td>
-        <td className="p-2 border">{selectedInvoice.discount_percentage}</td>
-        <td className="p-2 border">{selectedInvoice.discount_value}</td>
-        <td className="p-2 border">{selectedInvoice.cgst_percentage}</td>
-        <td className="p-2 border">{selectedInvoice.cgst_value}</td>
-        <td className="p-2 border">{selectedInvoice.sgst_percentage}</td>
-        <td className="p-2 border">{selectedInvoice.sgst_value}</td>
-        <td className="p-2 border">{selectedInvoice.total_amount}</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-6 justify-center text-sm pt-4">
-                <div>
-                  <div className="flex flex-col gap-2 text-base font-normal mt-2">
-                    <select className="border rounded p-2">
-                      <option>{selectedInvoice.payment_method}</option>
-                    </select>
-                    <select className="border rounded p-2">
-                      <option>{selectedInvoice.payment_method}</option>
-                    </select>
-                    <select className="border rounded p-2">
-                      <option>{selectedInvoice.status}</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex flex-col gap-2 text-base text-center font-normal mt-2">
-                    <p><span className="text-[#838383]">Total Amount :</span> {selectedInvoice.amount}</p>
-                    <p><span className="text-[#838383]">Received:</span>{selectedInvoice.received}</p>
-                    <p><span className="text-[#838383]">Balance:</span>{selectedInvoice.balance}</p>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex flex-col gap-2 text-base text-center font-normal mt-2">
-                    <p><span className="text-[#838383]">Total Amount Before Tax :</span> {selectedInvoice.total_amount_before_tax}</p>
-                    <p><span className="text-[#838383]">CGST:</span>{selectedInvoice.total_cgst}</p>
-                    <p><span className="text-[#838383]">SGST:</span>{selectedInvoice.total_sgst}</p>
-                    <p><span className="text-[#838383]">Discount :</span>{selectedInvoice.total_discount}</p>
-                    <p><span className="text-[#838383]">Grand Total:</span>{selectedInvoice.grand_total}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className=" p-4 flex items-right justify-end">
-
-              <button className="bg-purpleCustom text-white px-8 py-2 text-base font-semibold rounded flex items-center space-x-2"
- onClick={handlePrintInvoice }   >      
-      Print
-              </button>
-            </div>
-          </div>
-        </div>
-      )} */}
+   
   </div>
   );
 }

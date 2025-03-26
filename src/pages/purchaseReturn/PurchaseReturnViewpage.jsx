@@ -1,15 +1,14 @@
-import React, { useState } from "react";
+import React, { useState } from 'react'
 import { X, Printer, ChevronDown } from "lucide-react";
-import PrintInvoice from "./PrintInvoice";
+import PrintInvoice from '../sales/PrintInvoice';
 
-const ViewInvoiceModal = ({ selectedInvoice, closeModal }) => {
-  const [showPrintView, setShowPrintView] = useState(false);
+const PurchaseReturnViewpage = ({ selectedInvoice, closeModal }) => {
+    const [showPrintView, setShowPrintView] = useState(false);
+    if (!selectedInvoice) return null;
 
-  if (!selectedInvoice) return null;
-
-  return (
-    <>
-   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-20">
+    return (
+        <>
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-20">
                 {showPrintView ? (
                     <PrintInvoice invoiceData={selectedInvoice} closePrint={() => setShowPrintView(false)} />
                 ) : (
@@ -18,7 +17,7 @@ const ViewInvoiceModal = ({ selectedInvoice, closeModal }) => {
                         {/* Modal Header */}
                         <div className="flex justify-between items-center border-b p-4">
                             <h2 className="text-neutral-800 text-xl font-semibold font-jakarta">
-                                Sale Detail (Invoice No : {selectedInvoice.invoice_no})
+                                Purchase Return Detail (Invoice No : {selectedInvoice.return_no})
                             </h2>
                             <button
                                 onClick={closeModal}
@@ -35,12 +34,12 @@ const ViewInvoiceModal = ({ selectedInvoice, closeModal }) => {
                                 {/* Invoice Details */}
                                 <div>
                                     <h3 className=" text-neutral-800 text-lg font-semibold font-jakarta">
-                                        Invoice Details
+                                        Purchase Return Details
                                     </h3>
                                     <p className="text-zinc-500 text-base font-normal font-jakarta">
                                         Invoice No :{" "}
                                         <span className=" text-neutral-800 text-base font-normal font-jakarta">
-                                            {selectedInvoice.invoice_no}
+                                            {selectedInvoice.return_no}
                                         </span>
                                     </p>
                                     <p className="text-zinc-500 text-base font-normal font-jakarta">
@@ -60,12 +59,12 @@ const ViewInvoiceModal = ({ selectedInvoice, closeModal }) => {
                                 {/* Supplier Details */}
                                 <div>
                                     <h3 className="text-neutral-800 text-lg font-semibold font-jakarta">
-                                        Customer Details
+                                        Supplier Details
                                     </h3>
                                     <p className="text-zinc-500 text-base font-normal font-jakarta">
                                         Name :{" "}
                                         <span className=" text-neutral-800 text-base font-normal font-jakarta">
-                                            {selectedInvoice.customer_name}
+                                            {selectedInvoice.supplier_name}
                                         </span>
                                     </p>
                                     <p className="text-zinc-500 text-base font-normal font-jakarta">
@@ -113,23 +112,7 @@ const ViewInvoiceModal = ({ selectedInvoice, closeModal }) => {
                                         />
                                     </div>
 
-                                    {/* Payment Status */}
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={selectedInvoice.purchase_status}
-                                            className="peer w-52 h-11 pl-4 rounded border border-[#c9c9cd] justify-start items-center inline-flex overflow-hidden px-2 text-sm focus:outline-none focus:border-purpleCustom"
-                                            placeholder=" "
-                                        />
-                                        <label className="absolute left-3 -top-2 text-sm font-normal text-[#838383] bg-white px-1 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-[#838383] peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#838383] peer-focus:bg-white">
-                                            Invoice Status
-                                        </label>
-                                        <ChevronDown
-                                            className="absolute right-14 top-3 text-gray-500 pointer-events-none"
-                                            size={16}
-                                        />
-                                    </div>
+                                  
                                 </div>
                             </div>
 
@@ -263,23 +246,17 @@ const ViewInvoiceModal = ({ selectedInvoice, closeModal }) => {
                                     <p>Total Amount Before Tax : ₹{selectedInvoice.total_before_tax}</p>
                                     <p>CGST : ₹{selectedInvoice.cgst_total}</p>
                                     <p>SGST : ₹{selectedInvoice.sgst_total}</p>
+                                    <p>Discount : ₹{selectedInvoice.discount_total}</p>
                                     <p>Grand Total : ₹{selectedInvoice.grand_total}</p>
                                 </div>
-                            </div>
-
-                            {/* Print Button */}
-                            <div className="flex justify-end">
-                                <button className="px-11 py-2 text-white text-base font-semibold bg-violet-800 font-jakarta rounded-md"
-                                 onClick={() => setShowPrintView(true)}>
-                                    Print
-                                </button>
                             </div>
                         </div>
                     </div>
                 )}
             </div>
-            </>
-  );
-};
 
-export default ViewInvoiceModal;
+        </>
+    )
+}
+
+export default PurchaseReturnViewpage

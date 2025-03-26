@@ -16,7 +16,7 @@ import frame from "../../assets/Frame 14.png";
 const menuItems = [
   { name: "Dashboard", icon: <LayoutDashboard />, subMenu: [{ name: "Dashboard1", path: "/dashboard1" }, { name: "Dashboard2", path: "/dashboard2" }, {name:"Dasboard3",path:"/dasboard"}] },
   { name: "Sale", icon: <ChartNoAxesCombined />, subMenu: [{ name: "Sale Invoice ", path: "/dashboard/saleInvoiceList" }, {name:"Quotation",path:"/dashboard/quotation"}] },
-  { name: "Purchase", icon: <WalletCards />, subMenu: [{ name: "Purchase Invoice", path: "/dashboard/purchaseInvoiceList" },{name:"Purchase Return",path:"/dashboard/purchaseReturn"}] },
+  { name: "Purchase", icon: <WalletCards />, subMenu: [{ name: "Purchase Invoice", path: "/dashboard/purchaseInvoiceList" },{name:"Purchase Return",path:"/dashboard/purchaseReturnList"}] },
   { name: "Product", icon: <ShoppingBag />, subMenu: [{ name: "List Products", path: "/dashboard/listProduct" }, { name: "Add Products", path: "/dashboard/addProduct" },{ name: "Categories", path: "/dashboard/categories" },{ name: "Sub Category", path: "/dashboard/subCategories" },{ name: "Brand", path: "/dashboard/brands" },{ name: "Units", path: "/dashboard/units" },{ name: "PrintLabels", path: "/printlabels" }] },
   { name: "Expense", icon: <BadgeIndianRupee />, subMenu: [{ name: "Expense 1", path: "/expense1" }] },
   { name: "Contacts", icon: <UsersRound />, subMenu: [{ name: "Supplier", path: "/dashboard/supplier" }, { name: "Customer", path: "/dashboard/customer" }] },
