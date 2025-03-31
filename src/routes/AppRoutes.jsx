@@ -21,12 +21,16 @@ import AddSale from "../pages/sales/AddSale";
 
 import AddPurchase from "../pages/purchases/AddPurchase";
 import PurchaseInvoiceList from "../pages/purchases/PurchaseInvoiceList";
-import PrintInvoice from "../pages/sales/PrintInvoice";
 
 import SupplierView from '../pages/contact/supplier/SupplierView'
 import CustomerView from '../pages/contact/customer/CustomerView'
 import AddPurchaseReturn from "../pages/purchaseReturn/AddPurchaseReturn";
 import PurchaseReturnList from "../pages/purchaseReturn/PurchaseReturnList";
+
+import Quotation from "../pages/Quotation/Quotation";
+import QuotationInvoiceList from '../pages/Quotation/QuotationInvoiceList'
+import Dashboard from "../pages/dashboard/Dashboard";
+import BusinessProfile from "../pages/dashboard/BusinessProfile";
 
 // Authentication Check
 const isAuthenticated = () => {
@@ -48,23 +52,33 @@ const Route1 = () => {
         {isAuthenticated() ? (
          <Route path="/dashboard" element={isAuthenticated() ? <Layout /> : <Navigate to="/login" />}>
          <Route index element={<AddPage />} />
+
+         <Route path="dashboard" element={<Dashboard/>}/>
+         <Route path="businessProfile" element={<BusinessProfile/>}/>
+         {/* product */}
          <Route path="listProduct" element={<ListProducts />} />
          <Route path="addProduct" element={<AddProduct />} />
          <Route path="categories" element={<Categories />} />
          <Route path="subCategories" element={<SubCategories />} />
          <Route path="brands" element={<Brand />} />
          <Route path="units" element={<Units />} />
+         {/* contacts */}
          <Route path="supplier" element={<Supplier />} />
          <Route path="customer" element={<Customer />} />
          <Route path="viewPage" element={<SupplierView />} />
          <Route path="customerView" element={<CustomerView />} />
+          {/* sale */}
           <Route path="addSale" element={<AddSale />} />
-         <Route path="/dashboard/saleInvoiceList/printInvoice" element={<PrintInvoice />} />
          <Route path="saleInvoiceList" element={<SaleInvoiceList />}/>
+         {/* purchase */}
          <Route path="addPurchase" element={<AddPurchase />} />
+         <Route path="purchaseInvoiceList" element={<PurchaseInvoiceList />} />
+         {/* purchase return */}
          <Route path="purchaseReturn" element={<AddPurchaseReturn />} />
          <Route path="purchaseReturnList" element={<PurchaseReturnList />} />
-         <Route path="purchaseInvoiceList" element={<PurchaseInvoiceList />} />
+          {/* quotation */}
+         <Route path="quotation" element={<Quotation />} />
+         <Route path="quotationInvoiceList" element={<QuotationInvoiceList />} />
        </Route>
        
         ) : (

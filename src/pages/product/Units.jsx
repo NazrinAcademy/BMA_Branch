@@ -159,10 +159,11 @@ const Units = () => {
   };
 
 
-  // Filter units based on search term
-  const filteredUnits = units.filter(unit =>
-    unit?.unit?.toLowerCase().includes(searchTerm?.toLowerCase() || "")
-  );
+  const filteredUnits = Array.isArray(units)
+  ? units.filter(unit =>
+      unit?.unit?.toLowerCase().includes(searchTerm?.toLowerCase() || "")
+    )
+  : [];
 
 
   const totalPages = Math.ceil(filteredUnits.length / perPage);

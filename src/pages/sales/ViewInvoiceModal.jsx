@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X, Printer, ChevronDown } from "lucide-react";
-import PrintInvoice from "./PrintInvoice";
+import PrintInvoice from "../../components/common/PrintInvoice";
 
 const ViewInvoiceModal = ({ selectedInvoice, closeModal }) => {
   const [showPrintView, setShowPrintView] = useState(false);
@@ -11,7 +11,11 @@ const ViewInvoiceModal = ({ selectedInvoice, closeModal }) => {
     <>
    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-20">
                 {showPrintView ? (
-                    <PrintInvoice invoiceData={selectedInvoice} closePrint={() => setShowPrintView(false)} />
+                    <PrintInvoice 
+                        invoiceData={selectedInvoice}
+                        invoiceType="sale"
+                        content={"Sale Invoice"}
+                        closePrint={() => setShowPrintView(false)} />
                 ) : (
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-5xl max-h-[500px] overflow-y-auto">
 
@@ -85,52 +89,25 @@ const ViewInvoiceModal = ({ selectedInvoice, closeModal }) => {
                                 {/* Supplier Address + Dropdowns */}
                                 <div>
                                     <h3 className="text-neutral-800 text-lg font-semibold font-jakarta">
-                                        Supplier Address
+                                        Billing Address
                                     </h3>
                                     <p className=" text-neutral-800 text-base font-normal font-jakarta">
-                                        {selectedInvoice.address}
+                                        {selectedInvoice.billing_address}
                                     </p>
                                   
                                 </div>
-
-                                {/* Dropdowns */}
-                                <div className="flex flex-col gap-4">
-                                    {/* Payment Type */}
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            className="peer w-52 h-11 pl-4 rounded border border-[#c9c9cd] justify-start items-center inline-flex overflow-hidden px-2 text-sm focus:outline-none focus:border-purpleCustom"
-                                            placeholder=" "
-                                            value={selectedInvoice.invoice_type}
-                                        />
-                                        <label className="absolute left-3 -top-2 text-sm font-normal text-[#838383] bg-white px-1 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-[#838383] peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#838383] peer-focus:bg-white">
-                                            Invoice Type
-                                        </label>
-                                        <ChevronDown
-                                            className="absolute right-14 top-3 text-gray-500 pointer-events-none"
-                                            size={16}
-                                        />
-                                    </div>
-
-                                    {/* Payment Status */}
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={selectedInvoice.purchase_status}
-                                            className="peer w-52 h-11 pl-4 rounded border border-[#c9c9cd] justify-start items-center inline-flex overflow-hidden px-2 text-sm focus:outline-none focus:border-purpleCustom"
-                                            placeholder=" "
-                                        />
-                                        <label className="absolute left-3 -top-2 text-sm font-normal text-[#838383] bg-white px-1 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-[#838383] peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#838383] peer-focus:bg-white">
-                                            Invoice Status
-                                        </label>
-                                        <ChevronDown
-                                            className="absolute right-14 top-3 text-gray-500 pointer-events-none"
-                                            size={16}
-                                        />
-                                    </div>
+  {/* Supplier Address + Dropdowns */}
+  <div>
+                                    <h3 className="text-neutral-800 text-lg font-semibold font-jakarta">
+                                        Shipping Address
+                                    </h3>
+                                    <p className=" text-neutral-800 text-base font-normal font-jakarta">
+                                        {selectedInvoice.shipping_address}
+                                    </p>
+                                  
                                 </div>
+                               
+                               
                             </div>
 
                             {/* Product Table */}
@@ -221,6 +198,21 @@ const ViewInvoiceModal = ({ selectedInvoice, closeModal }) => {
                             <div className="px-20 rounded-md flex justify-between">
                                 {/* Payment Details */}
                                 <div className="flex flex-col gap-4">
+                                    
+                                    {/* Invoice Type */}
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={selectedInvoice.invoice_type}
+                                            className="peer w-full h-11 pl-4 rounded border border-[#c9c9cd] justify-start items-center inline-flex overflow-hidden px-2 text-sm focus:outline-none focus:border-purpleCustom"
+                                            placeholder=" "
+                                        />
+                                        <label className="absolute left-3 -top-2 text-sm font-normal text-[#838383] bg-white px-1 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-[#838383] peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#838383] peer-focus:bg-white">
+                                           Invoice Type
+                                        </label>
+
+                                    </div>
                                     {/* Payment Type */}
                                     <div className="relative">
                                         <input
@@ -263,6 +255,7 @@ const ViewInvoiceModal = ({ selectedInvoice, closeModal }) => {
                                     <p>Total Amount Before Tax : ₹{selectedInvoice.total_before_tax}</p>
                                     <p>CGST : ₹{selectedInvoice.cgst_total}</p>
                                     <p>SGST : ₹{selectedInvoice.sgst_total}</p>
+                                    <p>Discount : ₹{selectedInvoice.discount_total}</p>
                                     <p>Grand Total : ₹{selectedInvoice.grand_total}</p>
                                 </div>
                             </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { X, Printer, ChevronDown } from "lucide-react";
-import PrintInvoice from '../sales/PrintInvoice';
+import PrintInvoice from '../../components/common/PrintInvoice';
 
 const PurchaseViewpage = ({ selectedInvoice, closeModal }) => {
     const [showPrintView, setShowPrintView] = useState(false);
@@ -8,9 +8,13 @@ const PurchaseViewpage = ({ selectedInvoice, closeModal }) => {
 
     return (
         <>
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-20">
-                {showPrintView ? (
-                    <PrintInvoice invoiceData={selectedInvoice} closePrint={() => setShowPrintView(false)} />
+   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-20">
+   {showPrintView ? (
+                    <PrintInvoice
+                        invoiceData={selectedInvoice}
+                        content={"Purchase Invoice"}
+                          invoiceType="purchase"
+                        closePrint={() => setShowPrintView(false)} />
                 ) : (
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-5xl max-h-[500px] overflow-y-auto">
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { X, Printer, ChevronDown } from "lucide-react";
-import PrintInvoice from '../sales/PrintInvoice';
+import PrintInvoice from '../../components/common/PrintInvoice';
 
 const PurchaseReturnViewpage = ({ selectedInvoice, closeModal }) => {
     const [showPrintView, setShowPrintView] = useState(false);

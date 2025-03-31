@@ -21,6 +21,7 @@ const AddPurchase = () => {
   }, []);
 
   useEffect(() => {
+    if (!suppliers || !Array.isArray(suppliers)) return; // Prevent errors
     setFilteredSuppliers(
       suppliers.filter((supplier) =>
         supplier.supplier_name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -28,6 +29,7 @@ const AddPurchase = () => {
     );
     setHighlightIndex(-1);
   }, [searchTerm, suppliers]);
+  
 
   const handleDropdownKey = (e) => {
     if (e.key === "ArrowDown") {

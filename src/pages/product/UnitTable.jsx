@@ -33,7 +33,7 @@ const UnitTable = ({
                         </tr>
                     </thead>
                     <tbody>
-                        {units.length > 0 ? (
+                    {Array.isArray(units) && units.length > 0 ? (
                             units.map((unit, index) => (
                                 <tr
                                     key={unit.id}
