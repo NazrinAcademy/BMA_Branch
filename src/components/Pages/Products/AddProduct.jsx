@@ -16,7 +16,7 @@ const AddProduct = () => {
   // -------------------------------  usestate ---------------------------------
 
   const [activeForm, setActiveForm] = useState('price');
-  const {userDetails}=useSelector((state)=>(state.auth))
+  const { userDetails } = useSelector((state) => (state.auth))
 
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
 
@@ -217,12 +217,20 @@ const AddProduct = () => {
     }
   };
 
-
+  // --------category get function:
   useEffect(() => {
     const loadCategories = async () => {
+      const config = {
+        headers: {
+          "Content-Type": "application/jon",
+          Authorization: `Bearer ${userDetails?.access_token}`,
+        }
+      }
+
       try {
-        const data = await fetchCategories();
-        setCategories(data);
+        const data = await fetchCategories(config);
+        console.log("data:", data)
+        setCategories(data.data || []);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
       }
@@ -249,9 +257,16 @@ const AddProduct = () => {
   // Handle saving a new category
 
   const handleSaveCategory = async () => {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userDetails?.access_token}`,
+      },
+    };
+
     if (newCategory.categoryName && newCategory.igst) {
       try {
-        const addedCategory = await addCategory(newCategory);
+        const addedCategory = await addCategory(newCategory, config);
         setCategories((prev) => [...prev, addedCategory]);
         handleCloseOverlay();
       } catch (error) {
@@ -323,50 +338,73 @@ const AddProduct = () => {
 
   // Fetch all brands
   const fetchBrands = async () => {
-    const config={
-      headers:{
-        "Content-Type":"application/jon",
-        Authorization:`Bearer ${userDetails?.access_token}`,
+    const config = {
+      headers: {
+        "Content-Type": "application/jon",
+        Authorization: `Bearer ${userDetails?.access_token}`,
       }
     }
     try {
       const brandList = await getBrands(config);
-      console.log("brandlist:",brandList)
+      console.log("brandlist:", brandList)
       setBrands(brandList.data || []);
     } catch (error) {
       console.error("Error fetching brands:", error);
     }
   };
 
-  // Save a new brand
-  const handleSaveBrand = async () => {
-    if (newBrandName.trim()) {
-      try {
-        await addBrand(newBrandName);
-        setNewBrandName("");
-        await fetchBrands();
-        handleCloseOverlay();
-      } catch (error) {
-        alert("Failed to save the brand. Please try again.");
-      }
-    } else {
-      alert("Please provide a brand name.");
-    }
-  };
-
-
   useEffect(() => {
     fetchBrands();
   }, []);
 
 
+
+  // Save a new brand
+  const handleSaveBrand = async () => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    const token = userData?.access_token;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userDetails?.access_token}`
+      }
+    };
+
+    const payload = {
+      brand_name: newBrandName,
+    };
+
+    if (newBrandName.trim() !== "") {
+      try {
+        const newBrand = await addBrand(config, payload);
+        if (newBrand?.data) {
+          setBrands([...brands, newBrand.data]);
+        }
+        setNewBrandName("");
+        await fetchBrands();
+        handleCloseOverlay();
+      } catch (error) {
+        toast.error("Failed to save the brand. Please try again.");
+      }
+    } else {
+      toast.error("Please provide a brand name.");
+    }
+  };
+ 
   // ------------------------------------------ functions to unit --------------------------
 
   // Fetch units and set state
   const fetchUnits = async () => {
+    const config = {
+      headers: {
+        "Content-Type": "application/jon",
+        Authorization: `Bearer ${userDetails?.access_token}`,
+      }
+    }
     try {
-      const unitList = await fetchUnitsAPI();
-      setUnits(unitList);
+      const unitList = await fetchUnitsAPI(config);
+      console.log("unitList:", unitList);
+      setUnits(unitList.data || []);
     } catch (error) {
       console.error("Error fetching units:", error);
     }
@@ -378,18 +416,24 @@ const AddProduct = () => {
 
   // Save a new unit
   const handleSaveUnit = async () => {
-    if (unitName.trim() && unitFullName.trim()) {
+    if (unitName.trim() !== "" && unitFullName.trim() !== "") {
+      const newUnit = {
+        unit: unitName,
+        fullname: unitFullName,
+        allow_decimal: allowDecimal === "yes",
+      };
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userDetails?.access_token}`
+        }
+      }
       try {
-        const newUnitData = {
-          unit: unitName.trim(),
-          fullName: unitFullName.trim(),
-          allowDecimal: allowDecimal === "Yes",
-        };
-
-        await addNewUnit(newUnitData);
+        const addedUnit = await addNewUnit(newUnit, config);
+        setUnits([...units, addedUnit])
         setUnitName("");
         setUnitFullName("");
-        setAllowDecimal("No");
+        setAllowDecimal("yes");
         await fetchUnits();
         handleCloseOverlay();
       } catch (error) {
@@ -831,7 +875,7 @@ const AddProduct = () => {
     lowStockQty: "",
     date: new Date().toISOString().split("T")[0], // Auto-fill current date
     location: "",
-    supplier_name:"",
+    supplier_name: "",
   });
 
 
@@ -856,7 +900,7 @@ const AddProduct = () => {
           lowStockQty: "",
           date: new Date().toISOString().split("T")[0], // Set current date
           location: "",
-          supplier_name:"",
+          supplier_name: "",
         }); // Ensure default empty values
       }
     };
@@ -892,7 +936,7 @@ const AddProduct = () => {
   const handleSearchLocation = (searchText) => {
     console.log("Search Text:", searchText);
     setStockData((prev) => ({ ...prev, location: searchText }));
-  
+
     if (searchText.trim() === "") {
       setFilteredLocations([]);
       setDropdownOpen(false);
@@ -902,7 +946,7 @@ const AddProduct = () => {
         .filter((company_name) =>
           company_name.toLowerCase().startsWith(searchText.toLowerCase())
         );
-  
+
       console.log("Filtered Locations:", filtered);
       setFilteredLocations(filtered);
       setDropdownOpen(filtered.length > 0);
@@ -929,8 +973,8 @@ const AddProduct = () => {
 
     // Autocomplete Logic for Location
     if (name === "location") {
-    handleSearchLocation(value);
-  }
+      handleSearchLocation(value);
+    }
   };
 
   const handleKeyDownLocation = (e) => {
@@ -2150,7 +2194,7 @@ const AddProduct = () => {
               onKeyDown={(e) => {
                 handleKeyPress(e, supplier_nameRef, dateRef)
                 if (dropdownOpen) handleKeyDownLocation(e);
-            }}
+              }}
               onFocus={() => setDropdownOpen(true)}
               onBlur={() => setTimeout(() => setDropdownOpen(false), 200)}
               className="peer w-full h-11 pl-4 rounded border border-[#c9c9cd] justify-start items-center inline-flex overflow-hidden px-2 text-sm focus:outline-none focus:border-purpleCustom"
