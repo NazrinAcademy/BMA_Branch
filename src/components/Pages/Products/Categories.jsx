@@ -41,13 +41,13 @@ const Categories = () => {
 
   // Fetch categories when the component loads
   useEffect(() => {
-    if (!userDetails?.token) return; // Prevents fetching if token is not available
+    if (!userDetails?.access_token) return; // Prevents fetching if access_token is not available
   
     const getCategoriesData = async () => {
       const config = {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userDetails.token}`,
+          Authorization: `Bearer ${userDetails.access_token}`,
         },
       };
   
@@ -60,7 +60,7 @@ const Categories = () => {
     };
   
     getCategoriesData();
-  }, [userDetails?.token]); // Added dependency for token updates
+  }, [userDetails?.access_token]); // Added dependency for token updates
   
 
 
@@ -69,7 +69,7 @@ const Categories = () => {
     const config = {
       headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userDetails?.token}`
+          Authorization: `Bearer ${userDetails?.access_token}`
       }
   };
     try {
@@ -166,7 +166,7 @@ XLSX.writeFile(wb, "categories.xlsx");
     const config = {
       headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userDetails.token}`,
+          Authorization: `Bearer ${userDetails.access_token}`,
       },
     };
     try {

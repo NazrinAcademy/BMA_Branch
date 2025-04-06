@@ -283,7 +283,7 @@ const Registration = () => {
 		const config = {
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: `Bearer ${userDetails?.token}`,
+				Authorization: `Bearer ${userDetails?.access_token}`,
 			},
 		};
 

@@ -7,6 +7,7 @@ import successImage from '../../../assets/success.png'
 import { getPersonalDetails } from "../../../apiService/PGapi";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from "react-redux";
 
 
 
@@ -15,6 +16,7 @@ const AddProduct = () => {
   // -------------------------------  usestate ---------------------------------
 
   const [activeForm, setActiveForm] = useState('price');
+  const {userDetails}=useSelector((state)=>(state.auth))
 
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
 
@@ -321,9 +323,16 @@ const AddProduct = () => {
 
   // Fetch all brands
   const fetchBrands = async () => {
+    const config={
+      headers:{
+        "Content-Type":"application/jon",
+        Authorization:`Bearer ${userDetails?.access_token}`,
+      }
+    }
     try {
-      const brandList = await getBrands();
-      setBrands(brandList);
+      const brandList = await getBrands(config);
+      console.log("brandlist:",brandList)
+      setBrands(brandList.data || []);
     } catch (error) {
       console.error("Error fetching brands:", error);
     }

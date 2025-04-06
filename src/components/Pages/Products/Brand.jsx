@@ -17,23 +17,28 @@ const Brand = () => {
     const [searchTerm, setSearchTerm] = useState("");
 
     const {userDetails}=useSelector((state)=>(state.auth))
+    const [loading, setLoading] = useState({ isLoading: false, message: "" });
 
+    
     const startIndex = (currentPage - 1) * perPage;
 
     useEffect(() => {
       const fetchBrands = async () => {
+        setLoading({ isLoading: true, message: "Fetching brands..." });
         const config = {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${userDetails.token}`,
+              Authorization: `Bearer ${userDetails.access_token}`,
             },
           };
           try {
               const fetchedBrands = await getBrands(config);
               console.log("Fetched Brands:", fetchedBrands);
               setBrands(fetchedBrands.data || []);
+              setLoading({ isLoading: false, message: "" });
           } catch (error) {
               console.error("Error fetching brands:", error);
+              setLoading({ isLoading: false, message: "Failed to fetch data" });
           }
       };
   
@@ -52,7 +57,7 @@ const Brand = () => {
         const config = {
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${userDetails?.token}`
+                Authorization: `Bearer ${userDetails?.access_token}`
             }
         };
     
@@ -141,13 +146,13 @@ const Brand = () => {
       const config = {
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${userDetails.token}`,
+            Authorization: `Bearer ${userDetails.access_token}`,
         },
     };
       try {
         await deleteBrand(selectedBrand.id, config); // API call
         setBrands(brands.filter((brand) => brand.id !== selectedBrand.id));
-                setShowDeleteConfirm(false);
+        setShowDeleteConfirm(false);
         // alert("Category deleted successfully!");
       } catch (error) {
         console.error("Error deleting category:", error);
@@ -159,29 +164,37 @@ const Brand = () => {
     const [editingBrand, setEditingBrand] = useState(null);
     const [updatedBrand, setUpdatedBrand] = useState(null);
     
-   const handleKeyPress = async (e) => {
-    if (e.key === "Enter" && updatedBrand) {
-        try {
-            // API call to update brand
-            await updateBrand(editingBrand, updatedBrand);
-
-            console.log("Brand Updated in API. Fetching latest data...");
-
-            // Fetch updated brands list
-            const fetchedBrands = await getBrands();
-            setBrands(fetchedBrands.data || []);
-
-            setEditingBrand(null);
-            setUpdatedBrand(null);
-
-            setShowSuccessMessageUpdate(true);
-            setTimeout(() => setShowSuccessMessageUpdate(false), 3000);
-        } catch (error) {
-            console.error("Error updating brand:", error);
-            alert("Failed to update brand!");
+    const handleKeyPress = async (e) => {
+        if (e.key === "Enter" && updatedBrand) {
+            try {
+                const config = {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${userDetails?.access_token}`,
+                    },
+                };
+    
+                // API call to update brand
+                await updateBrand(editingBrand, updatedBrand, config);
+    
+                console.log("Brand Updated in API. Fetching latest data...");
+    
+                // Fetch updated brands list
+                const fetchedBrands = await getBrands(config);
+                setBrands(fetchedBrands.data || []);
+    
+                setEditingBrand(null);
+                setUpdatedBrand(null);
+    
+                setShowSuccessMessageUpdate(true);
+                setTimeout(() => setShowSuccessMessageUpdate(false), 3000);
+            } catch (error) {
+                console.error("Error updating brand:", error);
+                alert("Failed to update brand!");
+            }
         }
-    }
-};
+    };
+    
  
     
     const handleEdit = (brand) => {
@@ -315,6 +328,11 @@ const Brand = () => {
             {/* Table */}
 {/* Table */}
 <div className="max-h-[350px] overflow-y-auto rounded border border-[#c9c9cd]">
+{loading.isLoading ? (
+                <div className="p-4 text-center text-sm text-[#202020]">
+                  {loading.message || "Loading brands..."}
+                </div>
+              ) : (
       <table className="w-full ">
         <thead className="sticky top-0 bg-[#f8f8f8]">
         <tr className="text-sm font-semibold">
@@ -356,6 +374,7 @@ const Brand = () => {
             )}
         </tbody>
     </table>
+              )}
 </div>
             
         {/* ------------------------------------------ Context Menu -----------------------------------------------*/}
