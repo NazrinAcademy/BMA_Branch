@@ -163,33 +163,42 @@ const Customer = () => {
 	const { userDetails } = useSelector((state) => state.auth);
 	const [Customers, setCustomers] = useState(allCustomers);
 
+
+	//------------ edit and context menu states:
+	const [editRowId, setEditRowId] = useState(null);
+	const [editData, setEditData] = useState({});
+	const [editDropdown, setEditDropdown] = useState(null);
+	const inputRef = useRef(null);
+
+
 	const [perPage, setPerPage] = useState(10);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [searchQurey, setsearchQurey] = useState("");
 
 	// -----------------------Edit,Delete,View Function--------------------------
-	const [editDropdown, setEditDropdown] = useState(null);
 	const [editingCustomer, setEditingCustomer] = useState(null);
 	const [editUpdateCustomer, setUpdateCustomer] = useState({});
 	const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 	const [successMsg, setSuccessMsg] = useState({ create: "", update: "" })
+	const [loading, setLoading] = useState({ isLoading: false, message: "" });
+	
+	
 	const [deleteMessage, setDeleteMessage] = useState(false);
 	const [selectedRowId, setSelectedRowId] = useState(null);
 	const [filteredCustomers, setFilteredCustomers] = useState([]);
-	const inputRef = useRef(null);
 
-	useEffect(() => {
-		const handlePressOutside = (event) => {
-			if (editDropdown && !event.target.closest(".context-dropdown")) {
-				setEditDropdown(null);
-			}
-		};
+	// useEffect(() => {
+	// 	const handlePressOutside = (event) => {
+	// 		if (editDropdown && !event.target.closest(".context-dropdown")) {
+	// 			setEditDropdown(null);
+	// 		}
+	// 	};
 
-		document.addEventListener("click", handlePressOutside);
-		return () => {
-			document.removeEventListener("click", handlePressOutside);
-		};
-	}, [editDropdown]);
+	// 	document.addEventListener("click", handlePressOutside);
+	// 	return () => {
+	// 		document.removeEventListener("click", handlePressOutside);
+	// 	};
+	// }, [editDropdown]);
 
 	useEffect(() => {
 		setTimeout(() => {
@@ -198,25 +207,27 @@ const Customer = () => {
 		}, 2000);
 	}, [showSuccessMessage, successMsg?.create]);
 
-	const handleEditing = (tableData) => {
-		setEditingCustomer(tableData.id);
 
-		if (!tableData.address.includes(tableData.area)) {
-			setUpdateCustomer({
-				...tableData,
-				address: `${tableData.area}, ${tableData.state}, ${tableData.pinCode}`,
-			});
-		} else {
-			setUpdateCustomer(tableData);
-		}
-	};
 
-	const handleInputChanges = (e, field) => {
-		setUpdateCustomer({
-			...editUpdateCustomer,
-			[field]: e.target.value,
-		});
-	};
+	// const handleEditing = (tableData) => {
+	// 	setEditingCustomer(tableData.id);
+
+	// 	if (!tableData.address.includes(tableData.area)) {
+	// 		setUpdateCustomer({
+	// 			...tableData,
+	// 			address: `${tableData.area}, ${tableData.state}, ${tableData.pinCode}`,
+	// 		});
+	// 	} else {
+	// 		setUpdateCustomer(tableData);
+	// 	}
+	// };
+
+	// const handleInputChanges = (e, field) => {
+	// 	setUpdateCustomer({
+	// 		...editUpdateCustomer,
+	// 		[field]: e.target.value,
+	// 	});
+	// };
 
 	// --------- update function:
 	const handleUpdate = () => {
@@ -255,10 +266,10 @@ const Customer = () => {
 		}
 	};
 
-	const handleRightClick = (event, tableData) => {
-		event.preventDefault();
-		setEditDropdown({ x: event.pageX, y: event.pageY, tableData });
-	};
+	// const handleRightClick = (event, tableData) => {
+	// 	event.preventDefault();
+	// 	setEditDropdown({ x: event.pageX, y: event.pageY, tableData });
+	// };
 
 	//----------- delete function:
 
@@ -411,6 +422,7 @@ const Customer = () => {
 	};
 
 	const getDetails = useCallback(() => {
+		setLoading({ isLoading: true, message: "Fetching customer details..." });
 		const config = {
 			headers: {
 				"Content-Type": "application/json",
@@ -422,10 +434,12 @@ const Customer = () => {
 			(res) => {
 				console.log("customer response",res?.data?.Customer)
 				setCustomers(res?.data?.Customer)
+				setLoading({ isLoading: false, message: "" });
 				
 			},
 			(err) => {
 				console.log(err)
+				setLoading({ isLoading: false, message: "Failed to fetch data" });
 			}
 		);
 
@@ -623,7 +637,7 @@ const Customer = () => {
 					</div>
 
 					{/*---------------------- Context Dropdown (Right Click)------------------------ */}
-					{editDropdown && (
+					{/* {editDropdown && (
 						<div
 							className="absolute z-100 bg-white shadow-md border rounded"
 							style={{ top: editDropdown.y, left: editDropdown.x }}>
@@ -643,7 +657,7 @@ const Customer = () => {
 								</li>
 							</ul>
 						</div>
-					)}
+					)} */}
 
 					{/* ----------------------------Success Message Model------------------------------ */}
 					{showSuccessMessage && (
@@ -708,7 +722,18 @@ const Customer = () => {
 						</div>
 					)}
 				{/* </div> */} 
-				<CustomerTable Customers={Customers}/>
+				<CustomerTable 
+					Customers={Customers}
+					editRowId={editRowId}
+					setEditRowId={setEditRowId}
+					editData={editData}
+					setEditData={setEditData}
+					editDropdown={editDropdown}
+					setEditDropdown={setEditDropdown}
+					inputRef={inputRef}
+					setLoading={setLoading}
+					setSuccessMsg={setSuccessMsg}
+				 />
 
 				{showModal && (
 					<div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">

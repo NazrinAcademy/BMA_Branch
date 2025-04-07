@@ -222,7 +222,7 @@ const Supplier = () => {
   const [deleteMessage, setDeleteMessage] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState(null);
   const [SuccessMeg, setSuccessMsg] = useState({ create: "", update: "" })
-  const [filteredSuppliers, setFilteredSuppliers] = useState(Suppliers);
+  const [filteredSuppliers, setFilteredSuppliers] = useState(Suppliers); 
   const inputRef = useRef(null);
 
 
@@ -496,9 +496,9 @@ const Supplier = () => {
 
   }, [userDetails?.access_token])
 
-  // useEffect(() => {
-  //   getDetails();
-  // }, [getDetails]);
+  useEffect(() => {
+    getDetails();
+  }, [getDetails]);
 
 
 
