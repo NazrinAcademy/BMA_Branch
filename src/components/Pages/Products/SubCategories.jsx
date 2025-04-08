@@ -17,8 +17,10 @@ import { useSelector } from "react-redux";
 import * as XLSX from 'xlsx';
 import { jsPDF } from "jspdf";
 import { addSubCategory, fetchCategories } from "../../../apiService/AddProductAPI";
+import SubCategoryModal from "./ProductDetails/SubCategoryModal";
+import SubCategoryTable from "./ProductDetails/SubCategoryTable";
 
-const subCategories = () => {
+const SubCategories = () => {
   const allsubCategories = [
     { id: 1, categories: "Fashion", subCategories: "Women's Collection", hsnSacCode: 98765 },
     { id: 2, categories: "Electronics", subCategories: "Men's Collection", hsnSacCode: 45674 },
@@ -54,6 +56,11 @@ const subCategories = () => {
   
   const { userDetails } = useSelector((state) => state.auth);
   
+  const [isShowModal, setIsShowModal] = useState({
+    add: false,
+    edit: false
+  });
+    const [showModal, setShowModal] = useState(false);
 
 
 
@@ -79,7 +86,10 @@ const subCategories = () => {
 
   // Overlay Open & Close Functions
   const handleOpenOverlay = () => setShowOverlaySubCategory(true);
-  const handleCloseOverlay = () => setShowOverlaySubCategory(false);
+  const handleCloseOverlay = () => {
+    console.log("Modal Closed");
+    setIsShowModal({ add: false, edit: false });
+};
 
   // Input Change Function
   // const handleInputChange = (e, field) => {
@@ -91,6 +101,7 @@ const subCategories = () => {
   //   }
   // };
   useEffect(() => {
+
     if (!userDetails?.access_token) return;
     console.log("Access token found, fetching categories...");
 
@@ -230,19 +241,23 @@ const subCategories = () => {
   // };
 
   // Handle edit click
-  const handleEdit = (subCategories) => {
-    setEditRowId(subCategories.id);
-    setEditedData({ ...subCategories });
-    setContextMenu(null);
-    setIsEdited(false); 
+  const handleEdit = (subCategory) => {
+    console.log("Edit button clicked", subCategory);
+    setIsShowModal({ add: false, edit: true });
+    setSelectedCategory(subCategory.categories);
+    setNewSubCategory(subCategory.subCategories);
+    setHsnSacCode(subCategory.hsnSacCode);
+};
 
-    // Small delay to ensure input is rendered before focusing
-    setTimeout(() => {
-      if (categoryInputRef.current) {
-        categoryInputRef.current.focus();
-      }
-    }, 0);
-  };
+  
+
+  //   // Small delay to ensure input is rendered before focusing
+  //   setTimeout(() => {
+  //     if (categoryInputRef.current) {
+  //       categoryInputRef.current.focus();
+  //     }
+  //   }, 0);
+  // };
 
   // Handle delete click
   const handleDelete = (subCategories) => {
@@ -261,21 +276,21 @@ const subCategories = () => {
 
 
   // Handle input change
-  const handleInputChange = (e, field) => {
+  // const handleInputChange = (e, field) => {
 
-    // Remove currency symbols or units when updating
-    const value = e.target.value;
-    if (field === "hsnSacCode") {
-      setHsnSacCode(value);
-    } else if (field === "newSubCategory") {
-      setNewSubCategory(value);
-    }
-    setEditedData((prevData) => ({
-      ...prevData,
-      [field]: value
-    }));
-    setIsEdited(true);
-  };
+  //   // Remove currency symbols or units when updating
+  //   const value = e.target.value;
+  //   if (field === "hsnSacCode") {
+  //     setHsnSacCode(value);
+  //   } else if (field === "newSubCategory") {
+  //     setNewSubCategory(value);
+  //   }
+  //   setEditedData((prevData) => ({
+  //     ...prevData,
+  //     [field]: value
+  //   }));
+  //   setIsEdited(true);
+  // };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && isEdited) { // Only proceed if value is changed
@@ -301,6 +316,7 @@ const subCategories = () => {
 
    // ---------------------------------  Handle Click Outside --------------------------
    useEffect(() => {
+    
     const handleClickOutside = (event) => {
         if (contextMenu && !event.target.closest(".context-menu")) {
             setContextMenu(null);
@@ -319,7 +335,9 @@ const subCategories = () => {
     <div className="bg-white h-full px-7 py-3 rounded shadow-md w-full max-w-6xl font-['Plus Jakarta Sans'] mx-auto">
       <div>
         <div className="flex justify-between items-center border-b text-nowrap py-4">
-          <h2 className="text-xl font-semibold font-['Plus Jakarta Sans']">Sub Categories</h2>
+          <h2 className="text-xl font-semibold font-['Plus Jakarta Sans']">Sub Categories
+            
+          </h2>
           <div className="flex items-center gap-3">
             {/* Search Input */}
             <div className="relative w-3/5">
@@ -343,16 +361,14 @@ const subCategories = () => {
         {/* Overlay Form */}
 
         {/* Overlay Form */}
-        {showOverlaySubCategory && (
+        {/* {showOverlaySubCategory && (
           <div className="fixed inset-0 z-50 flex pt-5 justify-center bg-black bg-opacity-50">
             <div className="bg-white rounded-lg w-[692px] h-72 px-7 py-6">
               <h3 className="text-xl font-semibold text-center text-gray-700 mb-4">
                 Add New Sub Category
               </h3>
 
-              {/* Grid for Input Fields */}
               <div className="grid grid-cols-2 gap-4">
-  {/* Category Dropdown */}
   <div className="relative col-span-2">
     <label className="absolute left-3 -top-2 text-xs text-gray-500 bg-white px-1 z-10 transition-all 
       peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
@@ -376,7 +392,6 @@ const subCategories = () => {
     </div>
   </div>
 
-  {/* Sub Category Input */}
   <div className="relative">
     <input
       type="text"
@@ -393,7 +408,6 @@ const subCategories = () => {
     </label>
   </div>
 
-  {/* HSN/SAC Code Input */}
   <div className="relative">
     <input
       type="text"
@@ -411,7 +425,6 @@ const subCategories = () => {
   </div>
 </div>
 
-{/* Buttons */}
 <div className="flex justify-end gap-4 mt-6">
   <button
     onClick={handleCloseOverlay}
@@ -427,7 +440,7 @@ const subCategories = () => {
   </button>
 </div>  </div>
           </div>
-        )}
+        )} */}
 
 
         {/* Pagination Controls */}
@@ -488,12 +501,42 @@ const subCategories = () => {
           </div>
         </div>
 
+        {isShowModal?.add && (
+  <SubCategoryModal
+    categories={categories} 
+    handleSaveSubCategory={handleSaveSubCategory}
+    content={"Add New Sub Category"}
+    selectedCategory={selectedCategory}
+    setSelectedCategory={setSelectedCategory}
+    newSubCategory={newSubCategory}
+    setNewSubCategory={setNewSubCategory}
+    hsnSacCode={hsnSacCode}
+    setHsnSacCode={setHsnSacCode}
+    handleCloseOverlay={handleCloseOverlay}
+  />
+)}
+
+{isShowModal?.edit && (
+  <SubCategoryModal
+    categories={categories} 
+    // handleSaveSubCategory={handleUpdateSubCategory}
+    content={"Update Sub Category"}
+    selectedCategory={selectedCategory}
+    setSelectedCategory={setSelectedCategory}
+    newSubCategory={newSubCategory}
+    setNewSubCategory={setNewSubCategory}
+    hsnSacCode={hsnSacCode}
+    setHsnSacCode={setHsnSacCode}
+    handleCloseOverlay={handleCloseOverlay}
+  />
+)}
+
         {/* Table */}
-        <div className="overflow-x-auto">
-        <div className="max-h-[350px] overflow-y-auto rounded border border-[#c9c9cd]">
-      <table className="w-full ">
-        <thead className="sticky top-0 bg-[#f8f8f8]">
-        <tr className="text-sm font-semibold">
+        {/* <div className="overflow-x-auto">
+           <div className="max-h-[350px] overflow-y-auto rounded border border-[#c9c9cd]">
+              <table className="w-full ">
+                <thead className="sticky top-0 bg-[#f8f8f8]">
+                <tr className="text-sm font-semibold">
                   <th className="p-3 w-24">S.No</th>
                   <th className="p-3 w-72">Categories</th>
                   <th className="p-3 w-72">Sub Categories</th>
@@ -509,7 +552,6 @@ const subCategories = () => {
                       onContextMenu={(event) => handleRightClick(event, item)} className="cursor-pointer text-sm text-center" >
                       <td className="p-2">{item.id}</td>
 
-                      {/* Categories Field */}
                       <td className="py-4">
                       {editRowId === item.id ? (
                           <input
@@ -524,7 +566,6 @@ const subCategories = () => {
                         )}
                       </td>
 
-                      {/* subCategories Field */}
                       <td className="py-4">
                       {editRowId === item.id ? (
                           <input
@@ -538,7 +579,6 @@ const subCategories = () => {
                         )}
                       </td>
 
-                      {/* HSN/SAC Code Field */}
                       <td className="py-4">
                       {editRowId === item.id ? (
                           <input
@@ -564,9 +604,22 @@ const subCategories = () => {
               </tbody>
             </table>
           </div>
-          </div>
+          </div> */}
 
         </div>
+
+        <SubCategoryTable
+           paginatedCategories={paginatedCategories}
+           contextMenu={contextMenu}
+           handleEdit={handleEdit} 
+            handleDelete={handleDelete}
+           setContextMenu = {setContextMenu}
+           setEditRowId = {setEditRowId}
+           setEditedData ={setEditedData}
+           setIsEdited = {setIsEdited}
+           setHsnSacCode ={setHsnSacCode}
+           setNewSubCategory = {setNewSubCategory}
+        />
 
         {/* ------------------------------------------ Context Menu -----------------------------------------------*/}
         {contextMenu && (
@@ -666,4 +719,4 @@ const subCategories = () => {
       );
 };
 
-      export default subCategories;   
+      export default SubCategories;   

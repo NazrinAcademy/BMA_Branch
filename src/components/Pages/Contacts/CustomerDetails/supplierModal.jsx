@@ -9,8 +9,7 @@ const SupplierModal = ({
     selectedState,
     handleModalClose,
     content
-}
-) => {
+}) => {
     console.log("content",content);
     console.log("form data", form);
     console.log("model clode:" ,handleModalClose);
