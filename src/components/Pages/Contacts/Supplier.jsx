@@ -207,7 +207,7 @@ const Supplier = () => {
   const [loading, setLoading] = useState({ isLoading: false, message: "" });
 
   const [Suppliers, setSuppliers] = useState(allSuppliers);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // -------------------Pagenation Function----------------------------z
   const [perPage, setPerPage] = useState(10);
