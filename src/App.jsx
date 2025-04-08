@@ -3,15 +3,16 @@ import React from 'react'
 // import Route1 from './components/Routes/Route1'
 import { Provider } from 'react-redux'
 import store from './redux/Store'
-// import Supplier from './components/Pages/Contacts/Supplier'
+// import Customer from './components/Pages/Contacts/Customer'
+import Supplier from './components/Pages/Contacts/Supplier'
 
 const App = () => {  
   return (
     <div>
       <Provider store={store}>
       {/* <Route1/> */}
-      <Customer/>
-      {/* <Supplier/> */}
+      {/* <Customer/> */}
+      <Supplier/>
       </Provider>
     </div>
   )

@@ -277,6 +277,7 @@ const CustomerTable = ({
 				</div>
 
 				{/* Context Menu */}
+				
 				{editDropdown && (
 					<div
 						className="absolute z-50 bg-white shadow-md border rounded"

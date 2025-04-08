@@ -12,9 +12,11 @@ import {
   ChevronDown,
 } from "lucide-react";
 import successImage from '../../../assets/success.png'
+import { useSelector } from "react-redux";
 
 import * as XLSX from 'xlsx';
 import { jsPDF } from "jspdf";
+import { addSubCategory, fetchCategories } from "../../../apiService/AddProductAPI";
 
 const subCategories = () => {
   const allsubCategories = [
@@ -30,24 +32,28 @@ const subCategories = () => {
     { id: 10, categories: "Jewelry", subCategories: "Gold", hsnSacCode: 47364 },
   ];
 
-  const categories = [
-    { id: 1, categoryName: "Fashion" },
-    { id: 2, categoryName: "Electronics" },
-    { id: 3, categoryName: "Food" },
-    { id: 4, categoryName: "Vegetables" },
-    { id: 5, categoryName: "Accessories" },
-    { id: 6, categoryName: "Home Appliances" },
-    { id: 7, categoryName: "Cloths" },
-    { id: 8, categoryName: "Toys" },
-    { id: 9, categoryName: "Books" },
-    { id: 10, categoryName: "Jewelry" },
-  ];
+  // const categories = [
+  //   { id: 1, categoryName: "Fashion" },
+  //   { id: 2, categoryName: "Electronics" },
+  //   { id: 3, categoryName: "Food" },
+  //   { id: 4, categoryName: "Vegetables" },
+  //   { id: 5, categoryName: "Accessories" },
+  //   { id: 6, categoryName: "Home Appliances" },
+  //   { id: 7, categoryName: "Cloths" },
+  //   { id: 8, categoryName: "Toys" },
+  //   { id: 9, categoryName: "Books" },
+  //   { id: 10, categoryName: "Jewelry" },
+  // ];
 
 
   const [subCategories, setsubCategories] = useState(allsubCategories);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [newSubCategory, setNewSubCategory] = useState("");
   const [hsnSacCode, setHsnSacCode] = useState("");
+  
+  
+  const { userDetails } = useSelector((state) => state.auth);
+  
 
 
 
@@ -84,31 +90,74 @@ const subCategories = () => {
   //     setNewSubCategory(value);
   //   }
   // };
+  useEffect(() => {
+    if (!userDetails?.access_token) return;
+    console.log("Access token found, fetching categories...");
 
+    const getCategoriesData = async () => {
+      console.log("Fetching category data...");
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userDetails.access_token}`,
+        },
+      };
 
-  // Handle Save Category
+      try {
+        const fetchedCategories = await fetchCategories(config);
+        console.log("Fetched categories:", fetchedCategories);
 
-  const handleSaveSubCategory = () => {
-    if (!selectedCategory || !newSubCategory) {
-      alert("Please select a category and enter a subcategory name.");
-      return;
-    }
-
-    const newEntry = {
-      id: subCategories.length + 1,
-      categories: selectedCategory,
-      subCategories: newSubCategory,
-      hsnSacCode: hsnSacCode || Math.floor(10000 + Math.random() * 90000),
+        setCategories(fetchedCategories?.all_stock || []); // ✅ Set categories
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
     };
 
-    setsubCategories([...subCategories, newEntry]);
-    setShowOverlaySubCategory(false);
-    setNewSubCategory("");
-    setSelectedCategory("");
-    setHsnSacCode("");
+    getCategoriesData();
+  }, [userDetails?.access_token]); // ✅ Trigger fetch when token updates
+
+  // Handle Save Category
+  const handleSaveSubCategory = async () => {
+    if (!selectedCategory || !newSubCategory ) {
+      alert("Please select a category, enter a subcategory name, and provide a stock category ID.");
+      return;
+    }
+  
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userDetails?.access_token}`,
+      },
+    };
+  
+    const newEntry = {
+      subCategoryname: newSubCategory,
+      Categoryname: selectedCategory, 
+      hsn_sac_code: hsnSacCode || Math.floor(10000 + Math.random() * 90000),
+    };
+  
+    try {
+      console.log("Saving subcategory...", newEntry); 
+      const savedSubCategory = await addSubCategory(newEntry, config);
+  
+      if (!savedSubCategory) {
+        throw new Error("Failed to save subcategory");
+      }
+  
+      console.log("Subcategory saved successfully:", savedSubCategory);
+  
+      // Update state only after a successful API response
+      setsubCategories([...subCategories, savedSubCategory]);
+      setShowOverlaySubCategory(false);
+      setNewSubCategory("");
+      setSelectedCategory(""); // Clear stock category ID field
+      setHsnSacCode("");
+  
+    } catch (error) {
+      console.error("Error saving subcategory:", error);
+      alert("Failed to save subcategory. Please try again.");
+    }
   };
-
-
   // handle export excel
   const handleExportExcel = () => {
     const ws = XLSX.utils.json_to_sheet(subCategories);
@@ -158,6 +207,8 @@ const subCategories = () => {
   const [selectedRowId, setSelectedRowId] = useState(null);
   const categoryInputRef = useRef(null)
   const [isEdited, setIsEdited] = useState(false);
+  const [categories, setCategories] = useState([]);
+
 
 
   const handleRightClick = (event, product) => {
@@ -299,77 +350,80 @@ const subCategories = () => {
 
               {/* Grid for Input Fields */}
               <div className="grid grid-cols-2 gap-4">
-                {/* Category Dropdown */}
-                <div className="relative col-span-2">
-                  <label
-                    className="absolute left-3 -top-2 text-xs text-gray-500 bg-white px-1 z-10 transition-all 
+  {/* Category Dropdown */}
+  <div className="relative col-span-2">
+    <label className="absolute left-3 -top-2 text-xs text-gray-500 bg-white px-1 z-10 transition-all 
       peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 
-      peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white"
-                  >
-                    Category
-                  </label>
-                  <div className="peer w-full h-11 pl-4 rounded border border-gray-300 flex items-center overflow-hidden text-sm">
-                    <select
-                      className="peer w-full h-11 px-2 text-sm focus:outline-none appearance-none pr-8"
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                    >
-                      <option value="">Select Category</option>
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.categoryName}>
-                          {category.categoryName}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown size={20} className="absolute right-3 text-gray-500 pointer-events-none" />
-                  </div>
-                </div>
+      peer-focus:-top-2 peer-focus:text-xs peer-focus:text-gray-500 peer-focus:bg-white">
+      Category
+    </label>
+    <div className="peer w-full h-11 pl-4 rounded border border-gray-300 flex items-center overflow-hidden text-sm">
+      <select
+        className="peer w-full h-11 px-2 text-sm focus:outline-none appearance-none pr-8"
+        value={selectedCategory}
+        onChange={(e) => setSelectedCategory(e.target.value)}
+      >
+        <option value="">Select Category</option>
+        {categories.map((category) => (
+          <option key={category.id} value={category.id}>
+            {category.name}
+          </option>
+        ))}
+      </select>
+      <ChevronDown size={20} className="absolute right-3 text-gray-500 pointer-events-none" />
+    </div>
+  </div>
 
-                {/* Sub Category Input */}
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder=""
-                    value={newSubCategory}
-                    onChange={(e) => setNewSubCategory(e.target.value)}
-                    className="peer w-full h-11 pl-4 rounded border border-[#c9c9cd] text-sm focus:outline-none focus:border-purpleCustom"
-                  />
-                  <label className="absolute left-3 -top-2 text-sm font-normal text-[#838383] bg-white px-1 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-[#838383] peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#838383] peer-focus:bg-white">
-                    Sub Category *
-                  </label>
-                </div>
+  {/* Sub Category Input */}
+  <div className="relative">
+    <input
+      type="text"
+      placeholder=""
+      value={newSubCategory}
+      onChange={(e) => setNewSubCategory(e.target.value)}
+      className="peer w-full h-11 pl-4 rounded border border-[#c9c9cd] text-sm focus:outline-none focus:border-purpleCustom"
+    />
+    <label className="absolute left-3 -top-2 text-sm font-normal text-[#838383] bg-white px-1 transition-all 
+      peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-[#838383] 
+      peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#838383] 
+      peer-focus:bg-white">
+      Sub Category *
+    </label>
+  </div>
 
-                {/* HSN/SAC Code Input */}
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder=""
-                    value={hsnSacCode}
-                    onChange={(e) => setHsnSacCode(e.target.value)}
-                    className="peer w-full h-11 pl-4 rounded border border-[#c9c9cd] text-sm focus:outline-none focus:border-purpleCustom"
-                  />
-                  <label className="absolute left-3 -top-2 text-sm font-normal text-[#838383] bg-white px-1 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-[#838383] peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#838383] peer-focus:bg-white">
-                    HSN/SAC Code
-                  </label>
-                </div>
-              </div>
+  {/* HSN/SAC Code Input */}
+  <div className="relative">
+    <input
+      type="text"
+      placeholder=""
+      value={hsnSacCode}
+      onChange={(e) => setHsnSacCode(e.target.value)}
+      className="peer w-full h-11 pl-4 rounded border border-[#c9c9cd] text-sm focus:outline-none focus:border-purpleCustom"
+    />
+    <label className="absolute left-3 -top-2 text-sm font-normal text-[#838383] bg-white px-1 transition-all 
+      peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:text-[#838383] 
+      peer-placeholder-shown:bg-transparent peer-focus:-top-2 peer-focus:text-xs peer-focus:text-[#838383] 
+      peer-focus:bg-white">
+      HSN/SAC Code
+    </label>
+  </div>
+</div>
 
-              {/* Buttons */}
-              <div className="flex justify-end gap-4 mt-6">
-                <button
-                  onClick={handleCloseOverlay}
-                  className="border-[1px] border-purpleCustom font-semibold px-12 py-2 rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSaveSubCategory}
-                  className="bg-purpleCustom text-white font-semibold px-14 py-2 rounded"
-                >
-                  Save
-                </button>
-              </div>
-            </div>
+{/* Buttons */}
+<div className="flex justify-end gap-4 mt-6">
+  <button
+    onClick={handleCloseOverlay}
+    className="border-[1px] border-purpleCustom font-semibold px-12 py-2 rounded"
+  >
+    Cancel
+  </button>
+  <button
+    onClick={handleSaveSubCategory}
+    className="bg-purpleCustom text-white font-semibold px-14 py-2 rounded"
+  >
+    Save
+  </button>
+</div>  </div>
           </div>
         )}
 
