@@ -6,22 +6,46 @@ import { jsPDF } from "jspdf";
 import successImage from '../../../assets/success.png'
 import { useSelector } from "react-redux";
 import { toast, ToastContainer } from "react-toastify";
+import SuccessMessage from "../../SuccessMessage";
+import BrandTable from "./ProductDetails/BrandTable";
+import BrandModal from "./ProductDetails/BrandModal";
 
 
 const Brand = () => {
  
-    const [brands, setBrands] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [brands, setBrands] = useState([
+        { id: 1, brand_name: "Nike" },
+        { id: 2, brand_name: "Adidas" },
+        { id: 3, brand_name: "Puma" },
+        { id: 4, brand_name: "Reebok" }
+    ]);
+        const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
     const [showOverlay, setShowOverlay] = useState(false);
-    const [newBrandName, setNewBrandName] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
 
     const {userDetails}=useSelector((state)=>(state.auth))
     const [loading, setLoading] = useState({ isLoading: false, message: "" });
 
+  
+    const [successMsg, setSuccessMsg] = useState({ create: "", update: "" })
+    const [triggerApi,setTriggerApi]=useState({getApi:false})
+    const [isShowModal, setIsShowModal] = useState({ add: false, edit: false });
+    const [selectedBrand, setSelectedBrand] = useState(null);
+    const [newBrandName, setNewBrandName] = useState("");
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+    
     
     const startIndex = (currentPage - 1) * perPage;
+
+    useEffect(() => {
+          setTimeout(() => {
+            setShowSuccessMessage(false);
+            setSuccessMsg((prevState) => ({...prevState, create:false, update:false}))
+          }, 2000);
+        
+      }, [showSuccessMessage, successMsg?.create, successMsg?.update]);
+
 
     useEffect(() => {
       const fetchBrands = async () => {
@@ -48,15 +72,14 @@ const Brand = () => {
 
   
     // Handle Overlay
-    const handleOpenOverlay = () => setShowOverlay(true);
-    const handleCloseOverlay = () => setShowOverlay(false);
+    const handleOpenOverlay = () => {
+        setIsShowModal({ add: true, edit: false });
+        setNewBrandName("");
+    };    // const handleCloseOverlay = () => setShowOverlay(false);
 
     // Handle Save Brand
-    console.log("newBrandName",newBrandName)
+    // console.log("newBrandName",newBrandName)
     const handleSaveBrand = async () => {
-        const userData = JSON.parse(localStorage.getItem("user"));
-    
-        const token = userData?.access_token;
         const config = {
             headers: {
                 "Content-Type": "application/json",
@@ -71,17 +94,36 @@ const Brand = () => {
         if (newBrandName.trim() !== "") {
             try {
                 const newBrand = await addBrand(newBrandName, config);
-                // if (newBrand?.data) {
-                //     setBrands([...brands, newBrand.data]);
-                // }
-                getBrands()
+                
+                if (!newBrand) {
+                    throw new Error("Failed to save brand");
+                }
+    
+                console.log("Brand saved successfully:", newBrand);
+    
+                if (newBrand?.data) {
+                    setBrands([...brands, newBrand.data]);
+                }
+    
+                setSuccessMsg((prev) => ({ ...prev, create: "Brand added successfully!" })); 
                 setNewBrandName("");
-                handleCloseOverlay();
+    
+                console.log("Closing modal...");
+                handleModalClose();
             } catch (error) {
                 toast.error(`Error saving brand: ${error.message}`);
             }
         }
     };
+     
+     
+    const handleModalClose = () => {
+        console.log("Modal Close Function Called!"); // Debugging
+        setIsShowModal({ add: false, edit: false });
+        setSelectedBrand(null);
+        setNewBrandName("");
+    };
+    
     
     // Handle Export to Excel
     const handleExportExcel = () => {
@@ -123,7 +165,6 @@ const Brand = () => {
     // ------------------------ delete functions --------------------
     const [contextMenu, setContextMenu] = useState(null);
     const [showSuccessMessageUpdate, setShowSuccessMessageUpdate] = useState(false);
-    const [selectedBrand, setSelectedBrand] = useState(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
 
@@ -146,67 +187,110 @@ const Brand = () => {
         setContextMenu(null);
     };
     
-   const confirmDelete = async () => {
-    //   if (!selectedBrand) return;
-      const config = {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${userDetails.access_token}`,
-        },
+    const confirmDelete = async () => {
+        setLoading({ isLoading: true, message: "Deleting brands..." });
+    
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userDetails.access_token}`,
+            },
+        };
+    
+        try {
+            await deleteBrand(selectedBrand, config);
+            setShowDeleteConfirm(false);
+            
+            setSuccessMsg((prev) => ({ ...prev, update: "Brand deleted successfully!" })); 
+            
+            getBrands();
+        } catch (error) {
+            console.error("Error deleting brand:", error);
+            alert("Failed to delete brand!");
+        } finally {
+            setLoading({ isLoading: false, message: "" });
+            setShowDeleteConfirm(false);
+            setSelectedRowId(null);
+        }
     };
-      try {
-        await deleteBrand(selectedBrand, config); // API call
-        // setBrands(brands.filter((brand) => brand.id !== selectedBrand.id))
-        setShowDeleteConfirm(false);
-        getBrands()
-        // alert("Category deleted successfully!");
-      } catch (error) {
-        console.error("Error deleting category:", error);
-        alert("Failed to delete category!");
-      }
-    };
+    
 
     // -----------------------edit functions---------------------
     const [editingBrand, setEditingBrand] = useState(null);
     const [updatedBrand, setUpdatedBrand] = useState(null);
     
-    const handleKeyPress = async (e) => {
-        if (e.key === "Enter" && updatedBrand) {
-            try {
-                const config = {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${userDetails?.access_token}`,
-                    },
-                };
+    // const handleKeyPress = async (e) => {
+    //     if (e.key === "Enter" && updatedBrand) {
+    //         try {
+    //             const config = {
+    //                 headers: {
+    //                     "Content-Type": "application/json",
+    //                     Authorization: `Bearer ${userDetails?.access_token}`,
+    //                 },
+    //             };
     
-                // API call to update brand
-                await updateBrand(editingBrand, updatedBrand, config);
+    //             // API call to update brand
+    //             await updateBrand(editingBrand, updatedBrand, config);
     
-                console.log("Brand Updated in API. Fetching latest data...");
+    //             console.log("Brand Updated in API. Fetching latest data...");
     
-                // Fetch updated brands list
-                const fetchedBrands = await getBrands(config);
-                getBrands()
-                setEditingBrand(null);
-                setUpdatedBrand(null);
+    //             // Fetch updated brands list
+    //             const fetchedBrands = await getBrands(config);
+    //             getBrands()
+    //             setEditingBrand(null);
+    //             setUpdatedBrand(null);
     
-                setShowSuccessMessageUpdate(true);
-                setTimeout(() => setShowSuccessMessageUpdate(false), 3000);
-            } catch (error) {
-                console.error("Error updating brand:", error);
-                alert("Failed to update brand!");
-            }
+    //             setShowSuccessMessageUpdate(true);
+    //             setTimeout(() => setShowSuccessMessageUpdate(false), 3000);
+    //         } catch (error) {
+    //             console.error("Error updating brand:", error);
+    //             alert("Failed to update brand!");
+    //         }
+    //     }
+    // };
+    
+    const handleUpdateBrand = async () => {
+        if (!updatedBrandName.trim()) {
+            alert("Brand name is required!");
+            return;
         }
-    };
     
- 
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userDetails?.access_token}`
+            }
+        };
+    
+        const payload = {
+            brand_name: updatedBrandName,
+        };
+    
+        try {
+            await updateBrand(editingBrandId, payload, config);
+    
+            setBrands((prevBrands) =>
+                prevBrands.map((brand) =>
+                    brand.id === editingBrandId ? { ...brand, brand_name: updatedBrandName } : brand
+                )
+            );
+    
+            setSuccessMsg((prev) => ({ ...prev, update: "Brand updated successfully!" })); // ✅ String message
+            setEditingBrandId(null);
+            setIsShowModal({ edit: false, add: false });
+        } catch (error) {
+            console.error("Error updating brand:", error);
+            alert("Failed to update brand!");
+        }
+    };   
+    
     
     const handleEdit = (brand) => {
-        setEditingBrand(brand?.brand_id);
-        setUpdatedBrand({ ...brand }); // Ensure updatedBrand is set properly
-        setContextMenu(null); 
+        setSelectedBrand(brand); 
+        setNewBrandName(brand.brand_name);
+        setIsShowModal({ add: false, edit: true }); 
     };
+    
     
     const handleInputChange = (e, field) => {
         console.log("hqandleinputchange",field)
@@ -248,7 +332,7 @@ const Brand = () => {
             </div>
 
             {/* Overlay Form */}
-            {showOverlay && (
+            {/* {showOverlay && (
                 <div className="fixed inset-0 z-50 flex pt-5 justify-center bg-black bg-opacity-50">
                     <div className="bg-white overflow-hidden rounded-lg w-[692px] h-56 px-7 py-6">
                         <h3 className="text-xl font-semibold text-center text-gray-700 mb-4">
@@ -276,7 +360,7 @@ const Brand = () => {
                         </div>
                     </div>
                 </div>
-            )}
+            )} */}
 
             {/* Pagination Controls */}
             <div className="my-4 flex flex-col sm:flex-row justify-between text-[#838383] items-center">
@@ -331,9 +415,29 @@ const Brand = () => {
                 </div>
             </div>
 
-            {/* Table */}
+            {isShowModal?.add && (
+    <BrandModal
+        handleSaveBrand={handleSaveBrand}
+        content={"Add New Brand"}
+        handleModalClose={handleModalClose}
+        newBrandName={newBrandName}
+        setNewBrandName={setNewBrandName}
+    />
+)}
+
+{isShowModal?.edit && (
+    <BrandModal
+        handleSaveBrand={handleUpdateBrand}
+        content={"Update Brand"}
+        handleModalClose={handleModalClose}
+        newBrandName={newBrandName}
+        setNewBrandName={setNewBrandName}
+    />
+)}
+
+
 {/* Table */}
-<div className="max-h-[350px] overflow-y-auto rounded border border-[#c9c9cd]">
+{/* <div className="max-h-[350px] overflow-y-auto rounded border border-[#c9c9cd]">
 {loading.isLoading ? (
                 <div className="p-4 text-center text-sm text-[#202020]">
                   {loading.message || "Loading brands..."}
@@ -356,7 +460,6 @@ const Brand = () => {
                     >
                         <td className="px-6 py-4">{startIndex + index + 1}</td>
 
-                        {/* Brand Name Column */}
                         <td className="px-6 py-4">
                             {editingBrand === brand.brand_id ? (
                                 <input
@@ -381,10 +484,19 @@ const Brand = () => {
         </tbody>
     </table>
               )}
-</div>
+</div> */}
+
+<BrandTable
+    brands={brands}
+    setBrands={setBrands}
+    contextMenu={contextMenu}
+    handleEdit={handleEdit}
+    handleDelete={handleDelete}
+    setContextMenu={setContextMenu}
+/>
             
         {/* ------------------------------------------ Context Menu -----------------------------------------------*/}
-        {contextMenu && (
+        {/* {contextMenu && (
           <div
             className="absolute z-100 bg-white shadow-md border rounded"
             style={{ top: contextMenu.y, left: contextMenu.x }}
@@ -405,7 +517,7 @@ const Brand = () => {
               </li>
             </ul>
           </div>
-        )}
+        )} */}
 
          
           {/* --------------------------- update successfull message --------------------------------- */}
@@ -430,6 +542,13 @@ const Brand = () => {
                               </div>
                         )}
                       
+
+                {successMsg?.create &&
+      <SuccessMessage onClose={handleModalClose} showMsg={successMsg?.create} content={"Brand details have been created successfully!"}/>
+       }
+         {successMsg?.update &&
+      <SuccessMessage onClose={handleModalClose} showMsg={successMsg?.update} content={"Brand details have been Updated successfully!"}/>
+          }
                      
 
        {/* ----------------------------------------- Delete Confirmation --------------------------------------*/}
