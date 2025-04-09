@@ -210,7 +210,7 @@ const SupplierModal = ({
                                 onClick={handleModalClose}>
                                 Cancel
                             </button>
-                            <button className="px-16 py-2 text-[#fff] bg-[#593fa9] text-base font-semibold font-jakarta rounded">
+                            <button className="px-16 py-2 text-[#fff] bg-[#593fa9]  text-base font-semibold font-jakarta rounded">
                                 Save
                             </button>
                         </div>

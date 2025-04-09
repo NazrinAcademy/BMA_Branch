@@ -333,8 +333,8 @@ const [selectedItem, setSelectedItem] = useState(null);
   const handleDelete = (tableData) => {
     setSelectedRowId(tableData.supplier_id);
     setDeleteMessage(true);
-    setContextDropdown(null);
-  };
+    setEditDropdown(null);
+    };
 
   const confirmDeleteData = () => {
     const config = {
@@ -616,7 +616,7 @@ console.log("editRowId--",editData)
                 />
 
                 <div
-                  className="bg-[#593fa9] text-white  px-4 py-2 text-base font-semibold rounded flex items-center gap-2"
+                  className="bg-[#593fa9] text-white cursor-pointer  px-4 py-2 text-base font-semibold rounded flex items-center gap-2"
                   onClick={() => setShowModal(true)}
                 >
                   Add Supplier

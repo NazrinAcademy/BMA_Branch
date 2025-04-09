@@ -16,9 +16,10 @@ import { useSelector } from "react-redux";
 
 import * as XLSX from 'xlsx';
 import { jsPDF } from "jspdf";
-import { addSubCategory, fetchCategories } from "../../../apiService/AddProductAPI";
+import { addSubCategory, deleteSubCategory, fetchCategories, fetchSubCategories, updateSubCategory } from "../../../apiService/AddProductAPI";
 import SubCategoryModal from "./ProductDetails/SubCategoryModal";
 import SubCategoryTable from "./ProductDetails/SubCategoryTable";
+import SuccessMessage from "../../SuccessMessage";
 
 const SubCategories = () => {
   const allsubCategories = [
@@ -61,7 +62,10 @@ const SubCategories = () => {
     edit: false
   });
     const [showModal, setShowModal] = useState(false);
-
+    const [successMsg, setSuccessMsg] = useState({ create: "", update: "" })
+  const [loading, setLoading] = useState({ isLoading: false, message: "" });
+  const [triggerApi,setTriggerApi]=useState({getApi:false})
+  const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
 
 
   // Pagination
@@ -87,7 +91,8 @@ const SubCategories = () => {
   // Overlay Open & Close Functions
   const handleOpenOverlay = () => {
     setIsShowModal({ add: true });
-    setShowOverlaySubCategory(true);}
+    setShowOverlaySubCategory(true);
+  }
   const handleCloseOverlay = () => {
     console.log("Modal Closed");
     setIsShowModal({ add: false, edit: false });
@@ -102,6 +107,9 @@ const SubCategories = () => {
   //     setNewSubCategory(value);
   //   }
   // };
+
+
+  // ---------------------------  get categories:
   useEffect(() => {
 
     if (!userDetails?.access_token) return;
@@ -120,20 +128,44 @@ const SubCategories = () => {
         const fetchedCategories = await fetchCategories(config);
         console.log("Fetched categories:", fetchedCategories);
 
-        setCategories(fetchedCategories?.all_stock || []); // ✅ Set categories
+        setCategories(fetchedCategories?.all_stock || []); 
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
 
     getCategoriesData();
-  }, [userDetails?.access_token]); // ✅ Trigger fetch when token updates
+  }, [userDetails?.access_token]); 
 
-  // Handle Save Category
+
+// ------------------ fetch sub category:
+const config = {
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${userDetails?.access_token}`,
+  },
+};
+
+const loadSubCategories = async () => {
+  try {
+    const data = await fetchSubCategories(config);
+    setSubCategories(data); 
+  } catch (error) {
+    console.error("Failed to load subcategories:", error);
+  }
+};
+
+useEffect(() => {
+  loadSubCategories();
+}, []);
+
+
+  // -------------------------------Handle Save Category:
   const handleSaveSubCategory = async (e) => {
-    e.preventDefault()
-    if (!selectedCategory || !newSubCategory ) {
-      alert("Please select a category, enter a subcategory name, and provide a stock category ID.");
+    e.preventDefault();
+  
+    if (!selectedCategory || !newSubCategory) {
+      alert("Please select a category and enter a subcategory name.");
       return;
     }
   
@@ -143,17 +175,18 @@ const SubCategories = () => {
         Authorization: `Bearer ${userDetails?.access_token}`,
       },
     };
+  
     const selectedCategoryObject = categories.find(cat => cat.id === selectedCategory);
   
     const newEntry = {
       subCategoryname: newSubCategory,
-      Categoryname: selectedCategoryObject?.name, 
-      StockCategory_id:selectedCategory,
+      StockCategory_id: selectedCategory,
+      Categoryname: selectedCategoryObject?.name || "",
       hsn_sac_code: hsnSacCode || Math.floor(10000 + Math.random() * 90000),
     };
   
     try {
-      console.log("Saving subcategory...", newEntry); 
+      console.log("Saving subcategory...", newEntry);
       const savedSubCategory = await addSubCategory(newEntry, config);
   
       if (!savedSubCategory) {
@@ -162,18 +195,31 @@ const SubCategories = () => {
   
       console.log("Subcategory saved successfully:", savedSubCategory);
   
-      // Update state only after a successful API response
-      setsubCategories([...subCategories, savedSubCategory]);
-      setShowOverlaySubCategory(false);
       setNewSubCategory("");
-      setSelectedCategory(""); // Clear stock category ID field
+      setSelectedCategory("");
       setHsnSacCode("");
+  
+      setShowOverlaySubCategory(false);
+  
+      setsubCategories(prev => [...prev, savedSubCategory]);
   
     } catch (error) {
       console.error("Error saving subcategory:", error);
       alert("Failed to save subcategory. Please try again.");
     }
   };
+  
+	const handleModalClose = () => {
+		
+    setIsShowModal({ add: false, edit: false });
+    setNewSubCategory("");
+    setSelectedCategory("");
+    setHsnSacCode("");
+	}
+
+
+
+
   // handle export excel
   const handleExportExcel = () => {
     const ws = XLSX.utils.json_to_sheet(subCategories);
@@ -228,11 +274,11 @@ const SubCategories = () => {
 
 
   const handleRightClick = (event, product) => {
-    event.preventDefault(); // Prevent default right-click menu
+    event.preventDefault();
     setContextMenu({
       x: event.clientX,
       y: event.clientY,
-      product, // Store selected row data
+      product,
     });
   };
 
@@ -243,17 +289,6 @@ const SubCategories = () => {
   //   }
   // };
 
-  // Handle edit click
-  const handleEdit = (subCategory) => {
-    console.log("Edit button clicked", subCategory);
-    setIsShowModal({ add: false, edit: true });
-    setSelectedCategory(subCategory.categories);
-    setNewSubCategory(subCategory.subCategories);
-    setHsnSacCode(subCategory.hsnSacCode);
-};
-
-  
-
   //   // Small delay to ensure input is rendered before focusing
   //   setTimeout(() => {
   //     if (categoryInputRef.current) {
@@ -261,22 +296,6 @@ const SubCategories = () => {
   //     }
   //   }, 0);
   // };
-
-  // Handle delete click
-  const handleDelete = (subCategories) => {
-    setSelectedRowId(subCategories.id);
-    setShowDeleteConfirm(true);
-    setContextMenu(null);
-  };
-
-  // Confirm delete
-  const confirmDelete = () => {
-    setPaginatedProducts((prevData) =>
-      prevData.filter((item) => item.id !== selectedRowId)
-    );
-    setShowDeleteConfirm(false);
-  };
-
 
   // Handle input change
   // const handleInputChange = (e, field) => {
@@ -316,6 +335,102 @@ const SubCategories = () => {
   
     }
   };
+
+
+
+
+  //------------ Handle edit click
+  const handleEdit = (subCategory) => {
+    console.log("Edit button clicked", subCategory);
+    setIsShowModal({ add: false, edit: true });
+    setSelectedSubCategoryId(subCategory.id);  
+    setSelectedCategory(subCategory.categories);
+    setNewSubCategory(subCategory.subCategories);
+    setHsnSacCode(subCategory.hsnSacCode);
+};
+  
+// ------------ handle update function:
+const handleUpdateSubCategory = async (e) => {
+  e.preventDefault();
+
+  if (!selectedSubCategoryId) {
+    alert("No subcategory selected for update!");
+    return;
+  }
+
+  setLoading({ isLoading: true, message: "Updating subcategory..." });
+
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${userDetails?.access_token}`,
+    },
+  };
+
+  const selectedCategoryObject = categories.find(cat => cat.id === selectedCategory);
+
+  const updatedData = {
+    subCategoryname: newSubCategory,
+    StockCategory_id: selectedCategory,
+    Categoryname: selectedCategoryObject?.name || "",
+    hsn_sac_code: hsnSacCode || Math.floor(10000 + Math.random() * 90000),
+  };
+
+  try {
+    await updateSubCategory(selectedSubCategoryId, updatedData, config);
+    console.log("Subcategory updated successfully");
+
+    setsubCategories((prev) =>
+      prev.map((sub) =>
+        sub.id === selectedSubCategoryId ? { ...sub, ...updatedData } : sub
+      )
+    );
+
+    handleModalClose();
+    setSuccessMsg((prevState) => ({ ...prevState, update: true }));
+  } catch (error) {
+    console.error("Error updating subcategory:", error);
+    alert("Update failed");
+  } finally {
+    setLoading({ isLoading: false, message: "" });
+  }
+};
+
+
+// --------handle delete functions:
+const handleDelete = (subCategory) => {
+  setSelectedRowId(subCategory.id);
+  setShowDeleteConfirm(true);
+  setContextMenu(null);
+};
+
+//  ---------- handle confirm delete:
+const confirmDelete = async () => {
+if (!selectedRowId) {
+  console.error("No subcategory selected for deletion");
+  return;
+}
+
+setLoading({ isLoading: true, message: "Deleting subcategory..." });
+
+try {
+  await deleteSubCategory(selectedRowId);
+
+  console.log("Subcategory deleted successfully");
+
+  setSubCategories((prev) => prev.filter((sub) => sub.id !== selectedRowId));
+
+  setSuccessMsg((prev) => ({ ...prev, delete: "Subcategory deleted successfully!" }));
+} catch (error) {
+  console.error("Error deleting subcategory:", error);
+  alert("Failed to delete subcategory. Please try again.");
+} finally {
+  setLoading({ isLoading: false, message: "" });
+  setShowDeleteConfirm(false);
+  setSelectedRowId(null);
+}
+};
+
 
    // ---------------------------------  Handle Click Outside --------------------------
    useEffect(() => {
@@ -515,14 +630,14 @@ const SubCategories = () => {
     setNewSubCategory={setNewSubCategory}
     hsnSacCode={hsnSacCode}
     setHsnSacCode={setHsnSacCode}
-    handleCloseOverlay={handleCloseOverlay}
-  />
+    handleModalClose={handleModalClose}
+    />
 )}
 
 {isShowModal?.edit && (
   <SubCategoryModal
     categories={categories} 
-    // handleSaveSubCategory={handleUpdateSubCategory}
+    handleSaveSubCategory={handleUpdateSubCategory}
     content={"Update Sub Category"}
     selectedCategory={selectedCategory}
     setSelectedCategory={setSelectedCategory}
@@ -530,8 +645,8 @@ const SubCategories = () => {
     setNewSubCategory={setNewSubCategory}
     hsnSacCode={hsnSacCode}
     setHsnSacCode={setHsnSacCode}
-    handleCloseOverlay={handleCloseOverlay}
-  />
+    handleModalClose={handleModalClose}
+    />
 )}
 
         {/* Table */}
@@ -671,6 +786,13 @@ const SubCategories = () => {
                         )}
                       
                      
+                      {console.log("successMsg",successMsg)}
+					{successMsg?.create &&
+					<SuccessMessage onClose={handleModalClose} showMsg={successMsg?.create} content={"Subcategory details have been created successfully!"}/>
+					}
+								{successMsg?.update &&
+					<SuccessMessage onClose={handleModalClose} showMsg={successMsg?.update} content={"Subcategory details have been Updated successfully!"}/>
+					}
 
        {/* ----------------------------------------- Delete Confirmation --------------------------------------*/}
        {showDeleteConfirm && (

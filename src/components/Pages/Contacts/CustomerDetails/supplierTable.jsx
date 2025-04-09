@@ -67,14 +67,14 @@ const SupplierTable = ({
 		//     ...prevState,
 		//     [supplier?.Supplier_id]: true // Update only the specific key
 		// }));
-		setIsShowModal((prevState) => ({...prevState, edit:true}))
+		setIsShowModal((prevState) => ({ ...prevState, edit: true }))
 		console.log("Supplier State---", supplier?.state);
 		setShowModal(true)
 		setForm({
-			supplierName:supplier?.supplier_name,
+			supplierName: supplier?.supplier_name,
 			phoneNo: supplier?.mobile_no,
 			email: supplier?.email,
-			address:supplier?.address,
+			address: supplier?.address,
 			Area: supplier?.area,
 			pinCode: supplier?.pincode,
 			State: supplier?.state,
@@ -197,6 +197,7 @@ const SupplierTable = ({
 				{/* Context Menu */}
 				{editDropdown && (
 					<div
+						ref={menuRef}
 						className="absolute z-50 bg-white shadow-md border rounded"
 						style={{
 							top: editDropdown.y,

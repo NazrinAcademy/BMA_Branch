@@ -10,8 +10,8 @@ const SubCategoryModal = ({
     setNewSubCategory,
     hsnSacCode,
     setHsnSacCode,
-    handleCloseOverlay,
-    categories 
+    handleModalClose,
+        categories 
 }) => {
 
     return (
@@ -87,7 +87,7 @@ const SubCategoryModal = ({
                         {/* Buttons */}
                         <div className="flex justify-end gap-4 mt-6">
                             <button
-                                onClick={handleCloseOverlay}
+                                onClick={handleModalClose}
                                 className="border-[1px] border-purpleCustom font-semibold px-12 py-2 rounded"
                             >
                                 Cancel

@@ -5,6 +5,7 @@ const SubCategoryTable = ({
   contextMenu,
   setContextMenu,
   setEditRowId,
+  handleModalClose,
   setEditedData,
   handleDelete,
   setIsEdited,

@@ -384,9 +384,9 @@ export const updateStockData = async (id, data) => {
 // ----------------------- new sub category function --------------
 
 // Fetch all subcategories
-export const fetchSubCategories = async () => {
+export const fetchSubCategories = async (config) => {
   try {
-    const response = await axios.get(BASE_URL);
+    const response = await axios.get(`${BASE_URL}/Mathavan/subcategory/get/all`, config);
     return response.data;
   } catch (error) {
     console.error('Error fetching subcategories:', error);
@@ -395,9 +395,9 @@ export const fetchSubCategories = async () => {
 };
 
 // Add a new subcategory
-export const addSubCategory = async (newSubCategory) => {
+export const addSubCategory = async (newSubCategory, config) => {
   try {
-    const response = await axios.post(`${BASE_URL}/subcategory/add`, newSubCategory);
+    const response = await axios.post(`${BASE_URL}/Mathavan/subcategory/add`, newSubCategory, config);
     return response.data;
   } catch (error) {
     console.error('Error adding subcategory:', error);
@@ -406,9 +406,9 @@ export const addSubCategory = async (newSubCategory) => {
 };
 
 // Update a subcategory
-export const updateSubCategory = async (id, updatedData) => {
+export const updateSubCategory = async (id, updatedData, config) => {
   try {
-    const response = await axios.put(`${BASE_URL}/${id}`, updatedData);
+    const response = await axios.put(`${BASE_URL}/Mathavan/subcategory/update/${id}`, updatedData, config);
     return response.data;
   } catch (error) {
     console.error('Error updating subcategory:', error);
@@ -417,9 +417,9 @@ export const updateSubCategory = async (id, updatedData) => {
 };
 
 // Delete a subcategory
-export const deleteSubCategory = async (id) => {
+export const deleteSubCategory = async (id, config) => {
   try {
-    await axios.delete(`${BASE_URL}/${id}`);
+    await axios.delete(`${BASE_URL}/Mathavan/subcategory/delte/${id}`, config);
   } catch (error) {
     console.error('Error deleting subcategory:', error);
     throw error;
