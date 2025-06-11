@@ -449,6 +449,8 @@ const ProductList = () => {
       try {
         const fetchedData = await getProduct();
         console.log("Fetched Products:", fetchedData);
+        console.log("Fetched ProductsSSS:", fetchedData);
+
         
         
 
